@@ -3,7 +3,7 @@ export default function Headbanner(){
        
       <nav className="border bg-black">
         <div className="container-fluid justify-content-center">
-      <a className="" href="/src/pages/dashboard">
+      <a className="" href="/">
           Bar Time Trivia!
         </a>
                 

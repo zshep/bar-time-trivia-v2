@@ -1,6 +1,6 @@
 //dashboard page
 
-function dashboard() {
+export default function dashboard() {
 
     return(
         <div>
