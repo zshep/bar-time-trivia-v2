@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import './App.css';
-import Headbanner from './components/headbanner';
 import login from './components/login';
 import jedi from "./public/images/jedi.small.jpg";
 
@@ -13,7 +12,7 @@ function App() {
 
   return (
     <container className="flex-col align-top h-full border w-full">
-      <Headbanner></Headbanner>
+      
       <div className='flex-row w-full'>
         <img className ="rounded-full" src = {jedi}/>
         <div>

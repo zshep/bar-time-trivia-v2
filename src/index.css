@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  flex: auto;
+  width: max-content;
+  align-items: center;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -29,7 +32,7 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  
   min-width: 320px;
   min-height: 100vh;
 }
@@ -61,7 +64,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #b4b8b3de;
   }
   a:hover {
     color: #747bff;

@@ -1,13 +1,13 @@
 export default function Headbanner(){
     return(
        
-      <nav className="border bg-black">
+      <header className="border bg-black w-full align-top">
         <div className="container-fluid justify-content-center">
-      <a className="" href="/">
+      <a className="text-lg" href="/">
           Bar Time Trivia!
         </a>
                 
       </div>
-    </nav>
+    </header>
     )    
 }
