@@ -1,0 +1,1 @@
+// component for users to join a trivia session
