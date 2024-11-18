@@ -11,7 +11,7 @@ function App() {
 
 
   return (
-    <container className="flex-col align-top h-full border w-full">
+    <div className="flex-col align-top h-full border w-full">
       
       <div className='flex-row w-full'>
         <img className ="rounded-full" src = {jedi}/>
@@ -19,7 +19,7 @@ function App() {
           <p>log in goes here</p>
         </div>
       </div>
-    </container>
+    </div>
   )
 }
 
