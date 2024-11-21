@@ -11,14 +11,14 @@ function App() {
 
 
   return (
-    <div className="flex-col align-top h-full border w-full">
-      
-      <div className='flex-row w-full'>
-        <img className ="rounded-full" src = {jedi}/>
-        <div>
+    <div className="flex flex-row align-top h-full w-full">  
+          <div className='w-1/2 content-center self-center justify-items-center'>
+          <img className ="rounded-full" src = {jedi}/>
+          </div>
+        <div className='w-1/2 content-center self-center justify-items-center'>
           <p>log in goes here</p>
         </div>
-      </div>
+      
     </div>
   )
 }
