@@ -5,8 +5,9 @@ export default function login() {
     return (
 
         <>
-        <Auth>
-        </Auth>
+    
+            <Auth>
+            </Auth>
         </>
     )
 
