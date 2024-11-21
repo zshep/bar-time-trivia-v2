@@ -26,11 +26,12 @@ a:hover {
 }
 
 body {
-  margin: 0;
   display: flex;
   
+  margin: 0px;
   min-width: 100vw;
   min-height: 100vh;
+  justify-content: space-around;
 }
 
 h1 {
