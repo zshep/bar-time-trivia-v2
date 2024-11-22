@@ -17,10 +17,34 @@ function Auth() {
   };
 
   return (
-    <div>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={signIn}>Sign In</button>
+
+    <div className="flex-col">
+      <div className="flex justify-center">
+        <p>Log In</p>
+      </div>
+
+      <div className="flex content-start">
+        <label className="mr-4" htmlFor="email">Email:</label>
+        <input
+          className="border mb-8"
+          name="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <div className="flex content-start">
+        <label htmlFor="password">Password:</label>
+        <input
+          name="password"
+          className="border mb-2"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <button className="mt-4" onClick={signIn}>Sign In</button>
     </div>
   );
 }
