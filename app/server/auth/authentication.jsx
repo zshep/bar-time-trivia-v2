@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { auth } from "../api/firebase/firebaseConfig";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import React from "react";
+import { Link} from 'react-router-dom';
 
 function Auth() {
   const [email, setEmail] = useState("");
@@ -44,7 +46,16 @@ function Auth() {
         />
       </div>
 
-      <button className="mt-4" onClick={signIn}>Sign In</button>
+      <button className="mt-4 mb-10" onClick={signIn}>Sign In</button>
+
+      <div className="d-flex mt-2">
+                    <Link
+                        className="text-red-500"
+                        to="/signup.jsx">
+                          Need a log in? Sign up today!
+                    </Link>
+                </div>
+
     </div>
   );
 }

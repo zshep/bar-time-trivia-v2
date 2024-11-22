@@ -8,10 +8,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "build:css": "tailwindcss build src/index.css -o public/output.css",
-    "start-server": "node server.js",      
+    "start-server": "node server.js",
     "start-client": "vite",
-    "dev": "concurrently \"npm run start-server\" \"npm run start-client\""                       
-
+    "dev": "concurrently \"npm run start-server\" \"npm run start-client\""
   },
   "dependencies": {
     "express": "^4.21.1",
