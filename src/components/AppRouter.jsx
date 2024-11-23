@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
 import Dashboard from '../pages/Dashboard';  
-import NotFound from './pages/NotFound';  
+import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
-import Footer from './components/Footer'; 
+import Footer from './footer'; 
 
 function AppRouter() {
   return (
