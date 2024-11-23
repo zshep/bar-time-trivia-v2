@@ -1,25 +1,26 @@
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import React from "react";
+
 export default function Signup() {
 
 
     return (
 
 
-        <div>
+        <div className="self-center mb-20 pb-10">
 
             <div>
-                <p>This be the sign up form</p>
+                <p>Sign up today to create an account</p>
 
             </div>
             <div className="d-flex justify-content-center flex-column border border-black rounded m-2">
                 <div className="">
-                    <form action={formAction}>
-                        <div className="d-flex flex-column justify-content-space-between">
-                            <div className="d-flex flex-row justify-content-evenly mb-2">
-                                <label className="ml-3 text-xs font-medium" htmlFor="email">
-                                    Email
-                                </label>
-                                <input
-                                    className="border ml-2"
+                    <form>
+                        <div className="d-flex flex-column justify-content-space-between mr-4 ml-2">
+                            <div className="mb-2">
+                            <input
+                                    className="border mt-2 ml-2 text-center"
                                     id="email"
                                     type="email"
                                     name="email"
@@ -28,30 +29,34 @@ export default function Signup() {
                                     autoFocus
 
                                 />
+                                <label className="ml-3 text-xs font-medium hidden" htmlFor="email">
+                                    Email
+                                </label>
+                                
                             </div>
                             <div className="d-flex flex-row justify-content-evenly mb-2">
-                                <label className="ml-3 text-xs font-medium" htmlFor="email">
-                                    User Name
-                                </label>
-                                <input
-                                    className="border ml-2"
+                            <input
+                                    className="border ml-2 text-center"
                                     id="username"
                                     type="text"
                                     name="username"
-                                    placeholder="Enter usaername"
+                                    placeholder="Enter Username"
                                     required
                                     autoFocus
-
                                 />
+                                <label className="ml-3 text-xs font-medium hidden" htmlFor="email">
+                                    User Name
+                                </label>
+                                
                             </div>
                             <div className="d-flex flex-row justify-content-space-evenly">
                                 <label
-                                    className="ml-3 text-xs font-medium"
+                                    className="ml-3 text-xs font-medium hidden"
                                     htmlFor="password">
                                     Password
                                 </label>
                                 <input
-                                    className="border ml-2"
+                                    className="border ml-2 text-center"
                                     id="password"
                                     type="password"
                                     name="password"
@@ -62,12 +67,12 @@ export default function Signup() {
                             </div>
                             <div className="d-flex flex-row justify-content-space-evenly mt-2">
                                 <label
-                                    className="ml-3 text-xs font-medium"
+                                    className="ml-3 text-xs font-medium hidden"
                                     htmlFor="password2">
                                     Retype Password
                                 </label>
                                 <input
-                                    className="border ml-2"
+                                    className="border ml-2 text-center"
                                     id="password2"
                                     type="password"
                                     name="password2"

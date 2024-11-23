@@ -12,12 +12,9 @@ function App() {
 
 
   return (
-    <div className='flex h-full'>  
-          <Home></Home>
-      
-    </div>
+   <></>
   )
 }
 
-export default App
+export default App;
 

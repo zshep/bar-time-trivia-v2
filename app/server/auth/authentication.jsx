@@ -51,7 +51,7 @@ function Auth() {
       <div className="d-flex mt-2">
                     <Link
                         className="text-red-500"
-                        to="/signup.jsx">
+                        to="/signup">
                           Need a log in? Sign up today!
                     </Link>
                 </div>

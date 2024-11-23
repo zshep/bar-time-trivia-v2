@@ -11,12 +11,14 @@ function AppRouter() {
   return (
     <Router>
       <Headbanner />
+        <div className="flex h-full">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<NotFound />} />  {/* Wildcard for unmatched routes */}
       </Routes>
+      </div>
       <Footer />
     </Router>
   );

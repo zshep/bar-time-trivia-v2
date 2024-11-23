@@ -3,8 +3,10 @@
 export default function dashboard() {
 
     return(
-        <div>
-            <p>Come ride the wind with me</p>
-        </div>
+        
+            <div className="self-center">
+                <p>Come ride the wind with me</p>
+            </div>
+            
     )
 }
