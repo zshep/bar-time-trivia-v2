@@ -7,11 +7,11 @@ export default function dashboard() {
 
     return (
 
-        <div className="flex flex-row w-100">
+        <div className="flex flex-row w-full">
 
             <Navbar></Navbar>
 
-            <div className="d-flex flex-column justify-self-center mt-3 w-25">
+            <div className="d-flex flex-column">
                 <div className="border border-black p-2 text-center rounded mt-2">
                     <p>User Name</p>
 
@@ -23,11 +23,9 @@ export default function dashboard() {
                     <Playerstats></Playerstats>
                 </div>
             </div>
-            <div className="d-flex flex-column mt-3">
-                
-                    <Playericon></Playericon>
-                
 
+            <div className="d-flex flex-column mt-3">
+                    <Playericon></Playericon>
             </div>
         </div>
 
