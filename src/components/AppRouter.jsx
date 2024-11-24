@@ -5,7 +5,10 @@ import Signup from '../pages/signup';
 import Dashboard from '../pages/Dashboard/Dashboard';  
 import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
-import Footer from './footer'; 
+import Footer from './footer';
+import CreateTriviaGame from '../pages/Dashboard/CreateTriviaGame';
+import CreateTriviaSession from '../pages/Dashboard/CreateTriviaSession';
+import JoinTriviaSession from '../pages/Dashboard/JoinTriviaSession';
 
 function AppRouter() {
   return (
@@ -15,8 +18,18 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<NotFound />} />  {/* Wildcard for unmatched routes */}
+
+        {/* Dashboard Routes */}
+        <Route path="/dashboard" element={<Dashboard />} > 
+          <Route path="create-game" element={<CreateTriviaGame />} />
+          <Route path="create-session" element={<CreateTriviaSession />} />
+          <Route path="join-session" element={<JoinTriviaSession />} />      
+        
+        </Route>
+       
+       
+       {/* Wildcard for unmatched routes */}
+        <Route path="*" element={<NotFound />} />  
       </Routes>
       </div>
       <Footer />

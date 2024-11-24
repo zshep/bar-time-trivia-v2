@@ -12,10 +12,13 @@ export default function Navbar() {
                         <Link className="nav-link active" to="/dashboard">Home</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/dashboard/makeTriviaSession">Make Trivia</Link>
+                        <Link className="nav-link" to="create-game">Create Trivia Game</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/dashboard/playTrivia">Play Trivia</Link>
+                        <Link className="nav-link" to="create-session">Create Trivia Session</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="join-session">Join Trivia Session</Link>
                     </li>
                 
                 </ul>
