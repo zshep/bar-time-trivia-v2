@@ -11,7 +11,7 @@ function AppRouter() {
   return (
     <Router>
       <Headbanner />
-        <div className="flex h-full w-full">
+        <div className="flex h-full w-full justify-center">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
