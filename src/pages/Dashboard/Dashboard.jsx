@@ -1,7 +1,7 @@
 //dashboard page
-import Navbar from "../components/dashboard/navbar";
-import Playericon from "../components/dashboard/playerIcon";
-import Playerstats from "../components/dashboard/playerstats";
+import Navbar from "../../components/dashboard/navbar";
+import Playericon from "../../components/dashboard/playerIcon";
+import Playerstats from "../../components/dashboard/playerstats";
 
 export default function dashboard() {
 

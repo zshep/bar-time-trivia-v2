@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
-import Dashboard from '../pages/Dashboard';  
+import Dashboard from '../pages/Dashboard/Dashboard';  
 import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
 import Footer from './footer'; 
