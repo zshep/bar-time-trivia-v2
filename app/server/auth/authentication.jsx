@@ -53,7 +53,7 @@ function Auth() {
 
       <div className="d-flex mt-2">
         <Link
-          className="text-red-500"
+          className="text-green-500"
           to="/signup">
           Need a log in? Sign up today!
         </Link>

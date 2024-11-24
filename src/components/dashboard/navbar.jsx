@@ -5,8 +5,8 @@ export default function Navbar() {
 
 
     return(
-        <div className="border-black border-4 ml-px px-3 ">
-            <div>
+        <div className="flex flex-col justify-between border-black border-2 ml-px px-4 rounded">
+            <div className="mt-4">
                 <ul className="nav flex-column text-center">
                     <li className="nav-item">
                         <Link className="nav-link active" to="/dashboard">Home</Link>
@@ -21,9 +21,8 @@ export default function Navbar() {
                 </ul>
             </div>
 
-            <div className="flex justify-self-end">
+            <div className="mb-4">
                 <Logout></Logout>
-                
             </div>
 
 

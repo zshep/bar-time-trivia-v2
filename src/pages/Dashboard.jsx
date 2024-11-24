@@ -7,25 +7,29 @@ export default function dashboard() {
 
     return (
 
-        <div className="flex flex-row w-full">
-
-            <Navbar></Navbar>
-
-            <div className="flex flex-column">
-                <div className="border border-black p-2 text-center rounded mt-2">
-                    <p>User Name</p>
-
+        <div className="flex w-full">
+            
+          
+                <Navbar></Navbar>
+           
+            
+            <div className="flex mx-auto mt-40">
+                <div className="flex flex-col mx-4">
+                    <div className="border border-black p-2 text-center rounded mt-3">
+                        <p>User Name</p>
+                    </div>
+                    <Playericon></Playericon>
                 </div>
-                    <div className=" border border-dark">
-                        <p className="text-center pt-3">User Stats</p>
+
+                <div className="d-flex flex-column mx-4 mt-3">
+                    
+                    <div className=" border border-black p-2 rounded">
+                        <p className="text-center">User Stats</p>
                     </div>
                     <Playerstats></Playerstats>
-                
+                </div>
             </div>
 
-            <div className="d-flex flex-column mt-3">
-                    <Playericon></Playericon>
-            </div>
         </div>
 
     )

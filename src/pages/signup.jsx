@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export default function Signup() {
                     <form>
                         <div className="d-flex flex-column justify-content-space-between mr-4 ml-2">
                             <div className="mb-2">
-                            <input
+                                <input
                                     className="border mt-2 ml-2 text-center"
                                     id="email"
                                     type="email"
@@ -33,10 +34,10 @@ export default function Signup() {
                                 <label className="ml-3 text-xs font-medium hidden" htmlFor="email">
                                     Email
                                 </label>
-                                
+
                             </div>
                             <div className="d-flex flex-row justify-content-evenly mb-2">
-                            <input
+                                <input
                                     className="border ml-2 text-center"
                                     id="username"
                                     type="text"
@@ -48,7 +49,7 @@ export default function Signup() {
                                 <label className="ml-3 text-xs font-medium hidden" htmlFor="email">
                                     User Name
                                 </label>
-                                
+
                             </div>
                             <div className="d-flex flex-row justify-content-space-evenly">
                                 <label
@@ -91,12 +92,20 @@ export default function Signup() {
                                 name="loginBTN">
                                 Sign Up
                             </button>
+                            
                         </div>
                     </form>
 
                 </div>
 
             </div>
+            <div className="d-flex mt-2">
+                                <Link
+                                    className="text-green-500"
+                                    to="/">
+                                    Already have a log in? Log in!
+                                </Link>
+                            </div>
         </div>
     )
 }
