@@ -21,14 +21,14 @@ function AppRouter() {
         <Route path="/signup" element={<Signup />} />
 
         {/* Dashboard Routes */}
-        <Route path="/dashboard" element={<Dashboard />} > 
-          <Route path='/dashboard' element={<DashboardInfo />} />
-          <Route path="create-game" element={<CreateTriviaGame />} />
-          <Route path="create-session" element={<CreateTriviaSession />} />
-          <Route path="join-session" element={<JoinTriviaSession />} />      
+          <Route path="/dashboard" element={<Dashboard />} > 
         
-        </Route>
-       
+            <Route path='/dashboard' element={<DashboardInfo />} />
+            <Route path="create-game" element={<CreateTriviaGame />} />
+            <Route path="create-session" element={<CreateTriviaSession />} />
+            <Route path="join-session" element={<JoinTriviaSession />} />      
+        
+          </Route>
        
        {/* Wildcard for unmatched routes */}
         <Route path="*" element={<NotFound />} />  

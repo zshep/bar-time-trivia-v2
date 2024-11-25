@@ -12,6 +12,8 @@ function Auth() {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("Signed in:", userCredential.user);
+
+        window.location.href = '/dashboard';
       })
       .catch((error) => {
         console.error("Sign in error:", error);

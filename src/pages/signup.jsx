@@ -6,6 +6,38 @@ import { Link } from "react-router-dom";
 export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [password2, setPassword2] =useState("");
+    const [error, setError] = useState(null);
+
+    const handleSignup = async(event) => {
+        event.preventDefault();
+
+        try {
+            //check if passwords are the same
+            
+            if (password === password2){
+
+            // craete user with Firebase auth
+            await createUserWithEmailAndPassword(auth, email, password);
+            //redirect user to homepage after successful signup
+            window.location.href = "/";
+            }
+            else {
+                return (
+                    <div>
+                        <p> The passwords didn't match</p>
+
+                    </div>
+
+                )
+            }
+        }catch(err) {
+
+            setError.apply(err.message);
+        }
+
+    };
 
     return (
 
@@ -18,14 +50,15 @@ export default function Signup() {
             </div>
             <div className="d-flex justify-content-center flex-column border border-black rounded m-2">
                 <div className="">
-                    <form>
+                    <form onSubmit={handleSignup}>
                         <div className="d-flex flex-column justify-content-space-between mr-4 ml-2">
                             <div className="mb-2">
                                 <input
                                     className="border mt-2 ml-2 text-center"
                                     id="email"
                                     type="email"
-                                    name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Enter email address"
                                     required
                                     autoFocus
@@ -42,6 +75,8 @@ export default function Signup() {
                                     id="username"
                                     type="text"
                                     name="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     placeholder="Enter Username"
                                     required
                                     autoFocus
@@ -62,6 +97,8 @@ export default function Signup() {
                                     id="password"
                                     type="password"
                                     name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter password"
                                     required
                                     minLength={3}
@@ -77,7 +114,7 @@ export default function Signup() {
                                     className="border ml-2 text-center"
                                     id="password2"
                                     type="password"
-                                    name="password2"
+                                    onChange={(e) => setPassword2(e.target.value)}
                                     placeholder="Renter password"
                                     required
                                     minLength={3}
