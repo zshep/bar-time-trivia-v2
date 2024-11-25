@@ -1,7 +1,7 @@
 export default function CreateTriviaGame(){
 
     return (
-        <div>
+        <div className="flex justify-self-center">
             <h7>Create Trivia Game!</h7>
         </div>
     )

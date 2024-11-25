@@ -9,6 +9,7 @@ import Footer from './footer';
 import CreateTriviaGame from '../pages/Dashboard/CreateTriviaGame';
 import CreateTriviaSession from '../pages/Dashboard/CreateTriviaSession';
 import JoinTriviaSession from '../pages/Dashboard/JoinTriviaSession';
+import DashboardInfo from '../pages/Dashboard/Dashboardinfo';
 
 function AppRouter() {
   return (
@@ -21,6 +22,7 @@ function AppRouter() {
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<Dashboard />} > 
+          <Route path='/dashboard' element={<DashboardInfo />} />
           <Route path="create-game" element={<CreateTriviaGame />} />
           <Route path="create-session" element={<CreateTriviaSession />} />
           <Route path="join-session" element={<JoinTriviaSession />} />      
