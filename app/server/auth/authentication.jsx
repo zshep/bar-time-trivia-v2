@@ -26,6 +26,7 @@ function Auth() {
       <div className="flex justify-center">
         <p>Log In</p>
       </div>
+      <form onSubmit={signIn}>
       <div className="border border-black ">
         <div className="flex justify-center mt-2">
           <label className="mr-4 hidden" htmlFor="email">Email:</label>
@@ -51,8 +52,8 @@ function Auth() {
         </div>
       </div>
 
-      <button className="mt-4 mb-10" onClick={signIn}>Sign In</button>
-
+      <button className="mt-4 mb-10" type="submit">Sign In</button>
+      </form>
       <div className="d-flex mt-2">
         <Link
           className="text-green-500"
