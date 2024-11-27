@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, getFirestore } from "firebase/firestore";
 import { auth, firestore } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,9 @@ export default function Signup() {
     const [password2, setPassword2] = useState("");
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    //setting up db to firestore
+    const db = getFirestore();
 
     const handleSignup = async (event) => {
         event.preventDefault();
@@ -28,7 +31,7 @@ export default function Signup() {
             const user = userCredential.user;
 
             // Save additional user info to Firestore
-            await setDoc(doc(firestore, "users", user.uid), {
+            await setDoc(doc(db, "users", user.uid), {
                 username: username,
                 email: email,
             });

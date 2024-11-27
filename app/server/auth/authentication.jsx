@@ -2,23 +2,28 @@ import { useState } from "react";
 import { auth } from "../api/firebase/firebaseConfig";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const signIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Signed in:", userCredential.user);
+  const handleSignin = async (event) => {
+    event.preventDefault(); // Prevent the default form submission
 
-        window.location.href = '/dashboard';
-      })
-      .catch((error) => {
-        console.error("Sign in error:", error);
-      });
+    try {
+      // Sign in using Firebase Auth
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User successfully logged in.");
+
+      // Redirect user to dashboard after successful login
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
   };
+
 
   return (
 
@@ -26,7 +31,7 @@ function Auth() {
       <div className="flex justify-center">
         <p>Log In</p>
       </div>
-      <form onSubmit={signIn}>
+      <form onSubmit={handleSignin}>
       <div className="border border-black ">
         <div className="flex justify-center mt-2">
           <label className="mr-4 hidden" htmlFor="email">Email:</label>

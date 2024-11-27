@@ -13,7 +13,7 @@ export default function dashboard() {
           
                 <Navbar></Navbar>
 
-                <div>
+                <div className="flex justify-center">
                     <Outlet></Outlet>
                     
 
