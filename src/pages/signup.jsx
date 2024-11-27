@@ -3,7 +3,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { auth, firestore } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ export default function Signup() {
     const [username, setUsername] = useState("");
     const [password2, setPassword2] = useState("");
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const handleSignup = async (event) => {
         event.preventDefault();
@@ -31,8 +33,8 @@ export default function Signup() {
                 email: email,
             });
 
-            // Redirect user to dashboard after successful signup
-            window.location.href = "/dashboard";
+            // Redirect user to main screen after successful signup
+            navigate("/");
         } catch (err) {
             setError(err.message);
         }
