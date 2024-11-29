@@ -6,6 +6,7 @@ import Dashboard from '../pages/Dashboard/Dashboard';
 import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
 import Footer from './footer';
+
 import CreateTriviaGame from '../pages/Dashboard/CreateTriviaGame';
 import CreateTriviaSession from '../pages/Dashboard/CreateTriviaSession';
 import JoinTriviaSession from '../pages/Dashboard/JoinTriviaSession';
@@ -14,6 +15,7 @@ import DashboardInfo from '../pages/Dashboard/Dashboardinfo';
 function AppRouter() {
   return (
     <Router>
+      
       <Headbanner />
         <div className="flex h-full w-full justify-center">
       <Routes>
@@ -22,7 +24,7 @@ function AppRouter() {
 
         {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} > 
-        
+            
             <Route path='/dashboard' element={<DashboardInfo />} />
             <Route path="create-game" element={<CreateTriviaGame />} />
             <Route path="create-session" element={<CreateTriviaSession />} />
@@ -34,6 +36,7 @@ function AppRouter() {
         <Route path="*" element={<NotFound />} />  
       </Routes>
       </div>
+     
       <Footer />
     </Router>
   );

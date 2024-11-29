@@ -1,7 +1,7 @@
 export default function CreateTriviaSession(){
 
     return (
-        <div>
+        <div className="">
             <h7>Create Trivia Session!</h7>
         </div>
     )

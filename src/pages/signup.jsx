@@ -44,11 +44,11 @@ export default function Signup() {
     };
 
     return (
-        <div className="self-center mb-20 pb-10">
+        <div className="flex flex-col self-center w-80 mb-20 pb-10">
             <div>
                 <p>Sign up today to create an account</p>
             </div>
-            <div className="d-flex justify-content-center flex-column border border-black rounded m-2">
+            <div className="border border-black rounded m-2">
                 <div className="">
                     {error && <p className="error">{error}</p>}
                     <form onSubmit={handleSignup}>

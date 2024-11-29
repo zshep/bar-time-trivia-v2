@@ -32,7 +32,7 @@ export default function DashboardInfo(){
 
     return (
         
-            <div className="flex">
+            <div className="flex flex-col">
                 <div className="flex flex-col mx-4">
                     <div className="border border-black p-2 text-center rounded mt-3">
                         <p>Welcome, {username}</p>

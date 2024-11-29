@@ -8,19 +8,12 @@ export default function dashboard() {
 
     return (
 
-        <div className="flex w-full">
+        <div className="flex w-full ">
             
-          
                 <Navbar></Navbar>
-
-                <div className="flex justify-center">
-                    <Outlet></Outlet>
-                    
-
-                </div>
-           
-            
-            
+                
+                <Outlet></Outlet>
+                
 
         </div>
 
