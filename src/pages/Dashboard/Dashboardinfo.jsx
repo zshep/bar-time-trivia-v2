@@ -7,7 +7,7 @@ import Playerstats from "../../components/dashboard/playerstats";
 
 
 
-export default function DashboardInfo(){
+export default function DashboardInfo() {
 
     const [username, setUsername] = useState(null);
     const db = getFirestore();
@@ -31,7 +31,7 @@ export default function DashboardInfo(){
     }, []);
 
     return (
-        
+        <div className="flex w-full justify-center mt-20" >
             <div className="flex flex-col">
                 <div className="flex flex-col mx-4">
                     <div className="border border-black p-2 text-center rounded mt-3">
@@ -41,13 +41,13 @@ export default function DashboardInfo(){
                 </div>
 
                 <div className="d-flex flex-column mx-4 mt-3">
-                    
+
                     <div className=" border border-black p-2 rounded">
                         <p className="text-center">User Stats</p>
                     </div>
                     <Playerstats></Playerstats>
                 </div>
             </div>
-        
+        </div>
     )
 }
