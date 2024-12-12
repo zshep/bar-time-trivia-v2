@@ -10,7 +10,9 @@ export default function CreateRound() {
             <div>
                 <form>
                     <div>
-                        <input></input>
+                        <label>How many questions</label>
+                        <input
+                            type="number"></input>
                     </div>
 
 

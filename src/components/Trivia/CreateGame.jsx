@@ -8,7 +8,13 @@ export default function CreateGame() {
 
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent default form submission behavior
-        // ... gather gameName and description data
+        
+        const newGameName = gameName;
+        const newGameDescription = description;
+
+        console.log("game name: ", newGameName)
+        console.log("game description: ", newGameDescription)
+        
         // ... send data to Firebase backend
       };
     
