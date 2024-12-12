@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
-import Dashboard from '../pages/Dashboard/Dashboard';  
+import DashboardPage from '../pages/Dashboard/Dashboard';  
 import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
 import Footer from './footer';
@@ -23,7 +23,7 @@ function AppRouter() {
         <Route path="/signup" element={<Signup />} />
 
         {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<Dashboard />} > 
+          <Route path="/dashboard" element={<DashboardPage />} > 
             
             <Route path='/dashboard' element={<DashboardInfo />} />
             <Route path="create-game" element={<CreateTriviaGame />} />
