@@ -2,12 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
-import DashboardPage from '../pages/Dashboard/Dashboard';  
+import DashboardPage from '../pages/Dashboard/DashboardPage';  
 import NotFound from '../pages/NotFound';  
 import Headbanner from './headbanner';
 import Footer from './footer';
-
-import CreateTriviaGame from '../pages/Dashboard/CreateTriviaGame';
+import CreateTriviaGame from '../pages/Dashboard/CreateGamePage';
 import CreateTriviaSession from '../pages/Dashboard/CreateTriviaSession';
 import JoinTriviaSession from '../pages/Dashboard/JoinTriviaSession';
 import DashboardInfo from '../pages/Dashboard/Dashboardinfo';
