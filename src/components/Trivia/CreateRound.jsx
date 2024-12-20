@@ -8,7 +8,7 @@ export default function CreateRound() {
                 <p>Create Round</p>
             </div>
             <div>
-                <form>
+                <fieldset>
                     <div>
                         <label>How many questions</label>
                         <input
@@ -16,7 +16,7 @@ export default function CreateRound() {
                     </div>
 
 
-                </form>
+                </fieldset>
             </div>
 
         </div>

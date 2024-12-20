@@ -25,7 +25,7 @@ export default function CreateGame() {
         <h1>Create a Trivia Game</h1>
       </div>
       <div className="mt-5"> 
-        <form onSubmit={handleSubmit}> {/* Add onSubmit handler */}
+        <fieldset onSubmit={handleSubmit}> {/* Add onSubmit handler */}
           <div>
             <label htmlFor="gameName">Trivia Game Name</label>
             <input
@@ -49,7 +49,7 @@ export default function CreateGame() {
             />
           </div>
           <button type="submit">Create Game</button> {/* Add a submit button */}
-        </form>
+        </fieldset>
       </div>
     </div>
   );
