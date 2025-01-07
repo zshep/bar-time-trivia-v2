@@ -4,10 +4,12 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import React from "react";
 import { Link, useNavigate } from 'react-router-dom';
 
+
 function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [error, setError ] = useState(null);
 
   const handleSignin = async (event) => {
     event.preventDefault(); // Prevent the default form submission
@@ -20,7 +22,9 @@ function Auth() {
       // Redirect user to dashboard after successful login
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      console.log("Shit didn't work");
+      setError(err.message || 'An unknown error has occured');
+      navigate("/");
     }
   };
 
@@ -55,6 +59,7 @@ function Auth() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        {error && <div className="error-message">{error}</div>}
       </div>
 
       <button className="mt-4 mb-10" type="submit">Sign In</button>
