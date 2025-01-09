@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc, getFirestore } from "firebase/firestore";
+import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, firestore } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { updateProfile } from "firebase/auth";
 
 
 export default function Signup() {
@@ -26,20 +27,38 @@ export default function Signup() {
         }
 
         try {
+
+            // Check for unique username
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", "==", username));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                setError("Username is already taken. Please choose another.");
+                return;
+            }
+
             // Create user with Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Save additional user info to Firestore
-            await setDoc(doc(db, "users", user.uid), {
-                username: username,
-                email: email,
-            });
+            // Save additional user info to Firestore and update profile
+            await Promise.all([
+                updateProfile(user, { displayName: username }),
+                setDoc(doc(db, "users", user.uid), {
+                    username: username,
+                    email: user.email,
+                    gamesCreated: 0,
+                    sessionsPlayed: 0,
+                    stats: {},
+                }),
+            ]);
 
             // Redirect user to main screen after successful signup
-            navigate("/");
+            navigate("/dashboard");
         } catch (err) {
             setError(err.message);
+            console.error("Error during signup:", err);
         }
     };
 
@@ -50,7 +69,7 @@ export default function Signup() {
             </div>
             <div className="border border-black rounded m-2">
                 <div className="">
-                    {error && <p className="error">{error}</p>}
+                    {error && <p className="error text-red-700 font-bold">{error}</p>}
                     <form onSubmit={handleSignup}>
                         <div className="d-flex flex-column justify-content-space-between mr-4 ml-2">
                             <div className="mb-2">

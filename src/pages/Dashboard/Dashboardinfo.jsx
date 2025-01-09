@@ -15,18 +15,23 @@ export default function DashboardInfo() {
     useEffect(() => {
         const fetchUserData = async () => {
             const user = auth.currentUser;
-            console.log(user);
+            
             if (user) {
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
-                        setUsername(userDoc.data().username);
+                        const data = userDoc.data();
+                        setUsername(data.username || user.displayName || "User");
+                    } else {
+                        setUsername(user.displayName || "User");
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
                 }
             }
-            console.log("There is no user");
+            else {
+                console.log("There is no user");
+            }
         };
 
         fetchUserData();
