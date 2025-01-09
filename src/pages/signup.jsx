@@ -34,6 +34,7 @@ export default function Signup() {
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
+                console.log("Username already exists");
                 setError("Username is already taken. Please choose another.");
                 return;
             }
@@ -41,6 +42,8 @@ export default function Signup() {
             // Create user with Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+
+            console.log("Creating user with UID:", user.uid);
 
             // Save additional user info to Firestore and update profile
             await Promise.all([
