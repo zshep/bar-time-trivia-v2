@@ -28,10 +28,16 @@ export default function Signup() {
 
         try {
 
+            console.log("starting to do the try block");
+
             // Check for unique username
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
+            
+
+            console.log("this is after looking up username");
+            console.log(querySnapshot);
 
             if (!querySnapshot.empty) {
                 console.log("Username already exists");
