@@ -22,7 +22,7 @@ function Auth() {
       // Redirect user to dashboard after successful login
       navigate("/dashboard");
     } catch (err) {
-      console.log("Shit didn't work");
+      console.log("Credentials not recognized");
       setError(err.message || 'An unknown error has occured');
       navigate("/");
     }
@@ -59,7 +59,7 @@ function Auth() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error text-red-700 font-bold">{error}</div>}
       </div>
 
       <button className="mt-4 mb-10" type="submit">Sign In</button>

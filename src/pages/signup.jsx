@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
-import { auth, firestore } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
+import { auth, db } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
@@ -16,7 +16,7 @@ export default function Signup() {
     const navigate = useNavigate();
 
     //setting up db to firestore
-    const db = getFirestore();
+    //const db = getFirestore();
 
     const handleSignup = async (event) => {
         event.preventDefault();
@@ -28,19 +28,21 @@ export default function Signup() {
 
         try {
 
-            console.log("starting to do the try block");
+            console.log("starting username query");
 
             // Check for unique username
             const usersRef = collection(db, "users");
+            console.log("usersRef", usersRef);
             const q = query(usersRef, where("username", "==", username));
+            console.log("q", query);
             const querySnapshot = await getDocs(q);
             
 
-            console.log("this is after looking up username");
+            console.log("Query executed successfully!");
             console.log(querySnapshot);
 
             if (!querySnapshot.empty) {
-                console.log("Username already exists");
+                console.log("Username exists:", querySnapshot.docs.map(doc => doc.data()));
                 setError("Username is already taken. Please choose another.");
                 return;
             }
