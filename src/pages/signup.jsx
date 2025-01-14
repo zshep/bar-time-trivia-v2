@@ -32,10 +32,13 @@ export default function Signup() {
 
             // Check for unique username
             const usersRef = collection(db, "users");
-            console.log("usersRef", usersRef);
+            console.log("usersRef initialized:", usersRef);
+        
             const q = query(usersRef, where("username", "==", username));
-            console.log("q", query);
+            console.log("Query object created:", q);
+        
             const querySnapshot = await getDocs(q);
+            console.log("QuerySnapshot:", querySnapshot);
             
 
             console.log("Query executed successfully!");
