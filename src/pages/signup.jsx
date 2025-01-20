@@ -26,6 +26,7 @@ export default function Signup() {
             return;
         }
 
+    
         try {
 
             console.log("starting username query");
@@ -74,6 +75,7 @@ export default function Signup() {
             setError(err.message);
             console.error("Error during signup:", err);
         }
+             
     };
 
     return (
