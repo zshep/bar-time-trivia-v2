@@ -1,80 +1,57 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { auth, db } from "../../../app/server/api/firebase/firebaseConfig.js";
 import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 
 
 
 export default function CreateGame() {
-  const [gameName, setGamename] = useState("");
+  const [gameName, setGameName] = useState("");
   const [description, setDescription] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [gameCount, setGameCount] = useState(0);
   const [error, setError] = useState(null);
 
+  // grabs user id and number of games created
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        setUserId(user.uid);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const newGameName = gameName;
-    const newGameDescription = description;
-
-    console.log("game name: ", newGameName)
-    console.log("game description: ", newGameDescription)
-
-
-    try {
-      // creating newGame object to hold game details.
-      const newGame = {
-        Name_game: gameName,
-        Description_game: description,
-        // Round_number: roundNumber,
-        // user_id: userid
+        // Query Firestore to get user's created games count
+        const gamesRef = collection(db, "games");
+        const q = query(gamesRef, where("user_id", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        setGameCount(querySnapshot.size);
+      } else {
+        console.log("error grabbing user")
       }
+    };
 
-      // send data to Firebase backend, create new collection???
+    fetchUserData();
+  }, []);
 
-      // update user profile
-
-
-
-    } catch (err) {
-      setError(err.message);
-      console.error("Error: Could not create game", err);
-    }
-  }
-    ;
-
+  // updating game data change
+  /*
+  useEffect(() => {
+    onGameDataChange({ gameName, description, userId });
+  }, [gameName, description, userId]);
+  */
 
   return (
-    <div>
-      <div>
-        <h1>Create a Trivia Game</h1>
+    <div className="justify-items-center">
+      <h1>Create a Trivia Game</h1>
+      <p>You have created {gameCount} games.</p>
+      <div className="flex flex-col w-1/2 justify-items-center">
+        <label htmlFor="gameName">Trivia Game Name</label>
+        <input id="gameName" type="text" value={gameName} onChange={(e) => setGameName(e.target.value)} required />
+
+        <label htmlFor="gameDescription">Description</label>
+        <textarea id="gameDescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
       </div>
-      <div className="mt-5">
-        <fieldset onSubmit={handleSubmit}> {/* Add onSubmit handler */}
-          <div>
-            <label htmlFor="gameName">Trivia Game Name</label>
-            <input
-              id="gameName"
-              type="text"
-              value={gameName}
-              onChange={(e) => setGamename(e.target.value)}
-              placeholder="Eg. My sports Trivia"
-              required
-              autoFocus
-            />
-          </div>
-          <div className="mt-5">
-            <label htmlFor="gameDescription">Description of Game</label>
-            <textarea
-              id="gameDescription"
-              required
-              placeholder="What topics does your Trivia cover?"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <button type="submit">Create Game</button> {/* Add a submit button */}
-        </fieldset>
-      </div>
+
+      <p>Created by User ID: {userId || "Not logged in"}</p>
     </div>
   );
 };
