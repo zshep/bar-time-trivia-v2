@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
-import { auth, db } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
+
 
 
 export default function CreateGame() {

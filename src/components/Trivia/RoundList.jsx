@@ -1,7 +1,14 @@
+import Roundcard from "./Roundcard";
+import { useState } from "react";
+
+
 export default function RoundList() {
+    const [rounds, setRounds] = useState([]); // State for rounds data
 
-
-    //grab list of round
+     // Function to add a new round (example)
+    const addRound = () => {
+        setRounds([...rounds, { /* ... default round data */ }]);
+      };
 
 
 
