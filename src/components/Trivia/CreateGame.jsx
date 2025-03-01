@@ -1,13 +1,17 @@
 
 import { useState } from "react";
+import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { auth, db } from "../../app/server/api/firebase/firebaseConfig.js"; // Import your firebase configuration
 
 
 export default function CreateGame() {
   const [gameName, setGamename] = useState("");
   const [description, setDescription] = useState("");
+  const [error, setError] = useState(null);
+
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
+    event.preventDefault();
 
     const newGameName = gameName;
     const newGameDescription = description;
@@ -15,8 +19,28 @@ export default function CreateGame() {
     console.log("game name: ", newGameName)
     console.log("game description: ", newGameDescription)
 
-    // ... send data to Firebase backend
-  };
+
+    try {
+      // creating newGame object to hold game details.
+      const newGame = {
+        Name_game: gameName,
+        Description_game: description,
+        // Round_number: roundNumber,
+        // user_id: userid
+      }
+
+      // send data to Firebase backend, create new collection???
+
+      // update user profile
+
+
+
+    } catch (err) {
+      setError(err.message);
+      console.error("Error: Could not create game", err);
+    }
+  }
+    ;
 
 
   return (
@@ -24,7 +48,7 @@ export default function CreateGame() {
       <div>
         <h1>Create a Trivia Game</h1>
       </div>
-      <div className="mt-5"> 
+      <div className="mt-5">
         <fieldset onSubmit={handleSubmit}> {/* Add onSubmit handler */}
           <div>
             <label htmlFor="gameName">Trivia Game Name</label>
