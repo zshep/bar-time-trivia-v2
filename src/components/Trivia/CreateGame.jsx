@@ -33,7 +33,7 @@ export default function CreateGame() {
   }, []);
 
   // updating game data change
-  /*
+ /*
   useEffect(() => {
     onGameDataChange({ gameName, description, userId });
   }, [gameName, description, userId]);

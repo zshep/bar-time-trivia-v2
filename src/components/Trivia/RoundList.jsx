@@ -1,5 +1,5 @@
-import Roundcard from "./Roundcard";
 import { useState } from "react";
+import Roundcard from "./Roundcard";
 
 
 export default function RoundList() {
@@ -23,11 +23,9 @@ export default function RoundList() {
             </div>
 
             <div>
-                <button type="button" onClick={addRound}>Add Round</button> {/* Button to add a round */}
-                <button type="submit">Save</button> {/* Move Save button inside form */}
+                <button type="button" onClick={addRound}>Add Round</button> 
+                <button type="submit">Save</button>
             </div>
         </div>
-
-
     )
 };

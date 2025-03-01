@@ -1,17 +1,20 @@
-//need to import function to grab round data from server
+import { useEffect } from "react"
+
 
 export default function Roundcard() {
+    
+   
 
 
     return(
         <div className="flex border border-black">
-            <div>
+            <div className="border border-black">
                 <p>Round number</p>
             </div>
-            <div>
+            <div className="border border-black">
                 <p>Round Type</p>
             </div>
-            <div>
+            <div className="border border-black">
                 Number of Questions
             </div>
             <div className="flex flex-col">
