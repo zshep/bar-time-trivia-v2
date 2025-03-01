@@ -35,13 +35,13 @@ export default function Signup() {
             const usersRef = collection(db, "users");
             console.log("usersRef initialized:", usersRef);
         
-            /*
+            
             const q = query(usersRef, where("username", "==", username));
             console.log("Query object created:", q);
-             */
+             
             
             //debugging
-            const q = query(usersRef, where())
+            // const q = query(usersRef, where())
 
             const querySnapshot = await getDocs(q);
             console.log("QuerySnapshot:", querySnapshot);
