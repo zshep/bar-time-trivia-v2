@@ -5,39 +5,53 @@ import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "fi
 
 
 
-export default function CreateGame() {
+export default function CreateGame({ onGameDataChange}) {
   const [gameName, setGameName] = useState("");
   const [description, setDescription] = useState("");
   const [userId, setUserId] = useState(null);
   const [gameCount, setGameCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // grabs user id and number of games created
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        console.log("User authenticated:", user);
         setUserId(user.uid);
 
-        // Query Firestore to get user's created games count
-        const gamesRef = collection(db, "games");
-        const q = query(gamesRef, where("user_id", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-        setGameCount(querySnapshot.size);
+        try {
+          const gamesRef = collection(db, "games");
+          const q = query(gamesRef, where("user_id", "==", user.uid));
+          const querySnapshot = await getDocs(q);
+          setGameCount(querySnapshot.size);
+          setLoading(false);
+        } catch (err) {
+          console.error("Error fetching game count:", err);
+          setError(err.message);
+          setLoading(false);
+        }
       } else {
-        console.log("error grabbing user")
+        console.log("No user authenticated.");
+        setUserId(null);
+        setLoading(false);
       }
-    };
+    });
 
-    fetchUserData();
+    return () => unsubscribe(); // Cleanup subscription
   }, []);
 
-  // updating game data change
- /*
+  
   useEffect(() => {
-    onGameDataChange({ gameName, description, userId });
+    if (onGameDataChange) {
+      onGameDataChange({ gameName, description, userId });
+    }
   }, [gameName, description, userId]);
-  */
+
+
+  if (loading) return <p>Loading user data...</p>;
+  if (error) return <p>Error: {error}</p>;
+
 
   return (
     <div className="justify-items-center">

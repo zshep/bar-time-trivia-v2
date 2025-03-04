@@ -11,12 +11,15 @@ export default function CreateGamePage() {
   const [rounds, setRounds] = useState({});
   
   const handleGameDataChange = (data) => {
+    console.log("Game data updated:", data);
     setGameData(data);
   };
 
   const handleSubmit = async (event) => {
 
     event.preventDefault();
+    console.log("game data: ", gameData.gameData);
+    console.log("userid: ", gameData.userId);
 
     if (!gameData.gameName || !gameData.userId) {
       alert("Game Name and User must be set.");
@@ -48,7 +51,7 @@ export default function CreateGamePage() {
 
   return (
     <div className="flex w-full justify-center mt-20">
-      <form onSubmit={handleSubmit}> {/* Add form element */}
+      <form onSubmit={handleSubmit}> 
       <CreateGame onGameDataChange={handleGameDataChange} />
         <RoundList rounds={rounds} setRounds={setRounds} />
         <button type="submit">Save Game</button>
