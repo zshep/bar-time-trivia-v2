@@ -24,7 +24,7 @@ export default function RoundList() {
 
             <div>
                 <button type="button" onClick={addRound}>Add Round</button> 
-                <button type="submit">Save</button>
+                
             </div>
         </div>
     )
