@@ -10,6 +10,8 @@ import CreateTriviaGame from '../pages/Dashboard/CreateGamePage';
 import CreateTriviaSession from '../pages/Dashboard/CreateTriviaSession';
 import JoinTriviaSession from '../pages/Dashboard/JoinTriviaSession';
 import DashboardInfo from '../pages/Dashboard/Dashboardinfo';
+import ViewGamePage from '../pages/Dashboard/ViewGamePage';
+
 
 function AppRouter() {
   return (
@@ -26,6 +28,7 @@ function AppRouter() {
             
             <Route path='/dashboard' element={<DashboardInfo />} />
             <Route path="create-game" element={<CreateTriviaGame />} />
+            <Route path="viewgamePage" element={<ViewGamePage/>} />
             <Route path="create-session" element={<CreateTriviaSession />} />
             <Route path="join-session" element={<JoinTriviaSession />} />      
         

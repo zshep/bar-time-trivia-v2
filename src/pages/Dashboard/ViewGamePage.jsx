@@ -1,8 +1,10 @@
-
+import { useState } from "react";
 
 export default function ViewGamePage() {
 
     //create edit Games button logic
+    const [games, setGames] = useState([]);
+
 
 
     //create delete games button logic
@@ -11,7 +13,7 @@ export default function ViewGamePage() {
 
     return (
 
-        <div>
+        <div className="flex flex-col align-middle">
             <div className="border border-black">
                 <h1>Trivia Games</h1>
             </div>

@@ -1,6 +1,8 @@
 export default function Gamecard() {
 
 
+//create delete games button logic
+
     return (
 
         <div className="flex border border-black">
