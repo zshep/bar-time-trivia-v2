@@ -65,7 +65,7 @@ export default function CreateGame({ onGameDataChange}) {
         <textarea id="gameDescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
       </div>
 
-      <p>Created by User ID: {userId || "Not logged in"}</p>
+      
     </div>
   );
 };
