@@ -1,4 +1,4 @@
-export default function Gamecard() {
+export default function Gamecard({ name, description, rounds }) {
 
 
 //create delete games button logic
@@ -6,11 +6,17 @@ export default function Gamecard() {
     return (
 
         <div className="flex border border-black">
-            <div className="border border-black">
-                <p>Game Name</p>
+            <div className="border border-black pr-2 pl-2">
+                <p className="font-bold">Game Name: </p>
+                <p>{name}</p>
             </div>
-            <div className="border border-black">
-                <p>Number of Rounds</p>
+            <div className="border-r px-4">
+                <p className="font-bold">Description:</p>
+                <p>{description}</p>
+            </div>
+            <div className="border-r px-4">
+                <p className="font-bold">Number of Rounds:</p>
+                <p>{rounds}</p>
             </div>
             
             <div className="flex flex-col">

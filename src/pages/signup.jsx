@@ -47,9 +47,6 @@ export default function Signup() {
             console.log("QuerySnapshot:", querySnapshot);
             
 
-            console.log("Query executed successfully!");
-            console.log(querySnapshot);
-
             if (!querySnapshot.empty) {
                 console.log("Username exists:", querySnapshot.docs.map(doc => doc.data()));
                 setError("Username is already taken. Please choose another.");

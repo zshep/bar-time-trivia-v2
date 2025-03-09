@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
+import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import Gamecard from "../../components/Trivia/GameCard";
 
 export default function ViewGamePage() {
 
     //create edit Games button logic
     const [games, setGames] = useState([]);
     const [ userId, setUserId ] = useState(null);
+    const [ userName, setUsername ] = useState(null);
 
 
     //grabs list of games user has created
@@ -15,8 +18,36 @@ export default function ViewGamePage() {
             if (user)
             {
                 console.log("User Authenticated: ", user)
+                
                 setUserId(user.uid);
+                setUsername(user.displayName);
 
+                try{
+                    
+                    // grabbing game info from user
+                    const gamesInfo = collection(db, "games");
+            
+                    const q = query(gamesInfo, where("user_id", "==", user.uid));
+                    const querySnapshot = await getDocs(q);
+
+                    // Convert Firestore docs to an array of game objects
+                    const gameList = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    
+                    
+                    // adding game info to games variabel
+                    setGames(gameList);
+                    console.log("games: ", gameList);
+
+                   
+
+                } catch (err) {
+                    console.log("Error with grabbing games", err);
+
+                }
             } else {
                 console.log("No user Authenticated");
             }
@@ -28,11 +59,7 @@ export default function ViewGamePage() {
 
     }, []);
 
-
-
     //create delete games button logic
-
-
 
     return (
 
@@ -50,13 +77,20 @@ export default function ViewGamePage() {
                         to="/dashboard/create-game"> Create Trivia Game
                     </Link>    
                 </div>
-                <p className="text-xl  border-b-2 border-0 border-black">Games you've created</p>
+                <p className="text-xl  border-b-2 border-0 border-black">Games Created By { userName || "Your Mom" }</p>
                 <div>
-                    {games.map((game, index) => (
-                        <Gamecard />
-
-                    ))}
-
+                {games.length > 0 ? (
+                        games.map((game) => (
+                            <Gamecard 
+                                key={game.id} 
+                                name={game.name} 
+                                description={game.description} 
+                                rounds={game.rounds} 
+                            />
+                        ))
+                    ) : (
+                        <p>No games found.</p>
+                    )}
                 </div>
             </div>
         </div>
