@@ -2,7 +2,7 @@ import { useState } from "react";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import { setDoc, doc, collection, addDoc } from "firebase/firestore";
 import CreateGame from "../../components/Trivia/CreateGame";
-import RoundList from "../../components/Trivia/RoundList";
+import EditGame from "../../components/Trivia/EditGame";
 
 export default function CreateGamePage() {
   
@@ -42,6 +42,8 @@ export default function CreateGamePage() {
         */
 
       alert("Game created successfully!");
+      
+
     } catch (error) {
       console.error("Error creating game:", error);
     }
@@ -54,8 +56,8 @@ export default function CreateGamePage() {
     <div className="flex w-full justify-center mt-20">
       <form onSubmit={handleSubmit}> 
       <CreateGame onGameDataChange={handleGameDataChange} />
-        <RoundList rounds={rounds} setRounds={setRounds} />
-        <button type="submit">Save Game</button>
+    
+        <button className="mt-6" type="submit">Save Game </button>
         
       </form>
     </div>

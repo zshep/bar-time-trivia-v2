@@ -70,15 +70,15 @@ export default function ViewGamePage() {
 
             <div>
 
-                <div className="mt-4 mb-2 border border-black rounded-lg pt-1 bg-black">
+                <div className="mt-4 mb-2 w-80 border justify-self-center border-black rounded-lg pt-1 bg-black">
 
                     <Link
-                        className="text-3xl text-green-500  pt-2 pr-2 pl-2 "
+                        className="text-3xl text-green-500  pt-2 pr-2 pl-2"
                         to="/dashboard/create-game"> Create Trivia Game
                     </Link>    
                 </div>
-                <p className="text-xl  border-b-2 border-0 border-black">Games Created By { userName || "Your Mom" }</p>
-                <div>
+                <p className="text-xl  border-b-2 border-0 border-black">Games Created By { userName || "You" }</p>
+                <div className="mt-1">
                 {games.length > 0 ? (
                         games.map((game) => (
                             <Gamecard 
@@ -89,7 +89,7 @@ export default function ViewGamePage() {
                             />
                         ))
                     ) : (
-                        <p>No games found.</p>
+                        <p>No games found</p>
                     )}
                 </div>
             </div>
