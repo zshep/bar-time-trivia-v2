@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
-import { setDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import Gamecard from "../../components/Trivia/GameCard";
 
 export default function ViewGamePage() {
@@ -10,6 +10,10 @@ export default function ViewGamePage() {
     const [games, setGames] = useState([]);
     const [ userId, setUserId ] = useState(null);
     const [ userName, setUsername ] = useState(null);
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedGame, setSelectedGame] = useState(null); // Holds game info
 
 
     //grabs list of games user has created
@@ -59,6 +63,34 @@ export default function ViewGamePage() {
 
     }, []);
 
+
+      // Open confirmation modal
+      const confirmDelete = (gameId) => {
+        setSelectedGame(gameId);
+        setIsModalOpen(true);
+    };
+
+    // **Delete game from Firestore**
+    const deleteGame = async () => {
+        if (!selectedGame) return;
+        console.log("Deleting game:", selectedGame.id);
+
+        try {
+            const gameRef = doc(db, "games", selectedGame.id);
+            await deleteDoc(gameRef);
+
+            // Remove the game from the UI instantly (Optimistic Update)
+            setGames(prevGames => prevGames.filter(game => game.id !== selectedGame.id));
+
+            console.log("Game deleted successfully");
+        } catch (error) {
+            console.error("Error deleting game:", error);
+        }
+
+        setIsModalOpen(false); // Close modal
+    };
+
+
     //create delete games button logic
 
     return (
@@ -83,9 +115,8 @@ export default function ViewGamePage() {
                         games.map((game) => (
                             <Gamecard 
                                 key={game.id} 
-                                name={game.name} 
-                                description={game.description} 
-                                rounds={game.rounds} 
+                                game = {game}
+                                confirmDelete={confirmDelete}
                             />
                         ))
                     ) : (
@@ -93,6 +124,23 @@ export default function ViewGamePage() {
                     )}
                 </div>
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold">Confirm Deletion</h3>
+                        <p>Are you sure you want to delete <strong>{selectedGame?.name}</strong>? This action cannot be undone.</p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
+                                Cancel
+                            </button>
+                            <button onClick={deleteGame} className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-700">
+                                Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
         </div>
     )
 
