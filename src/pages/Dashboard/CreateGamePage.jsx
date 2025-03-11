@@ -3,6 +3,7 @@ import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import { setDoc, doc, collection, addDoc } from "firebase/firestore";
 import CreateGame from "../../components/Trivia/CreateGame";
 import EditGame from "../../components/Trivia/EditGame";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateGamePage() {
   
@@ -14,6 +15,8 @@ export default function CreateGamePage() {
     console.log("Game data updated:", data);
     setGameData(data);
   };
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
 
@@ -42,6 +45,8 @@ export default function CreateGamePage() {
         */
 
       alert("Game created successfully!");
+      navigate("/dashboard/edit-game");
+      
       
 
     } catch (error) {

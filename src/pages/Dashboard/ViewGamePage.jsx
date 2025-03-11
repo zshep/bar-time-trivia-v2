@@ -63,11 +63,17 @@ export default function ViewGamePage() {
 
     }, []);
 
-
       // Open confirmation modal
       const confirmDelete = (gameId) => {
         setSelectedGame(gameId);
         setIsModalOpen(true);
+    };
+
+    // Edit game selected
+    const editGame = (gameId) => {
+        setSelectedGame(gameId);
+        console.log(selectedGame);
+
     };
 
     // **Delete game from Firestore**
@@ -117,6 +123,7 @@ export default function ViewGamePage() {
                                 key={game.id} 
                                 game = {game}
                                 confirmDelete={confirmDelete}
+                                editGame={editGame}
                             />
                         ))
                     ) : (
