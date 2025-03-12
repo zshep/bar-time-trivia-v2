@@ -1,6 +1,7 @@
 //import game and round cards
 import { useState } from "react";
 import RoundList from "./RoundList";
+import { useLocation } from "react-router-dom";
 
 export default function EditGame() {
 
@@ -10,6 +11,17 @@ export default function EditGame() {
     const [gameName, setGameName] = useState(null);
     const [gameDescription, setgameDescription] = useState();
     const [rounds, setRounds ] = useState({});
+
+    const location = useLocation();
+    const game = location.state?.game // grabbing passed game
+
+    setGameName(game.name);
+    setgameDescription(game.description);
+
+    console.log("Editing game:", game);
+    console.log(game);
+
+
 
     const  handleSubmit = async (event) =>
     {
@@ -26,7 +38,7 @@ export default function EditGame() {
                 <p>"{gameName || "The Trivia Game"}"</p>
 
                 <p className="mt-4 text-2xl">Description</p>
-                <p>{gameDescription || "this is a description"} </p>
+                <p>{gameDescription|| "this is a description"} </p>
             </div>
             <form onSubmit={handleSubmit}>
 

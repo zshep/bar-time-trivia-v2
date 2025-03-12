@@ -14,6 +14,7 @@ export default function ViewGamePage() {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGame, setSelectedGame] = useState(null); // Holds game info
+    const navigate = useNavigate();
 
 
     //grabs list of games user has created
@@ -70,9 +71,12 @@ export default function ViewGamePage() {
     };
 
     // Edit game selected
-    const editGame = (gameId) => {
-        setSelectedGame(gameId);
-        console.log(selectedGame);
+    const editGame = (game) => {
+        
+        
+        console.log("game id:", game);
+        setSelectedGame(game);
+        navigate("/dashboard/edit-game", { state: { game } });
 
     };
 
