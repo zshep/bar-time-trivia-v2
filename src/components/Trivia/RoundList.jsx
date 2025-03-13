@@ -1,14 +1,20 @@
 import { useState } from "react";
 import Roundcard from "./Roundcard";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
-export default function RoundList() {
+export default function RoundList(game) {
     const [rounds, setRounds] = useState([]); // State for rounds data
     const [roundNum, setRoundNum] = useState(0);
 
+    const gameId = game.game.id;
+    console.log("game: ", game);
+    console.log("gameID: ",gameId);
+
     // function to grab current number of rounds for game
     const getRoundCount = async (gameId) => {
-        const roundsInfo = colleciton(db, "rounds");
+        const roundsInfo = collection(db, "rounds");
         const q = query(roundsInfo, where("gameid", "==", gameId));
         const snapshot = await getDocs(q);
         return snapshot.size;
@@ -42,6 +48,8 @@ export default function RoundList() {
       const handleAddRound = async() => {
         const gameId = "123"
         const roundType = "Multiple Choice"
+
+        await addRound(gameId, roundType);
 
       }
 

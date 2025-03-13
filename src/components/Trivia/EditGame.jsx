@@ -34,13 +34,14 @@ export default function EditGame() {
                 <p className="mt-4 text-2xl">Description</p>
                 <p>{game.description|| "this is a description"} </p>
             </div>
-            <form onSubmit={handleSubmit}>
+            <div>
 
-                <RoundList rounds ={rounds} setRounds={setRounds} />
+                <RoundList rounds ={rounds} setRounds={setRounds} game={game}/>
                 <button 
+                    onClick={handleSubmit}
                     className="mt-3"
                     type="submit">Save Game</button>
-            </form>
+            </div>
         </div>
     )
 }
