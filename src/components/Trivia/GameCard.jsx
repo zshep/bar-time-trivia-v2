@@ -22,7 +22,7 @@ export default function Gamecard({ game, confirmDelete, editGame }) {
             </div>
             
             <div className="flex flex-col text-sm py-2 ml-1">
-                <button onClick={() => editGame()} className="bg-yellow-500 hover:bg-yellow-700 text-white rounded-full py-2" to="/dashboard/edit-game">Edit</button>
+                <button onClick={() => editGame(game)} className="bg-yellow-500 hover:bg-yellow-700 text-white rounded-full py-2" to="/dashboard/edit-game">Edit</button>
                 <button onClick={() => confirmDelete(game)} className="mt-2 bg-red-500 hover:bg-red-700 text-white rounded-full">Delete</button>
             </div>
         </div>

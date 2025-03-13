@@ -16,7 +16,7 @@ export default function RoundList() {
 
         <div>
             <p>Rounds</p>
-            <div className="border border-r-4">
+            <div className="mb-1 justify-items-center">
                 {rounds.map((round, index) => (
                     <Roundcard key={index} roundData={round} />
                 ))}

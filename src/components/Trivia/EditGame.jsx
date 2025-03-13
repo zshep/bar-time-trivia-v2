@@ -1,25 +1,19 @@
 //import game and round cards
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoundList from "./RoundList";
 import { useLocation } from "react-router-dom";
 
 export default function EditGame() {
 
-    // grab game id (from prop) and grab other data
-    // grab game name
-
-    const [gameName, setGameName] = useState(null);
-    const [gameDescription, setgameDescription] = useState();
+        
     const [rounds, setRounds ] = useState({});
 
+   
     const location = useLocation();
     const game = location.state?.game // grabbing passed game
 
-    setGameName(game.name);
-    setgameDescription(game.description);
-
-    console.log("Editing game:", game);
-    console.log(game);
+    //console.log("Editing game:", game);
+    //console.log(game.name);
 
 
 
@@ -33,17 +27,19 @@ export default function EditGame() {
 
     return (
         <div className="flex flex-col w-full justify-items-center">
-            <div className="mt-4">
+            <div className="mt-4 mb-3">
                 <p className="text-3xl">Game Name</p>
-                <p>"{gameName || "The Trivia Game"}"</p>
+                <p>"{game.name || "The Trivia Game"}"</p>
 
                 <p className="mt-4 text-2xl">Description</p>
-                <p>{gameDescription|| "this is a description"} </p>
+                <p>{game.description|| "this is a description"} </p>
             </div>
             <form onSubmit={handleSubmit}>
 
                 <RoundList rounds ={rounds} setRounds={setRounds} />
-                <button type="submit">Save Game</button>
+                <button 
+                    className="mt-3"
+                    type="submit">Save Game</button>
             </form>
         </div>
     )
