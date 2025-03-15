@@ -37,12 +37,7 @@ export default function CreateGamePage() {
         user_id: gameData.userId,
         createdAt: new Date(),
       });
-      /*
-      // Create rounds as a subcollection
-      for (const round of rounds) {
-        await addDoc(collection(db, "games", gameRef.id, "rounds"), round);
-      }
-        */
+ 
 
       alert("Game created successfully!");
       navigate("/dashboard/edit-game");

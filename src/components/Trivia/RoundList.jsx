@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Roundcard from "./Roundcard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
@@ -10,20 +10,34 @@ export default function RoundList(game) {
 
     
     const gameId = game.game.id;
-    console.log("game: ", game);
-    console.log("gameID: ",gameId);
+    //console.log("game: ", game);
+    //console.log("gameID: ",gameId);
     
+    //grabbing nuber of rounds
     useEffect(() => {
         console.log("Fetching rounds...");
-        getRoundCount(gameId);
-    }, [gameId]); 
+        const count =getRoundCount(gameId);
+        setRoundNum(count);
+
+    }, [gameId]);
+    
+    //grabbing round data from user.
+    useEffect(() => {
+        
+
+    })
 
     // function to grab current number of rounds for game
     const getRoundCount = async (gameId) => {
-        console.log("counting rounds for gameid: ", gameId);
+        //console.log("counting rounds for gameid: ", gameId);
         const roundsInfo = collection(db, "rounds");
-        const q = query(roundsInfo, where("gameid", "==", gameId));
+        const q = query(roundsInfo, where("gameId", "==", gameId));
+        
         const snapshot = await getDocs(q);
+        
+        console.log("total number of Rounds:", snapshot.size)
+
+
         return snapshot.size;
     }
 
@@ -33,12 +47,12 @@ export default function RoundList(game) {
 
             console.log("starting to add round");
             //getting number of rounds for game
-            const roundCount = await getRoundCount(gameId);
-            console.log("round count:",roundCount);
+            //const roundCount = await getRoundCount(gameId);
+            console.log("round count:", roundNum);
             const newRound = {
-                gameId,
-                roundNumber: roundCount + 1,
-                roundType,
+                gameId: gameId,
+                roundNumber: roundNum + 1,
+                roundType: "roundType",
                 numberQuestions: 0,
                 createdAt: new Date()
             };
@@ -46,7 +60,7 @@ export default function RoundList(game) {
             const docRef = await addDoc(collection(db, "rounds"), newRound);
             console.log("New round added", docRef.id);
 
-            return doc.Ref.id;
+            return doc.Ref;
 
         }catch (err){
             console.log("Error adding Rounds", err)
@@ -60,7 +74,6 @@ export default function RoundList(game) {
         const roundType = "Multiple Choice"
 
         await addRound(gameId, roundType);
-
       }
 
 
@@ -76,7 +89,7 @@ export default function RoundList(game) {
             </div>
 
             <div>
-                <button type="button" onClick={() => addRound(game.id)}>Add Round</button> 
+                <button type="button" onClick={() => addRound(gameId)}>Add Round</button> 
                 
             </div>
         </div>
