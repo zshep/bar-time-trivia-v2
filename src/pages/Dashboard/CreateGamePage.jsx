@@ -30,7 +30,7 @@ export default function CreateGamePage() {
     }
 
     try {
-      // Create game document
+      // Create game document in firestore
       const gameRef = await addDoc(collection(db, "games"), {
         name: gameData.gameName,
         description: gameData.description,
@@ -38,6 +38,7 @@ export default function CreateGamePage() {
         createdAt: new Date(),
       });
 
+      // used to pass as a state varilable going to edit-game
       const newGame = {
         id: gameRef.id,
         name: gameData.gameName,

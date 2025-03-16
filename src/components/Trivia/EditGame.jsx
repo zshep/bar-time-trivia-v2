@@ -11,7 +11,7 @@ export default function EditGame() {
     const navigate = useNavigate();
     const game = location.state?.game  || {};// grabbing passed game
 
-    console.log("Editing game:", game);
+    //console.log("Editing game:", game);
     //console.log(game.name);
 
 

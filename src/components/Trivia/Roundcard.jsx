@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react"
 
 
-export default function Roundcard( {roundData} ) {
+export default function Roundcard( {roundData, deleteRound} ) {
   
     
-    console.log("roundData: ", roundData)
+    console.log("roundData: ", roundData);
+
+    const id = roundData.id;
+  
     
 
     
-    const deleteRound = () => {
-        console.log("YOUR GOING TO DELETE THE ROUND!");
-
-    }
+  
 
     const editRound = () => {
         console.log("YOU'RE GOIN TO EDIT THE ROUND!");
@@ -36,7 +36,7 @@ export default function Roundcard( {roundData} ) {
             </div>
             <div className="flex flex-col">
                 <button onClick={editRound} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full">Edit Round</button>
-                <button onClick={deleteRound} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Delete Round</button>
+                <button onClick={() => deleteRound(id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Delete Round</button>
             </div>
         </div>
 

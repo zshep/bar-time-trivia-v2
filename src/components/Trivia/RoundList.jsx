@@ -1,40 +1,35 @@
 import { useState, useEffect } from "react";
 import Roundcard from "./Roundcard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
 export default function RoundList({game, rounds, setRounds}) {
     const [roundsState, setRoundsState] = useState([]); // State for rounds data
     const [roundNum, setRoundNum] = useState(0);
-
-    console.log("game Prop", game);
+    const [ selectedGame, setSelectedGame ] = useState(null);
 
     const gameId = game.id;
+
+    const getRoundData = async () => {
+        const roundsInfo = collection(db, "rounds");
+        const q = query(roundsInfo, where("gameId", "==", gameId), orderBy("roundNumber", "asc"));
+        const snapshot = await getDocs(q);
+
+        const roundList = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        console.log("List of Rounds", roundList);
+
+        setRoundsState(roundList);
+    }
     
    
     //grabbing round data from user.
     useEffect(() => {
-        const getRoundData = async () => {
-            const roundsInfo = collection(db, "rounds");
-            const q = query(roundsInfo, where("gameId", "==", gameId));
-            
-            const snapshot = await getDocs(q);
-    
-            console.log("snapshot: ", snapshot);
-            console.log("size: ", snapshot.size);
-            console.log("Docs:", snapshot.docs);
-            const roundList = snapshot.docs.map(doc => ({
-                ...doc.data()
-            }));
-            console.log("List of Rounds", roundList);
-
-            setRoundsState(roundList);
-    
-        }
-
+        
         if (gameId){
-
             getRoundData();
         }
 
@@ -76,7 +71,12 @@ export default function RoundList({game, rounds, setRounds}) {
             const docRef = await addDoc(collection(db, "rounds"), newRound);
             console.log("New round added", docRef.id);
 
-            return doc.Ref;
+            // re-fetching data:
+            if (gameId) {
+              await  getRoundData();
+            }
+
+            return docRef;
 
         }catch (err){
             console.log("Error adding Rounds", err)
@@ -85,9 +85,30 @@ export default function RoundList({game, rounds, setRounds}) {
 
 
       //delete round
-      const deleteRound = async() => {
-        console.log("we're going to delete YOU Round!!");
-        
+      const deleteRound = async (id) => {
+        console.log("we're going to delete YOU Round!!", id);
+        setSelectedGame(id);
+
+        try {
+            
+            const roundRef = doc(db, "rounds", id);
+            await deleteDoc(roundRef);
+
+            //optimistically removing round
+            setRoundsState(prevRound => prevRound.filter(roundsState => roundsState.id !== selectedGame));
+
+            console.log("Round Delete Successfully");
+
+            // re-fetching data:
+            if (gameId) {
+               await getRoundData();
+            }
+
+
+        } catch (err) {
+            console.error("Error Deleting Round:", err);
+        }
+
 
       }
 
@@ -99,7 +120,10 @@ export default function RoundList({game, rounds, setRounds}) {
             <p>Rounds</p>
             <div className="mb-1 justify-items-center">
                 {roundsState.map((round, index) => (
-                    <Roundcard key={index} roundData={round} />
+                    <Roundcard 
+                        key={index} 
+                        roundData={round}
+                        deleteRound={deleteRound} />
                 ))}
             </div>
 
