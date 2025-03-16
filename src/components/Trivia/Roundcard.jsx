@@ -20,8 +20,8 @@ export default function Roundcard( {roundData} ) {
 
 
     return(
-        <div className="flex border border-black w-1/2 mb-3">
-            <div className="border border-black">
+        <div className="flex  w-1/2 mb-3 p-2">
+            <div className="border border-black p-2">
                 <p className="font-bold mx-2">Round number</p>
                 <p>{roundData.roundNumber !== undefined ? roundData.roundNumber : "N/A"}</p>
 

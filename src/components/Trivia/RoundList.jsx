@@ -13,17 +13,6 @@ export default function RoundList({game, rounds, setRounds}) {
     const gameId = game.id;
     
    
-  
-    /*
-    useEffect(() => {
-        console.log("Fetching rounds...");
-        const count =getRoundCount(gameId);
-        setRoundNum(count);
-
-    }, [gameId]);
-     */
-
-
     //grabbing round data from user.
     useEffect(() => {
         const getRoundData = async () => {
@@ -59,13 +48,9 @@ export default function RoundList({game, rounds, setRounds}) {
         
         const snapshot = await getDocs(q);
 
-        
-
         //converting Firestore docs to an array of game objects
         
         console.log("total number of Rounds:", snapshot.size)
-
-
 
         return snapshot.size;
     }
@@ -99,12 +84,11 @@ export default function RoundList({game, rounds, setRounds}) {
       };
 
 
-      //
-      const handleAddRound = async() => {
-        const gameId = "123"
-        const roundType = "Multiple Choice"
+      //delete round
+      const deleteRound = async() => {
+        console.log("we're going to delete YOU Round!!");
+        
 
-        await addRound(gameId, roundType);
       }
 
 

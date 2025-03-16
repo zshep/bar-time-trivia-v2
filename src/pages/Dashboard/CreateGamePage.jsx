@@ -12,7 +12,7 @@ export default function CreateGamePage() {
   const [rounds, setRounds] = useState({});
   
   const handleGameDataChange = (data) => {
-    console.log("Game data updated:", data);
+    //console.log("Game data updated:", data);
     setGameData(data);
   };
 
@@ -37,10 +37,19 @@ export default function CreateGamePage() {
         user_id: gameData.userId,
         createdAt: new Date(),
       });
+
+      const newGame = {
+        id: gameRef.id,
+        name: gameData.gameName,
+        description: gameData.description,
+        user_id: gameData.userId,
+        createdAt: new Date(),
+
+      };
  
 
       alert("Game created successfully!");
-      navigate("/dashboard/edit-game");
+      navigate("/dashboard/edit-game", { state: { game: newGame } });
       
       
 

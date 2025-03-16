@@ -1,28 +1,31 @@
 //import game and round cards
 import { useEffect, useState } from "react";
 import RoundList from "./RoundList";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function EditGame() {
 
         
     const [rounds, setRounds ] = useState({});
-
-   
     const location = useLocation();
-    const game = location.state?.game // grabbing passed game
+    const navigate = useNavigate();
+    const game = location.state?.game  || {};// grabbing passed game
 
-    //console.log("Editing game:", game);
+    console.log("Editing game:", game);
     //console.log(game.name);
 
 
+    // double checking if game data is available
+    useEffect(() => {
 
-    const  handleSubmit = async (event) =>
-    {
-        event.preventDefault();
-        console.log("attempting to edit game");
-        
-    }
+        if (!game) {
+            console.error("no game Data found, redirecting...");
+            navigate("/dashbaord"); // redirect if no game data
+
+        }
+    }, [game, navigate]);
+
+    if (!game) return null; 
 
 
     return (
@@ -38,7 +41,7 @@ export default function EditGame() {
 
                 <RoundList rounds ={rounds} setRounds={setRounds} game={game}/>
                 <button 
-                    onClick={handleSubmit}
+                    
                     className="mt-3"
                     type="submit">Save Game</button>
             </div>
