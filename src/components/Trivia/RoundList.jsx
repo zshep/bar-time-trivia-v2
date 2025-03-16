@@ -4,16 +4,16 @@ import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
-export default function RoundList(game) {
-    const [rounds, setRounds] = useState([]); // State for rounds data
+export default function RoundList({game, rounds, setRounds}) {
+    const [roundsState, setRoundsState] = useState([]); // State for rounds data
     const [roundNum, setRoundNum] = useState(0);
 
+    console.log("game Prop", game);
+
+    const gameId = game.id;
     
-    const gameId = game.game.id;
-    //console.log("game: ", game);
-    //console.log("gameID: ",gameId);
-    
-    //grabbing nuber of rounds
+   
+  
     /*
     useEffect(() => {
         console.log("Fetching rounds...");
@@ -26,7 +26,7 @@ export default function RoundList(game) {
 
     //grabbing round data from user.
     useEffect(() => {
-        const getRoundData = async (gameId) => {
+        const getRoundData = async () => {
             const roundsInfo = collection(db, "rounds");
             const q = query(roundsInfo, where("gameId", "==", gameId));
             
@@ -38,16 +38,18 @@ export default function RoundList(game) {
             const roundList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
-            console.log("List of Rounds", RoundList);
+            console.log("List of Rounds", roundList);
 
-            setRounds(roundList);
+            setRoundsState(roundList);
     
         }
 
-        getRoundData(gameId)
-        
+        if (gameId){
 
-    }, [])
+            getRoundData();
+        }
+
+    }, [gameId]);
 
     // function to grab current number of rounds for game
     const getRoundCount = async (gameId) => {
@@ -112,7 +114,7 @@ export default function RoundList(game) {
         <div>
             <p>Rounds</p>
             <div className="mb-1 justify-items-center">
-                {rounds.map((round, index) => (
+                {roundsState.map((round, index) => (
                     <Roundcard key={index} roundData={round} />
                 ))}
             </div>
