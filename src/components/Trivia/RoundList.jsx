@@ -14,18 +14,40 @@ export default function RoundList(game) {
     //console.log("gameID: ",gameId);
     
     //grabbing nuber of rounds
+    /*
     useEffect(() => {
         console.log("Fetching rounds...");
         const count =getRoundCount(gameId);
         setRoundNum(count);
 
     }, [gameId]);
-    
+     */
+
+
     //grabbing round data from user.
     useEffect(() => {
+        const getRoundData = async (gameId) => {
+            const roundsInfo = collection(db, "rounds");
+            const q = query(roundsInfo, where("gameId", "==", gameId));
+            
+            const snapshot = await getDocs(q);
+    
+            console.log("snapshot: ", snapshot);
+            console.log("size: ", snapshot.size);
+            console.log("Docs:", snapshot.docs);
+            const roundList = snapshot.docs.map(doc => ({
+                ...doc.data()
+            }));
+            console.log("List of Rounds", RoundList);
+
+            setRounds(roundList);
+    
+        }
+
+        getRoundData(gameId)
         
 
-    })
+    }, [])
 
     // function to grab current number of rounds for game
     const getRoundCount = async (gameId) => {
@@ -34,12 +56,19 @@ export default function RoundList(game) {
         const q = query(roundsInfo, where("gameId", "==", gameId));
         
         const snapshot = await getDocs(q);
+
+        
+
+        //converting Firestore docs to an array of game objects
         
         console.log("total number of Rounds:", snapshot.size)
 
 
+
         return snapshot.size;
     }
+
+    
 
      // Function to add a new round (example)
     const addRound = async (gameId, roundType) => {
@@ -47,12 +76,12 @@ export default function RoundList(game) {
 
             console.log("starting to add round");
             //getting number of rounds for game
-            //const roundCount = await getRoundCount(gameId);
-            console.log("round count:", roundNum);
+            const roundCount = await getRoundCount(gameId);
+            
             const newRound = {
                 gameId: gameId,
-                roundNumber: roundNum + 1,
-                roundType: "roundType",
+                roundNumber: roundCount + 1,
+                roundType: "MC",
                 numberQuestions: 0,
                 createdAt: new Date()
             };
