@@ -5,7 +5,7 @@ export default function Navbar() {
 
 
     return(
-        <div className="flex flex-col justify-between border-black border-2 ml-px px-4 rounded w-44">
+        <div className="flex flex-col justify-between border-black border-2 ml-px px-4 rounded w-44 ">
             <div className="mt-4">
                 <ul className="nav flex-column text-center">
                     <li className="nav-item mb-1">

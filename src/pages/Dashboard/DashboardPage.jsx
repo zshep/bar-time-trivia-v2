@@ -6,7 +6,7 @@ export default function DashboardPage() {
 
     return (
 
-        <div className="flex w-full ">
+        <div className="flex w-full h-full">
             
                 <Navbar></Navbar>
                 
