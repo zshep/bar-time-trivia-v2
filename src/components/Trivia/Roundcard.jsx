@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 export default function Roundcard( {roundData, deleteRound} ) {
   
     
-    console.log("roundData: ", roundData);
+    //console.log("roundData: ", roundData);
 
     const id = roundData.id;
   
@@ -23,12 +23,12 @@ export default function Roundcard( {roundData, deleteRound} ) {
         <div className="flex  w-1/2 mb-3 p-2">
             <div className="border border-black p-2">
                 <p className="font-bold mx-2">Round number</p>
-                <p>{roundData.roundNumber !== undefined ? roundData.roundNumber : "N/A"}</p>
+                <p >{roundData.roundNumber !== undefined ? roundData.roundNumber : "N/A"}</p>
 
             </div>
             <div className="border border-black">
-                <p className="font-bold mx-2">Round Type</p>
-                <p>{roundData.roundType || "Type not specified"}</p>
+                <p className="font-bold mx-2">Round Category</p>
+                <p >{roundData.roundCategory || "Category not specified"}</p>
             </div>
             <div className="border border-black">
                 <p className="font-bold mx-2">Number of Questions</p>

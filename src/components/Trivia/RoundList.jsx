@@ -6,8 +6,9 @@ import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function RoundList({game, rounds, setRounds}) {
     const [roundsState, setRoundsState] = useState([]); // State for rounds data
-    const [roundNum, setRoundNum] = useState(0);
-    const [ selectedGame, setSelectedGame ] = useState(null);
+    const [roundCategory, setRoundCategory] = useState(null);
+    const [selectedGame, setSelectedGame ] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const gameId = game.id;
 
@@ -45,17 +46,25 @@ export default function RoundList({game, rounds, setRounds}) {
 
         //converting Firestore docs to an array of game objects
         
-        console.log("total number of Rounds:", snapshot.size)
+        //console.log("total number of Rounds:", snapshot.size)
 
         return snapshot.size;
     }
 
+     // open modal to add Round Category
+     const chooseCategory = () => {
+        setRoundCategory("");
+        console.log("Choose the category for the round");
+        setIsModalOpen(true);
+     }
+
     
 
      // Function to add a new round (example)
-    const addRound = async (gameId, roundType) => {
+    const addRound = async (gameId, category) => {
         try {
 
+            setIsModalOpen(false);
             console.log("starting to add round");
             //getting number of rounds for game
             const roundCount = await getRoundCount(gameId);
@@ -63,7 +72,7 @@ export default function RoundList({game, rounds, setRounds}) {
             const newRound = {
                 gameId: gameId,
                 roundNumber: roundCount + 1,
-                roundType: "MC",
+                roundCategory: category,
                 numberQuestions: 0,
                 createdAt: new Date()
             };
@@ -128,9 +137,35 @@ export default function RoundList({game, rounds, setRounds}) {
             </div>
 
             <div>
-                <button type="button" onClick={() => addRound(gameId)}>Add Round</button> 
+                <button type="button" onClick={() => chooseCategory()}>Add Round</button> 
                 
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col">
+                        <h3 className="text-lg font-bold">Add Round</h3>
+                        <lable htmlFor="roundCategory">What is the cateogry for the round?</lable>
+                        <input
+                            className="border border-black p-2" 
+                            id="roundCategory"
+                            type="text"
+                            value={roundCategory}
+                            onChange={(e) => setRoundCategory(e.target.value)}
+                            placeholder="Category"
+                            autoComplete="off"
+                            />
+                        
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
+                                Cancel
+                            </button>
+                            <button onClick={() =>addRound(gameId, roundCategory)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                                Add Round
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 };

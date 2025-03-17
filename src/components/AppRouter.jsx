@@ -19,7 +19,7 @@ function AppRouter() {
     <Router>
       
       <Headbanner />
-        <div className="flex h-full w-full justify-center">
+        <div className="flex-1 h-full w-full justify-center p-5">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />

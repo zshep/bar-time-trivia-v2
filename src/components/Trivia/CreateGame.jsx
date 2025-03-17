@@ -59,7 +59,13 @@ export default function CreateGame({ onGameDataChange}) {
       <p>You have created {gameCount} games.</p>
       <div className="flex flex-col w-1/2 justify-items-center">
         <label htmlFor="gameName">Trivia Game Name</label>
-        <input id="gameName" type="text" value={gameName} onChange={(e) => setGameName(e.target.value)} required />
+        <input 
+          id="gameName" 
+          type="text" 
+          value={gameName} 
+          onChange={(e) => setGameName(e.target.value)} required
+          autoComplete="off" 
+          />
 
         <label htmlFor="gameDescription">Description</label>
         <textarea id="gameDescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
