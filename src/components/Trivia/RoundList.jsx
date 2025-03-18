@@ -136,7 +136,7 @@ export default function RoundList({game, rounds, setRounds}) {
                 ))}
             </div>
 
-            <div>
+            <div className="mb-3">
                 <button type="button" onClick={() => chooseCategory()}>Add Round</button> 
                 
             </div>
@@ -155,7 +155,7 @@ export default function RoundList({game, rounds, setRounds}) {
                             autoComplete="off"
                             />
                         
-                        <div className="flex justify-end mt-4">
+                        <div className="flex justify-end mt-4 ">
                             <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
                                 Cancel
                             </button>

@@ -40,10 +40,7 @@ export default function EditGame() {
             <div>
 
                 <RoundList rounds ={rounds} setRounds={setRounds} game={game}/>
-                <button 
-                    
-                    className="mt-3"
-                    type="submit">Save Game</button>
+                
             </div>
         </div>
     )
