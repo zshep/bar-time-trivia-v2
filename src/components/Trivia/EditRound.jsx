@@ -102,8 +102,8 @@ export default function EditRound() {
 
     return (
         <div className="flex flex-col w-full items-center ">
-            <div className="mt-3">
-                <p className="text-xl">Round: {round.roundCategory}</p>
+            <div className="mt-3 ">
+                <p className="text-xl mb-3">Round: {round.roundCategory}</p>
                 <div>
                     {questionsState.map((question) => (
                         <QuestionCard
