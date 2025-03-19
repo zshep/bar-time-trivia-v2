@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Roundcard from "./Roundcard";
 import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
-import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
+import {  db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
 export default function RoundList({game, rounds, setRounds}) {

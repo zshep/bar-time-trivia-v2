@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 
 export default function Roundcard( {roundData, deleteRound} ) {
   
     
-    //console.log("roundData: ", roundData);
+    console.log("roundData: ", roundData);
 
     const id = roundData.id;
-  
-    
+    const navigate = useNavigate();
 
-    
-  
+    const editRound = (roundData) => {
 
-    const editRound = () => {
-        console.log("YOU'RE GOIN TO EDIT THE ROUND!");
+        console.log("YOU'RE GOIN TO EDIT THE ROUND!", roundData.roundCategory);
+
+        navigate("/dashboard/edit-round", { state: { roundData }});
     }
     
 
@@ -35,7 +35,7 @@ export default function Roundcard( {roundData, deleteRound} ) {
                 <p>{roundData.numberQuestions !== undefined ? roundData.numberQuestions : "N/A"}</p>
             </div>
             <div className="flex flex-col">
-                <button onClick={editRound} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full">Edit Round</button>
+                <button onClick={() => editRound(roundData)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full">Edit Round</button>
                 <button onClick={() => deleteRound(id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Delete Round</button>
             </div>
         </div>
