@@ -16,6 +16,7 @@ export default function EditRound() {
     const [ answer, setAnswer ] = useState("");
     const [ questionType, setQuestionType ] = useState("");
     const [ points, setPoints ] =useState(0);
+    const [ questionNumber, setQuestionNumber ] =useState(0);
 
     const [ isAddModalOpen, setIsAddModalOpen ] = useState(false);
     const [ deleteModalOpen, setDeleteModalOpen ] = useState(false);
@@ -24,6 +25,7 @@ export default function EditRound() {
     console.log("Round Data: ", round);
     console.log("Round Id:", roundId);
 
+   
     
 
     //grab question data from firestore
@@ -39,7 +41,9 @@ export default function EditRound() {
         }));
 
         console.log("list of questions: ", questionList);
-    
+        console.log("amount of questions: ",snapshot.size);
+
+        setQuestionNumber(snapshot.size);
         setQuestionsState(questionList);
     }
 
@@ -58,7 +62,7 @@ export default function EditRound() {
             // creating newQuestion object
             const newQuestion = {
                 roundId: roundId,
-                questionNumber: 1,
+                questionNumber: questionNumber + 1,
                 question: question,
                 answer: answer,
                 questionType: questionType,
@@ -107,8 +111,6 @@ export default function EditRound() {
                             deleteQuestion ={deleteQuestion}
                         />
                     ))}
-
-
 
                 </div>
                 <button
