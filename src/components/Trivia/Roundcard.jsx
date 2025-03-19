@@ -5,7 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 export default function Roundcard( {roundData, deleteRound} ) {
   
     
-    console.log("roundData: ", roundData);
+   // console.log("roundData: ", roundData);
 
     const id = roundData.id;
     const navigate = useNavigate();
