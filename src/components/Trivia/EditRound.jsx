@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard";
 import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
@@ -25,11 +25,8 @@ export default function EditRound() {
     console.log("Round Data: ", round);
     console.log("Round Id:", roundId);
 
-
-
-
     //grab question data from firestore
-    const getQuestionData = async (roundId) => {
+    const getQuestionData = async () => {
 
         const questionInfo = collection(db, "questions");
         const q = query(questionInfo, where("roundId", "==", roundId));
@@ -47,9 +44,17 @@ export default function EditRound() {
         setQuestionsState(questionList);
     }
 
+    useEffect(() => {
+        console.log("grabbing question data");
+        getQuestionData();
+
+    }, [roundId])
+
     //open modal to add question
     const addQuestionModal = async () => {
-        console.log("OPEN THE MODAL!")
+        console.log("OPEN THE MODAL!");
+        setQuestion("");
+        
         setIsAddModalOpen(true);
     }
 
@@ -58,6 +63,7 @@ export default function EditRound() {
         try {
 
             console.log("adding Question to round, ", roundId);
+            console.log("this question is number ", questionNumber);
 
             // creating newQuestion object
             const newQuestion = {
@@ -143,7 +149,7 @@ export default function EditRound() {
 
                         <label htmlFor="questionType">Question type</label>
                         <select id="questionType" name="questionType" className="border border-black mb-2" required>
-                            <option disabled selected value="">-- Choose the Question Type --</option>
+                            <option disabled defaultValue value="">-- Choose the Question Type --</option>
                             <option value="multipleChoice">Multiple Choice</option>
                             <option value="freeResponse">Free Response</option>
                             <option value="sort">Sort</option>

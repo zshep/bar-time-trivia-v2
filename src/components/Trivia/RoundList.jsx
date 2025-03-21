@@ -26,12 +26,13 @@ export default function RoundList({game, rounds, setRounds}) {
         setRoundsState(roundList);
     }
     
+    getRoundData();
    
     //grabbing round data from user.
     useEffect(() => {
         
         if (gameId){
-            getRoundData();
+            getRoundData(gameId);
         }
 
     }, [gameId]);
