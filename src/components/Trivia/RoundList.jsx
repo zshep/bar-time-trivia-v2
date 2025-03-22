@@ -26,7 +26,7 @@ export default function RoundList({game, rounds, setRounds}) {
         setRoundsState(roundList);
     }
     
-    getRoundData();
+    //getRoundData();
    
     //grabbing round data from user.
     useEffect(() => {
@@ -145,7 +145,7 @@ export default function RoundList({game, rounds, setRounds}) {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col">
                         <h3 className="text-lg font-bold">Add Round</h3>
-                        <lable htmlFor="roundCategory">What is the cateogry for the round?</lable>
+                        <label htmlFor="roundCategory">What is the cateogry for the round?</label>
                         <input
                             className="border border-black p-2" 
                             id="roundCategory"

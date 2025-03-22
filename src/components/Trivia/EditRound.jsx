@@ -47,7 +47,7 @@ export default function EditRound() {
 
     useEffect(() => {
         console.log("grabbing question data");
-        getQuestionData();
+        getQuestionData(roundId);
 
     }, [roundId])
 
@@ -56,6 +56,7 @@ export default function EditRound() {
         console.log("OPEN THE MODAL!");
         setQuestion("");
         setAnswer("");
+        setQuestionType("");
 
         
         setIsAddModalOpen(true);
