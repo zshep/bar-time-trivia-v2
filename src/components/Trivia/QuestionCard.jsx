@@ -1,8 +1,12 @@
 
 
-export default function QuestionCard ( { questionData } ) {
+export default function QuestionCard ( { questionData, confirmDelete, editQuestion } ) {
 
     console.log("question data: ", questionData);
+    const questionId = questionData.id;
+    console.log("questionid:", questionData.id);
+
+    
 
     return(
 
@@ -17,13 +21,13 @@ export default function QuestionCard ( { questionData } ) {
                 <p>{questionData.question}</p>
             </div>
 
-            <div className="border border-black p-2 w-1/4">
+            <div className="border border-black p-2 w-1/3">
                 <p className="font-bold">Answer</p>
                 <p>{questionData.answer}</p>
             </div>
 
             <div className="border border-black p-2 ">
-                <p className="font-bold">Question Type</p>
+                <p className="font-bold">Type</p>
                 <p>{questionData.questionType}</p>
             </div>
 
@@ -32,8 +36,8 @@ export default function QuestionCard ( { questionData } ) {
                 <p>{questionData.points}</p>
             </div>
             <div className="flex flex-col">
-                <button onClick={() => editRound(roundData)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold  text-sm">Edit</button>
-                <button onClick={() => deleteRound(id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 text-sm">Delete</button>
+                <button onClick={() => editQuestion(questionData)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold  text-sm">Edit</button>
+                <button onClick={() => confirmDelete(questionData)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 text-sm">Delete</button>
             </div>
             
         </div>

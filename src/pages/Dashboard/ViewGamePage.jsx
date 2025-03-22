@@ -65,8 +65,8 @@ export default function ViewGamePage() {
     }, []);
 
       // Open confirmation modal
-      const confirmDelete = (gameId) => {
-        setSelectedGame(gameId);
+      const confirmDelete = (game) => {
+        setSelectedGame(game);
         setIsModalOpen(true);
     };
 

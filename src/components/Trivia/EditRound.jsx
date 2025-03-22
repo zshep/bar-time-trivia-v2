@@ -19,7 +19,8 @@ export default function EditRound() {
     const [questionNumber, setQuestionNumber] = useState(0);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [selectedQuestion, setSelectedQuestion] =useState("");
 
 
     console.log("Round Data: ", round);
@@ -29,7 +30,7 @@ export default function EditRound() {
     const getQuestionData = async () => {
 
         const questionInfo = collection(db, "questions");
-        const q = query(questionInfo, where("roundId", "==", roundId));
+        const q = query(questionInfo, where("roundId", "==", roundId), orderBy("questionNumber", "asc"));
         const snapshot = await getDocs(q);
 
         const questionList = snapshot.docs.map(doc => ({
@@ -54,6 +55,8 @@ export default function EditRound() {
     const addQuestionModal = async () => {
         console.log("OPEN THE MODAL!");
         setQuestion("");
+        setAnswer("");
+
         
         setIsAddModalOpen(true);
     }
@@ -94,12 +97,36 @@ export default function EditRound() {
 
     }
 
-    const confirmDelete = (questionId) => {
+    const editQuestion = (questionId) => {
+        console.log("Edit the question", questionId);
+        
+
+    }
+
+    const confirmDelete = (questionData) => {
+        console.log("About to delete ", questionData.question);
+        setSelectedQuestion(questionData);
         setDeleteModalOpen(true);
     }
 
     const deleteQuestion = async () => {
+        if (!selectedQuestion) return;
 
+        console.log("Deleting Question", selectedQuestion.id);
+
+        try{
+            const questionInfo = doc(db, "questions", selectedQuestion.id);
+            await deleteDoc(questionInfo);
+
+            //Optimistically updating questions
+            setQuestionsState(prevQuestion => prevQuestion.filter(question => question.id !== selectedQuestion.id))
+
+
+        } catch(err){
+            console.error("Error deleting Question:", err);
+        }
+
+        setDeleteModalOpen(false);
 
     }
 
@@ -114,7 +141,8 @@ export default function EditRound() {
                     {questionsState.map((question) => (
                         <QuestionCard
                             questionData={question}
-                            deleteQuestion={deleteQuestion}
+                            confirmDelete={confirmDelete}
+                            editQuestion={editQuestion}
                         />
                     ))}
 
@@ -148,7 +176,7 @@ export default function EditRound() {
                         />
 
                         <label htmlFor="questionType">Question type</label>
-                        <select id="questionType" name="questionType" className="border border-black mb-2" required>
+                        <select id="questionType" name="questionType" className="border border-black mb-2" required onChange={(e) => setQuestionType(e.target.value)}>
                             <option disabled defaultValue value="">-- Choose the Question Type --</option>
                             <option value="multipleChoice">Multiple Choice</option>
                             <option value="freeResponse">Free Response</option>
@@ -177,6 +205,22 @@ export default function EditRound() {
                             </button>
                             <button onClick={() => addQuestion(roundId, question, answer, questionType, points)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
                                 Add Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold">Confirm Deletion</h3>
+                        <p>Are you sure you want to delete <strong>{selectedQuestion.question}?!?!</strong>? This action cannot be undone.</p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setDeleteModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
+                                Cancel
+                            </button>
+                            <button onClick={deleteQuestion} className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-700">
+                                Yes, Delete
                             </button>
                         </div>
                     </div>
