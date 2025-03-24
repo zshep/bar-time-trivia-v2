@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard";
 import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
@@ -8,8 +8,9 @@ export default function EditRound() {
 
     //grabing state variabel passed from RoundCard
     const location = useLocation();
-    const round = location.state?.roundData
+    const round = location.state?.roundData;
     const roundId = round.id;
+    const navigate = useNavigate();
 
     const [questionsState, setQuestionsState] = useState([]); // list of all questions
     const [question, setQuestion] = useState(""); // actual question for question
@@ -54,54 +55,30 @@ export default function EditRound() {
     //open modal to add question
     const addQuestionModal = async () => {
         console.log("OPEN THE MODAL!");
-        setQuestion("");
-        setAnswer("");
         setQuestionType("");
 
-        
         setIsAddModalOpen(true);
     }
 
     //add question
-    const addQuestion = async (roundId, question, answer, questionType, points) => {
-        try {
-
-            console.log("adding Question to round, ", roundId);
-            console.log("this question is number ", questionNumber);
-
-            // creating newQuestion object
-            const newQuestion = {
-                roundId: roundId,
-                questionNumber: questionNumber + 1,
-                question: question,
-                answer: answer,
-                questionType: questionType,
-                points: points,
-
-            };
-
-            //adding doc to firestore
-            const docRef = await addDoc(collection(db, "questions"), newQuestion);
-            console.log("added new question:", docRef.id);
-
-            if (roundId) {
-                await getQuestionData(roundId);
-            }
-
-            setIsAddModalOpen(false); // turn off modal
-            return docRef;
-
-
-        } catch (err) {
-            console.log("Error adding question", err);
+    const getQuestionType = async (questionType) => {
+       
+        console.log("adding Question to round, ", roundId);
+        console.log("they chose ", questionType);
+        const questionData = {
+            roundId: roundId,
+            questionType: questionType
         }
+
+            navigate("/dashboard/questionpage", { state: {questionData: questionData}});       
+
+       
 
     }
 
     const editQuestion = (questionId) => {
         console.log("Edit the question", questionId);
         
-
     }
 
     const confirmDelete = (questionData) => {
@@ -156,26 +133,7 @@ export default function EditRound() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                         <h3 className="text-lg font-bold">Add Question</h3>
-                        <label htmlFor="question">Question</label>
-                        <textarea
-                            className="border border-black p-2 mb-2"
-                            id="question"
-                            type="text"
-                            value={question}
-                            onChange={(e) => setQuestion(e.target.value)}
-                            placeholder="What is the question?"
-                            autoComplete="off"
-                        />
-                        <label htmlFor="answer">Answer</label>
-                        <input
-                            className="mt-1 border px-2 border-black mb-2"
-                            id="answer"
-                            type="text"
-                            placeholder="What's the answer?"
-                            value={answer}
-                            onChange={(e) => setAnswer(e.target.value)}
-                        />
-
+                        
                         <label htmlFor="questionType">Question type</label>
                         <select id="questionType" name="questionType" className="border border-black mb-2" required onChange={(e) => setQuestionType(e.target.value)}>
                             <option disabled defaultValue value="">-- Choose the Question Type --</option>
@@ -184,19 +142,6 @@ export default function EditRound() {
                             <option value="sort">Sort</option>
                         </select>
 
-                        <label htmlFor="points">Points Available</label>
-                        <input
-                            className="border border-black text-center"
-                            id="points"
-                            type="number"
-                            min="0"
-                            max="10"
-                            step="1"
-                            value={points}
-                            onChange={(e) => setPoints(e.target.value)}
-                        />
-
-
                         <div className="flex justify-end mt-4 ">
                             <button
                                 type="button"
@@ -204,7 +149,7 @@ export default function EditRound() {
                                 className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
                                 Cancel
                             </button>
-                            <button onClick={() => addQuestion(roundId, question, answer, questionType, points)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                            <button onClick={() => getQuestionType(questionType)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
                                 Add Question
                             </button>
                         </div>
