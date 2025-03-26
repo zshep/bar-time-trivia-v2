@@ -2,28 +2,23 @@ import { useEffect, useState } from "react"
 
 export default function CreateQuestionFr() {
 
-    [choiceNumber, setChoiceNumber] =useEffect(0);
+    const [frAnswer, setFrAnswer] =useState("");
+
     
-
-
-
-
     return(
-        <div className="flex justify-center">
-            <p>In mother Russia, Question make you!</p>
+        <div className="flex flex-col justify-center w-full">
+           
 
-            <p className="text-2xl">this is Fr Question</p>
+            <p className="text-2xl">Answer</p>
             <div>
                 <label htmlFor="FrQuestion"></label>
-                <input
+                <textarea
+                    className="w-full"
+                    name="FrQuestion"
                     type="text"
-                    autoFocus="false"/>
-            </div>
-
-            <div>
-                <p>Answer Choices</p>
-                
-
+                    autoFocus="false"
+                    onChange={(e) => setFrAnswer(e.target.value)}
+                    />
             </div>
     
         </div>

@@ -2,13 +2,20 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 import CreateQuestionMc from "../../components/Trivia/CreateQuestionMc";
+import CreateQuestionSort from "../../components/Trivia/CreateQuestionSort";
 
 
 export default function CreateQuestionPage() {
 
     //grabing state variabel passed from Edit-Round
     const location = useLocation();
-    const questionType = location.state?.questionType
+    const questionData = location.state?.questionData;
+    
+
+    const roundId = questionData.roundId;
+    const questionType = questionData.questionType;
+    //console.log(roundId, questionType);
+
 
     const [questionsState, setQuestionsState] = useState([]); // list of all questions
     const [question, setQuestion] = useState(""); // actual question for question
@@ -61,9 +68,10 @@ export default function CreateQuestionPage() {
 
     return (
 
-        <div className="flex w-full">
+        <div className="flex w-full justify-center">
             <div className="  flex flex-col justify-items-center">
                 <h3 className="text-lg font-bold">Add Question</h3>
+                <h3 className="text-lg font-bold">Question Type: {questionType}</h3>
                 <label htmlFor="question">Question</label>
                 <textarea
                     className="border border-black p-2 mb-2"
@@ -74,18 +82,7 @@ export default function CreateQuestionPage() {
                     placeholder="What is the question?"
                     autoComplete="off"
                 />
-                <label htmlFor="answer">Answer</label>
-                <input
-                    className="mt-1 border px-2 border-black mb-2"
-                    id="answer"
-                    type="text"
-                    placeholder="What's the answer?"
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                />
-
-
-                <label htmlFor="points">Points Available</label>
+                 <label htmlFor="points">Points Available</label>
                 <input
                     className="border border-black text-center"
                     id="points"
@@ -96,8 +93,18 @@ export default function CreateQuestionPage() {
                     value={points}
                     onChange={(e) => setPoints(e.target.value)}
                 />
+            
+               
                 <div>
-                    <p>Question Type Options Here</p>
+                    {questionType === "freeResponse" && (
+                        <CreateQuestionFr />
+                    )}
+                    {questionType === "multipleChoice" && (
+                        <CreateQuestionMc/>
+                    )}
+                    {questionType === "sort" &&(
+                        <CreateQuestionSort />
+                    )}
                 </div>
 
                 <div className="flex justify-center mt-10 ">
