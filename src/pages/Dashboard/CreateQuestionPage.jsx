@@ -16,13 +16,20 @@ export default function CreateQuestionPage() {
     const questionType = questionData.questionType;
     //console.log(roundId, questionType);
 
-
-    const [questionsState, setQuestionsState] = useState([]); // list of all questions
+    
+    
+    const [questionNumber, setQuestionNumber] = useState(0);
+    const [points, setPoints] = useState(0);
+    
     const [question, setQuestion] = useState(""); // actual question for question
     const [answer, setAnswer] = useState("");
 
-    const [points, setPoints] = useState(0);
-    const [questionNumber, setQuestionNumber] = useState(0);
+    //For MC, storing array of an answer choices
+    const [mcAnswers, setMcAnswers] = useState(["","","",""]);
+    const [mcFinalAnswer, setMcFinalAnswer] =useState("");
+    // for FR, storing single string
+    const [frAnswer, setFrAnswer]=useState("");
+
 
 
 

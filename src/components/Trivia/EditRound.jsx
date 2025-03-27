@@ -135,8 +135,12 @@ export default function EditRound() {
                         <h3 className="text-lg font-bold">Add Question</h3>
                         
                         <label htmlFor="questionType">Question type</label>
-                        <select id="questionType" name="questionType" className="border border-black mb-2" required onChange={(e) => setQuestionType(e.target.value)}>
-                            <option disabled defaultValue value="">-- Choose the Question Type --</option>
+                        <select 
+                            value={questionType} 
+                            name="questionType" 
+                            className="border border-black mb-2" 
+                            required onChange={(e) => setQuestionType(e.target.value)}>
+                            <option disabled value="">-- Choose the Question Type --</option>
                             <option value="multipleChoice">Multiple Choice</option>
                             <option value="freeResponse">Free Response</option>
                             <option value="sort">Sort</option>
