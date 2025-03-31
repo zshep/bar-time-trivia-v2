@@ -11,29 +11,26 @@ export default function CreateQuestionPage() {
     const location = useLocation();
     const questionData = location.state?.questionData;
     
-
+    //Generic Question Data
     const roundId = questionData.roundId;
     const questionType = questionData.questionType;
-    //console.log(roundId, questionType);
-
-    
-    
     const [questionNumber, setQuestionNumber] = useState(0);
-    const [points, setPoints] = useState(0);
-    
+    const [points, setPoints] = useState(0); 
     const [question, setQuestion] = useState(""); // actual question for question
-    const [answer, setAnswer] = useState("");
-
+    
     //For MC, storing array of an answer choices
     const [mcAnswers, setMcAnswers] = useState(["","","",""]);
     const [mcFinalAnswer, setMcFinalAnswer] =useState("");
     // for FR, storing single string
     const [frAnswer, setFrAnswer]=useState("");
 
+    // for Sort, store it in as array of objects???
+    const [sortAnswers, setSortAnswers] = useState({});
 
 
 
-    const CreateQuestion = async (roundId, question, answer, questionType, points) => {
+
+    const handleAddQuestion = async () => {
         console.log("adding question");
 
         try {
@@ -41,12 +38,30 @@ export default function CreateQuestionPage() {
             console.log("adding Question to round, ", roundId);
             console.log("this question is number ", questionNumber);
 
+            //setting up final answer data based on question type
+            let finalAnswerData = null;
+
+            if (questionType === "multipleChoice"){
+                finalAnswerData = {
+                    mcAnswers : mcAnswers,
+                    mcFinalAnswer: mcFinalAnswer
+                }
+            }
+
+            if (questionType === "freeResponse"){
+                finalAnswerData = frAnswer;
+            }
+
+            // set up sorting 
+
+            
+
             // creating newQuestion object
             const newQuestion = {
                 roundId: roundId,
                 questionNumber: questionNumber + 1,
                 question: question,
-                answer: answer,
+                answer: finalAnswerData,
                 questionType: questionType,
                 points: points,
 
@@ -116,7 +131,7 @@ export default function CreateQuestionPage() {
 
                 <div className="flex justify-center mt-10 ">
 
-                    <button onClick={() => CreateQuestion(roundId, question, answer, questionType, points)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                    <button onClick={() => handleAddQuestion()} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
                         Add Question
                     </button>
                 </div>
