@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 import CreateQuestionMc from "../../components/Trivia/CreateQuestionMc";
 import CreateQuestionSort from "../../components/Trivia/CreateQuestionSort";
+
 
 
 export default function CreateQuestionPage() {
@@ -10,6 +13,7 @@ export default function CreateQuestionPage() {
     //grabing state variabel passed from Edit-Round
     const location = useLocation();
     const questionData = location.state?.questionData;
+    const navigate = useNavigate();
     
     //Generic Question Data
     const roundId = questionData.roundId;
@@ -71,12 +75,9 @@ export default function CreateQuestionPage() {
             const docRef = await addDoc(collection(db, "questions"), newQuestion);
             console.log("added new question:", docRef.id);
 
-            if (roundId) {
-                await getQuestionData(roundId);
-            }
 
-            setIsAddModalOpen(false); // turn off modal
-            return docRef;
+            navigate("/dashboard/edit-round", { state: { roundId }});
+            
 
 
         } catch (err) {
@@ -119,10 +120,10 @@ export default function CreateQuestionPage() {
                
                 <div>
                     {questionType === "freeResponse" && (
-                        <CreateQuestionFr />
+                        <CreateQuestionFr answer={frAnswer} setAnswer={setFrAnswer} />
                     )}
                     {questionType === "multipleChoice" && (
-                        <CreateQuestionMc/>
+                        <CreateQuestionMc answers={mcAnswers} setAnswer={setMcAnswers}/>
                     )}
                     {questionType === "sort" &&(
                         <CreateQuestionSort />

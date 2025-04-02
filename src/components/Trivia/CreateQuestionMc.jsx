@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react"
 
-export default function CreateQuestionMc() {
+export default function CreateQuestionMc({answers, setAnswers}) {
 
-    const [choiceNumber, setChoiceNumber] =useState(0);
-    const [choiseAnswer, setChoiceAnswer] =useState([]);
+    //updates array in parent's whenever user types
+    const handleAnswerChange = (index, newValue) => {
+        const updated =[...answers];
+        updated[index] = newValue;
+        setAnswers(updated);
+    }
 
     // function to add answer choice
 
@@ -27,24 +31,16 @@ export default function CreateQuestionMc() {
             <div className="flex flex-col ">
                 <p className="text-lg text-wrap text-center">Answer Choices</p>
                 <p>Note: The game will randomize the answer choices</p>
-                <input
-                    className="border border-black text-center my-1"
-                    id="mcAnswer1"
-                    placeholder="Answer choice 1"/>
-                <input
-                    className="border border-black text-center my-1"
-                    id="mcAnswer2"
-                    placeholder="Answer choice 2"
-                     />
-                <input
-                    className="border border-black text-center my-1"
-                    id="mcAnswer3"
-                    placeholder="Answer choice 3" />
-                <input 
-                    className="border border-black text-center my-1"
-                    id="mcAnswer4"
-                    placeholder="Answer choice 4" />
-                
+               {answers.map((ans, idx) => (
+                    <input
+                        key={idx}
+                        className="border border-black text-center my-1"
+                        value={ans}
+                        placeholder={`Answer choice ${idx + 1}`}
+                        onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                    />
+
+               ))}
 
             </div>
     

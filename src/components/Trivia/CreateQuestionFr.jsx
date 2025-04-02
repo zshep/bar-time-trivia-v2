@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 
-export default function CreateQuestionFr() {
+export default function CreateQuestionFr( {answer, setAnswer} ) {
 
-    const [frAnswer, setFrAnswer] =useState("");
 
     
     return(
@@ -11,14 +10,16 @@ export default function CreateQuestionFr() {
 
             <p className="text-2xl">Answer</p>
             <div>
-                <label htmlFor="FrQuestion"></label>
-                <textarea
+               
+                <input
                     className="w-full"
                     name="FrQuestion"
                     type="text"
-                    autoFocus="false"
-                    onChange={(e) => setFrAnswer(e.target.value)}
-                    />
+                    
+                    value={answer}
+                    placeholder="Answer"
+                    onChange={(e) => setAnswer(e.target.value)}
+                />
             </div>
     
         </div>
