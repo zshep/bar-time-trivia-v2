@@ -24,7 +24,7 @@ export default function CreateQuestionMc({answers, setAnswers}) {
                     name="FrQuestion"
                     type="text"
                     autoFocus="false"
-                    onChange={(e) => setFrAnswer(e.target.value)}
+                    onChange={(e) => setAnswers(e.target.value)}
                     />
             </div>
             

@@ -76,7 +76,8 @@ export default function CreateQuestionPage() {
             console.log("added new question:", docRef.id);
 
 
-            navigate("/dashboard/edit-round", { state: { roundId }});
+            alert("Question created");
+            //navigate("/dashboard/edit-round", { state: { roundId }});
             
 
 
