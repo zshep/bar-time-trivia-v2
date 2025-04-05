@@ -6,6 +6,8 @@ import { db } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function EditRound() {
 
+    
+
     //grabing state variabel passed from RoundCard
     const location = useLocation();
     const round = location.state?.roundData;
@@ -26,6 +28,9 @@ export default function EditRound() {
 
     console.log("Round Data: ", round);
     console.log("Round Id:", roundId);
+
+    
+
 
     //grab question data from firestore
     const getQuestionData = async () => {
@@ -66,11 +71,12 @@ export default function EditRound() {
         console.log("adding Question to round, ", roundId);
         console.log("they chose ", questionType);
         const questionData = {
-            roundId: roundId,
-            questionType: questionType
+            roundData: round,
+            questionType: questionType,
+            questionNumber: questionNumber
         }
 
-            navigate("/dashboard/questionpage", { state: {questionData: questionData}});       
+            navigate("/dashboard/questionpage", { state: { questionData }});       
 
        
 

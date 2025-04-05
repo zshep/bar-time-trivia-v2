@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 
 export default function CreateQuestionMc({answers, setAnswers}) {
 
+    
+
     //updates array in parent's whenever user types
     const handleAnswerChange = (index, newValue) => {
         const updated =[...answers];
@@ -23,7 +25,7 @@ export default function CreateQuestionMc({answers, setAnswers}) {
                     className="w-full"
                     name="FrQuestion"
                     type="text"
-                    autoFocus="false"
+                    autoFocus={false}
                     onChange={(e) => setAnswers(e.target.value)}
                     />
             </div>

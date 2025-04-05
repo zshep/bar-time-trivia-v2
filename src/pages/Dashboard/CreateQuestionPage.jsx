@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { collection, addDoc } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy  } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 import CreateQuestionMc from "../../components/Trivia/CreateQuestionMc";
@@ -16,10 +16,10 @@ export default function CreateQuestionPage() {
     const navigate = useNavigate();
     
     //Generic Question Data
-    const roundId = questionData.roundId;
+    const roundId = questionData.roundData.id;
     const questionType = questionData.questionType;
     const [questionNumber, setQuestionNumber] = useState(0);
-    const [points, setPoints] = useState(0); 
+    const [points, setPoints] = useState(1); 
     const [question, setQuestion] = useState(""); // actual question for question
     
     //For MC, storing array of an answer choices
@@ -31,21 +31,29 @@ export default function CreateQuestionPage() {
     // for Sort, store it in as array of objects???
     const [sortAnswers, setSortAnswers] = useState({});
 
+    
+    
 
-
+        
 
     const handleAddQuestion = async () => {
         console.log("adding question");
+        console.log("questionData:", questionData);
+        console.log("number of questions:", questionData.questionNumber);
+       
 
         try {
-
-            console.log("adding Question to round, ", roundId);
-            console.log("this question is number ", questionNumber);
 
             //setting up final answer data based on question type
             let finalAnswerData = null;
 
             if (questionType === "multipleChoice"){
+
+                console.log("It's MC");
+                // check if mcFinalAnswer is in mcAnswers
+                console.log("mcAnswers: ", mcAnswers);
+                console.log("mcFinalsAnswer: ", mcFinalAnswer);
+
                 finalAnswerData = {
                     mcAnswers : mcAnswers,
                     mcFinalAnswer: mcFinalAnswer
@@ -63,7 +71,7 @@ export default function CreateQuestionPage() {
             // creating newQuestion object
             const newQuestion = {
                 roundId: roundId,
-                questionNumber: questionNumber + 1,
+                questionNumber: questionData.questionNumber + 1,
                 question: question,
                 answer: finalAnswerData,
                 questionType: questionType,
@@ -76,8 +84,8 @@ export default function CreateQuestionPage() {
             console.log("added new question:", docRef.id);
 
 
-            alert("Question created");
-            //navigate("/dashboard/edit-round", { state: { roundId }});
+            
+            navigate("/dashboard/edit-round", { state: {  roundData: questionData.roundData }});
             
 
 
@@ -111,7 +119,7 @@ export default function CreateQuestionPage() {
                     className="border border-black text-center"
                     id="points"
                     type="number"
-                    min="0"
+                    min="1"
                     max="10"
                     step="1"
                     value={points}
