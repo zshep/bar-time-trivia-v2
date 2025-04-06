@@ -82,8 +82,9 @@ export default function EditRound() {
 
     }
 
-    const editQuestion = (questionId) => {
-        console.log("Edit the question", questionId);
+    const editQuestion = (questionData) => {
+        console.log("Edit the question", questionData);
+        navigate("/dashboard/editQuestion", { state: { questionData }});
         
     }
 

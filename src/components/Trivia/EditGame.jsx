@@ -42,6 +42,10 @@ export default function EditGame() {
                 <RoundList rounds ={rounds} setRounds={setRounds} game={game}/>
                 
             </div>
+            <div>
+                <button>View Games</button>
+
+            </div>
         </div>
     )
 }

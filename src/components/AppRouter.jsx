@@ -14,6 +14,7 @@ import ViewGamePage from '../pages/Dashboard/ViewGamePage';
 import EditGame from './Trivia/EditGame';
 import EditRound from './Trivia/EditRound';
 import CreateQuestionPage from '../pages/Dashboard/CreateQuestionPage';
+import EditQuestion from '../pages/Dashboard/EditQuestionPage';
 
 
 
@@ -36,6 +37,7 @@ function AppRouter() {
             <Route path="edit-game" element={<EditGame/>} />
             <Route path="edit-round" element={<EditRound/>}/>
             <Route path="questionpage" element={<CreateQuestionPage/>} />
+            <Route path="editQuestion" element={<EditQuestion/>} />
 
 
             <Route path="create-session" element={<CreateTriviaSession />} />

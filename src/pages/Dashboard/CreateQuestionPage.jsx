@@ -23,8 +23,8 @@ export default function CreateQuestionPage() {
     const [question, setQuestion] = useState(""); // actual question for question
     
     //For MC, storing array of an answer choices
-    const [mcAnswers, setMcAnswers] = useState(["","","",""]);
-    const [mcFinalAnswer, setMcFinalAnswer] =useState("");
+    const [mcChoices, setMcChoices] = useState(["","","",""]);
+    const [mcAnswers, setMcAnswers] =useState([]);
     // for FR, storing single string
     const [frAnswer, setFrAnswer]=useState("");
 
@@ -51,12 +51,12 @@ export default function CreateQuestionPage() {
 
                 console.log("It's MC");
                 // check if mcFinalAnswer is in mcAnswers
+                console.log("mcChoices: ", mcChoices);
                 console.log("mcAnswers: ", mcAnswers);
-                console.log("mcFinalsAnswer: ", mcFinalAnswer);
 
                 finalAnswerData = {
-                    mcAnswers : mcAnswers,
-                    mcFinalAnswer: mcFinalAnswer
+                    mcchoices : mcChoices,
+                    mcAnswers: mcAnswers
                 }
             }
 
@@ -132,7 +132,7 @@ export default function CreateQuestionPage() {
                         <CreateQuestionFr answer={frAnswer} setAnswer={setFrAnswer} />
                     )}
                     {questionType === "multipleChoice" && (
-                        <CreateQuestionMc answers={mcAnswers} setAnswer={setMcAnswers}/>
+                        <CreateQuestionMc answers={mcAnswers} setAnswers={setMcAnswers} choices={mcChoices} setChoices={setMcChoices}/>
                     )}
                     {questionType === "sort" &&(
                         <CreateQuestionSort />

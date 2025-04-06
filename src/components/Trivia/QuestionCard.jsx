@@ -6,7 +6,7 @@ export default function QuestionCard ( { questionData, confirmDelete, editQuesti
     const questionId = questionData.id;
     console.log("questionid:", questionData.id);
 
-    
+        
 
     return(
 
@@ -19,11 +19,6 @@ export default function QuestionCard ( { questionData, confirmDelete, editQuesti
             <div className="border border-black p-2 w-1/2">
                 <p className="font-bold">Question</p>
                 <p>{questionData.question}</p>
-            </div>
-
-            <div className="border border-black p-2 w-1/3">
-                <p className="font-bold">Answer</p>
-                <p>{questionData.answer}</p>
             </div>
 
             <div className="border border-black p-2 ">
