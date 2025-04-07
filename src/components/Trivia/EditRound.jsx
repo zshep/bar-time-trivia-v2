@@ -77,9 +77,6 @@ export default function EditRound() {
         }
 
             navigate("/dashboard/questionpage", { state: { questionData }});       
-
-       
-
     }
 
     const editQuestion = (questionData) => {
@@ -150,7 +147,7 @@ export default function EditRound() {
                             <option disabled value="">-- Choose the Question Type --</option>
                             <option value="multipleChoice">Multiple Choice</option>
                             <option value="freeResponse">Free Response</option>
-                            <option value="sort">Sort</option>
+                            <option value="sort" disabled>Sort (coming soon)</option>
                         </select>
 
                         <div className="flex justify-end mt-4 ">

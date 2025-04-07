@@ -31,6 +31,7 @@ export default function CreateQuestionMc({ answers, setAnswers, choices, setChoi
             <div className="flex flex-col ">
                 <p className="text-lg text-wrap text-center">Answer Choices</p>
                 <p>Note: The game will randomize the answer choices</p>
+                <p>Select all the answers that are correct</p>
                
                     
                     {choices.map((choice, idx) => (
