@@ -1,5 +1,7 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, updateDoc  } from "firebase/firestore";
+import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import CreateQuestionMc from "../../components/Trivia/CreateQuestionMc";
 import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 
@@ -9,6 +11,7 @@ export default function EditQuestion() {
     const location = useLocation();
     const questionData = location.state?.questionData;
     console.log(questionData);
+    const navigate = useNavigate();
 
     //Generic Question Data
     const roundId = questionData.roundData;
@@ -36,7 +39,7 @@ export default function EditQuestion() {
 
     //edit answer
     const handleEditQuestion = async () => {
-        console.log("ediiting Question: ", questionNumber);
+        console.log("editing Question: ", questionNumber);
 
         try{
              //setting up final answer data based on question type
@@ -63,20 +66,18 @@ export default function EditQuestion() {
                         
                         // creating newQuestion object
                         const updateQuestion = {
-                            roundId: roundId,
-                            questionNumber: questionData.questionNumber + 1,
                             question: question,
                             answer: finalAnswerData,
-                            questionType: questionType,
                             points: points,
             
                         };
             
                         //adding doc to firestore
                         const docRef = doc(db, "questions", questionData.id);
-                        await updateDoc(docRef, updateQuestion)
+                        await updateDoc(docRef, updateQuestion);
+                        console.log("Edit successful");
                         
-                        navigate("/dashboard/edit-round", { state: {  roundData: questionData.roundData }});
+                        navigate("/dashboard/edit-round", { state: {  roundData: questionData }});
                         
 
 
@@ -127,7 +128,7 @@ export default function EditQuestion() {
 
                 <div className="flex justify-center mt-10 ">
 
-                    <button onClick={() => handleAddQuestion()} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                    <button onClick={() => handleEditQuestion()} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
                         Edit Question
                     </button>
                 </div>
