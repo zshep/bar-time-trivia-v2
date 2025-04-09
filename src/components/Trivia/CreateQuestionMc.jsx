@@ -2,7 +2,8 @@ import { useEffect, useState } from "react"
 
 export default function CreateQuestionMc({ answers, setAnswers, choices, setChoices }) {
 
-
+    console.log(answers);
+    console.log(choices);
 
     //updates array in parent's whenever user types
     const handleChoiceChange = (index, newValue) => {

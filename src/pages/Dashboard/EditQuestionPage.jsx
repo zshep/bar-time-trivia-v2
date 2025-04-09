@@ -8,34 +8,28 @@ import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 export default function EditQuestion() {
 
     console.log("Editing a question");
-    const location = useLocation();
-    const questionData = location.state?.questionData;
+    
+    const { state } = useLocation();
+    const { questionData, roundData } = state || {};
     console.log(questionData);
+    console.log(questionData.answer);
+    console.log(questionData.answer.mcchoices);
     const navigate = useNavigate();
 
     //Generic Question Data
-    const roundId = questionData.roundData;
+    const roundId = roundData;
     const questionType = questionData.questionType;
-    const [questionNumber, setQuestionNumber] = useState(0);
-    const [points, setPoints] = useState(1);
-    const [question, setQuestion] = useState(""); // actual question for question
+    const [questionNumber, setQuestionNumber] = useState(questionData.questionNumber);
+    const [points, setPoints] = useState(questionData.points);
+    const [question, setQuestion] = useState(questionData.question); // actual question for question
 
     //For MC, storing array of an answer choices
-    const [mcChoices, setMcChoices] = useState(["", "", "", ""]);
-    const [mcAnswers, setMcAnswers] = useState([]);
+    const [mcChoices, setMcChoices] = useState(questionData.answer.mcchoices);
+    const [mcAnswers, setMcAnswers] = useState([questionData.answer.mcAnswers]);
     // for FR, storing single string
-    const [frAnswer, setFrAnswer] = useState("");
+    const [frAnswer, setFrAnswer] = useState(questionData.answer);
 
-    //fill initial saved data into values:
-    useEffect(() =>{
-        setQuestion(questionData.question);
-        setPoints(questionData.points);
-        setMcChoices(questionData.answer.mcChoices);
-        setMcAnswers(questionData.answer.mcAnswers);
-        setQuestionNumber(questionData.questionNumber);
-        setFrAnswer(questionData.answer);
-
-    }, [])
+    
 
     //edit answer
     const handleEditQuestion = async () => {
@@ -53,7 +47,7 @@ export default function EditQuestion() {
                             console.log("mcAnswers: ", mcAnswers);
             
                             finalAnswerData = {
-                                mcchoices : mcChoices,
+                                mcChoices : mcChoices,
                                 mcAnswers: mcAnswers
                             }
                         }
@@ -77,7 +71,7 @@ export default function EditQuestion() {
                         await updateDoc(docRef, updateQuestion);
                         console.log("Edit successful");
                         
-                        navigate("/dashboard/edit-round", { state: {  roundData: questionData }});
+                        navigate("/dashboard/edit-round", { state: {  roundData }});
                         
 
 

@@ -27,7 +27,7 @@ export default function EditRound() {
 
 
     console.log("Round Data: ", round);
-    console.log("Round Id:", roundId);
+    //console.log("Round Id:", roundId);
 
     
 
@@ -44,15 +44,15 @@ export default function EditRound() {
             ...doc.data()
         }));
 
-        console.log("list of questions: ", questionList);
-        console.log("amount of questions: ", snapshot.size);
+        //console.log("list of questions: ", questionList);
+        //console.log("amount of questions: ", snapshot.size);
 
         setQuestionNumber(snapshot.size);
         setQuestionsState(questionList);
     }
 
     useEffect(() => {
-        console.log("grabbing question data");
+        //console.log("grabbing question data");
         getQuestionData(roundId);
 
     }, [roundId])
@@ -76,12 +76,15 @@ export default function EditRound() {
             questionNumber: questionNumber
         }
 
-            navigate("/dashboard/questionpage", { state: { questionData }});       
+            navigate("/dashboard/questionpage", { state: 
+                { questionData }});       
     }
 
     const editQuestion = (questionData) => {
         console.log("Edit the question", questionData);
-        navigate("/dashboard/editQuestion", { state: { questionData }});
+        navigate("/dashboard/editQuestion", { state: { questionData,
+        roundData: round
+         }});
         
     }
 
@@ -122,6 +125,7 @@ export default function EditRound() {
                 <div>
                     {questionsState.map((question) => (
                         <QuestionCard
+                            key={question.id}
                             questionData={question}
                             confirmDelete={confirmDelete}
                             editQuestion={editQuestion}

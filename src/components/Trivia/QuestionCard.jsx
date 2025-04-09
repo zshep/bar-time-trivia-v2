@@ -2,9 +2,9 @@
 
 export default function QuestionCard ( { questionData, confirmDelete, editQuestion } ) {
 
-    console.log("question data: ", questionData);
+    //console.log("question data: ", questionData);
     const questionId = questionData.id;
-    console.log("questionid:", questionData.id);
+    //console.log("questionid:", questionData.id);
 
         
 
