@@ -13,7 +13,7 @@ export default function EditQuestion() {
     const { questionData, roundData } = state || {};
     console.log(questionData);
     console.log(questionData.answer);
-    console.log(questionData.answer.mcchoices);
+    console.log(questionData.answer.mcChoices);
     const navigate = useNavigate();
 
     //Generic Question Data
@@ -24,8 +24,8 @@ export default function EditQuestion() {
     const [question, setQuestion] = useState(questionData.question); // actual question for question
 
     //For MC, storing array of an answer choices
-    const [mcChoices, setMcChoices] = useState(questionData.answer.mcchoices);
-    const [mcAnswers, setMcAnswers] = useState([questionData.answer.mcAnswers]);
+    const [mcChoices, setMcChoices] = useState(questionData.answer.mcChoices);
+    const [mcAnswers, setMcAnswers] = useState(questionData.answer.mcAnswers);
     // for FR, storing single string
     const [frAnswer, setFrAnswer] = useState(questionData.answer);
 

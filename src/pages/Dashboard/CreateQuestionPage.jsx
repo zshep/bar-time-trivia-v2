@@ -55,7 +55,7 @@ export default function CreateQuestionPage() {
                 console.log("mcAnswers: ", mcAnswers);
 
                 finalAnswerData = {
-                    mcchoices : mcChoices,
+                    mcChoices : mcChoices,
                     mcAnswers: mcAnswers
                 }
             }
