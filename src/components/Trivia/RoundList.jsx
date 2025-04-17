@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Roundcard from "./Roundcard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment } from "firebase/firestore";
 import {  db } from "../../../app/server/api/firebase/firebaseConfig";
 
 
@@ -80,15 +80,22 @@ export default function RoundList({game, rounds, setRounds}) {
                 createdAt: new Date()
             };
             //adding doc to firestore
-            const docRef = await addDoc(collection(db, "rounds"), newRound);
-            console.log("New round added", docRef.id);
+            const roundRef = await addDoc(collection(db, "rounds"), newRound);
+            console.log("New round added", roundRef.id);
+
+            // updating game's count 
+            const gameRef = doc(db, "games", gameId);
+            await updateDoc(gameRef, {
+                numberRounds: increment(1),
+            });
+
 
             // re-fetching data:
-            if (gameId) {
-              await  getRoundData();
-            }
+         
+            await  getRoundData();
+           
 
-            return docRef;
+            return roundRef;
 
         }catch (err){
             console.log("Error adding Rounds", err)

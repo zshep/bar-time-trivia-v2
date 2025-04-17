@@ -45,6 +45,7 @@ export default function CreateGamePage() {
         description: gameData.description,
         user_id: gameData.userId,
         createdAt: new Date(),
+        numberRounds: 0,
 
       };
  

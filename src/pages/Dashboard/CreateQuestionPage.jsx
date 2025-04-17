@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy  } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment  } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import CreateQuestionFr from "../../components/Trivia/CreateQuestionFr";
 import CreateQuestionMc from "../../components/Trivia/CreateQuestionMc";
@@ -82,6 +82,12 @@ export default function CreateQuestionPage() {
             //adding doc to firestore
             const docRef = await addDoc(collection(db, "questions"), newQuestion);
             console.log("added new question:", docRef.id);
+
+            // updating Round's Question count
+            const roundRef = doc(db, "rounds", roundId);
+            await updateDoc(roundRef, {
+                numberQuestions: increment(1),
+            })
 
 
             

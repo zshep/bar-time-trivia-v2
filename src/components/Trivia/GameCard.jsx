@@ -17,7 +17,7 @@ export default function Gamecard({ game, confirmDelete, editGame }) {
             </div>
             <div className="border-r px-4">
                 <p className="font-bold">Rounds</p>
-                <p>{game.rounds}</p>
+                <p>{game.numberRounds || "unknown"}</p>
             </div>
             
             <div className="flex flex-col text-sm py-2 ml-1">
