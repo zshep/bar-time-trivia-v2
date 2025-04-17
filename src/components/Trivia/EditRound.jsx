@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment} from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function EditRound() {
 
-    
+
 
     //grabing state variabel passed from RoundCard
     const location = useLocation();
@@ -23,13 +23,13 @@ export default function EditRound() {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedQuestion, setSelectedQuestion] =useState("");
+    const [selectedQuestion, setSelectedQuestion] = useState("");
 
 
     console.log("Round Data: ", round);
     //console.log("Round Id:", roundId);
 
-    
+
 
 
     //grab question data from firestore
@@ -67,7 +67,7 @@ export default function EditRound() {
 
     //add question
     const getQuestionType = async (questionType) => {
-       
+
         console.log("adding Question to round, ", roundId);
         console.log("they chose ", questionType);
         const questionData = {
@@ -76,16 +76,21 @@ export default function EditRound() {
             questionNumber: questionNumber
         }
 
-            navigate("/dashboard/questionpage", { state: 
-                { questionData }});       
+        navigate("/dashboard/questionpage", {
+            state:
+                { questionData }
+        });
     }
 
     const editQuestion = (questionData) => {
         console.log("Edit the question", questionData);
-        navigate("/dashboard/editQuestion", { state: { questionData,
-        roundData: round
-         }});
-        
+        navigate("/dashboard/editQuestion", {
+            state: {
+                questionData,
+                roundData: round
+            }
+        });
+
     }
 
     const confirmDelete = (questionData) => {
@@ -99,15 +104,22 @@ export default function EditRound() {
 
         console.log("Deleting Question", selectedQuestion.id);
 
-        try{
+        try {
             const questionInfo = doc(db, "questions", selectedQuestion.id);
             await deleteDoc(questionInfo);
 
             //Optimistically updating questions
-            setQuestionsState(prevQuestion => prevQuestion.filter(question => question.id !== selectedQuestion.id))
+            setQuestionsState(prevQuestion => prevQuestion.filter(question => question.id !== selectedQuestion.id));
+
+            // updating Round's Question count
+            const roundRef = doc(db, "rounds", roundId);
+            await updateDoc(roundRef, {
+                numberQuestions: increment(-1),
+            })
 
 
-        } catch(err){
+
+        } catch (err) {
             console.error("Error deleting Question:", err);
         }
 
@@ -141,12 +153,12 @@ export default function EditRound() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                         <h3 className="text-lg font-bold">Add Question</h3>
-                        
+
                         <label htmlFor="questionType">Question type</label>
-                        <select 
-                            value={questionType} 
-                            name="questionType" 
-                            className="border border-black mb-2" 
+                        <select
+                            value={questionType}
+                            name="questionType"
+                            className="border border-black mb-2"
                             required onChange={(e) => setQuestionType(e.target.value)}>
                             <option disabled value="">-- Choose the Question Type --</option>
                             <option value="multipleChoice">Multiple Choice</option>

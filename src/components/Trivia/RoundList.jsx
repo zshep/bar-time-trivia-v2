@@ -125,10 +125,16 @@ export default function RoundList({game, rounds, setRounds}) {
             console.log("Round Delete Successfully");
             setDeleteOpen(false);
 
-            // re-fetching data:
-            if (gameId) {
-               await getRoundData();
-            }
+             // updating game's count 
+             const gameRef = doc(db, "games", gameId);
+             await updateDoc(gameRef, {
+                 numberRounds: increment(-1),
+             });
+ 
+ 
+             // re-fetching data:
+          
+             await  getRoundData();
 
 
         } catch (err) {
