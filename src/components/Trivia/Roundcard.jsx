@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 
-export default function Roundcard( {roundData, deleteRound} ) {
+export default function Roundcard( {roundData, confirmDeleteRound} ) {
   
     
    // console.log("roundData: ", roundData);
@@ -36,7 +36,7 @@ export default function Roundcard( {roundData, deleteRound} ) {
             </div>
             <div className="flex flex-col">
                 <button onClick={() => editRound(roundData)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full">Edit Round</button>
-                <button onClick={() => deleteRound(id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Delete Round</button>
+                <button onClick={() => confirmDeleteRound(roundData)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Delete Round</button>
             </div>
         </div>
 

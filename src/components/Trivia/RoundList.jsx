@@ -9,6 +9,8 @@ export default function RoundList({game, rounds, setRounds}) {
     const [roundCategory, setRoundCategory] = useState(null);
     const [selectedGame, setSelectedGame ] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteOpen, setDeleteOpen] =useState(false);
+    const [selectedRound, setSelectedRound] = useState(null);
 
     const gameId = game.id;
 
@@ -93,21 +95,28 @@ export default function RoundList({game, rounds, setRounds}) {
         }
       };
 
+      const confirmDeleteRound = (round) => {
+        console.log("You are going to delete this round: ", round);
+        setSelectedRound(round);
+        setDeleteOpen(true);
+      }
+
 
       //delete round
-      const deleteRound = async (id) => {
-        console.log("we're going to delete YOU Round!!", id);
-        setSelectedGame(id);
+      const deleteRound = async () => {
+        console.log("we're going to delete YOU Round!!", selectedRound.roundCategory);
+        
 
         try {
             
-            const roundRef = doc(db, "rounds", id);
+            const roundRef = doc(db, "rounds", selectedRound.id);
             await deleteDoc(roundRef);
 
             //optimistically removing round
             setRoundsState(prevRound => prevRound.filter(roundsState => roundsState.id !== selectedGame));
 
             console.log("Round Delete Successfully");
+            setDeleteOpen(false);
 
             // re-fetching data:
             if (gameId) {
@@ -133,7 +142,7 @@ export default function RoundList({game, rounds, setRounds}) {
                     <Roundcard 
                         key={index} 
                         roundData={round}
-                        deleteRound={deleteRound} />
+                        confirmDeleteRound={confirmDeleteRound} />
                 ))}
             </div>
 
@@ -166,6 +175,23 @@ export default function RoundList({game, rounds, setRounds}) {
                         </div>
                     </div>
                 </div>
+            )}
+            {isDeleteOpen && (
+                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                 <div className="bg-white p-6 rounded-lg shadow-lg">
+                     <h3 className="text-lg font-bold">Confirm Deletion</h3>
+                     <p>Are you sure you want to delete the round <strong>{selectedRound.roundCategory}?!?!</strong>?This action will delete all attached questions and cannot be undone.</p>
+                     <div className="flex justify-end mt-4">
+                         <button onClick={() => setDeleteOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
+                             Cancel
+                         </button>
+                         <button onClick={deleteRound} className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-700">
+                             Yes, Delete
+                         </button>
+                     </div>
+                 </div>
+             </div>
+                
             )}
         </div>
     )
