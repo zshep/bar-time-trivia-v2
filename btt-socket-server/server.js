@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { registerSocketHandlers } from './socket/index.js'
 
 const app = express();
 const server = createServer(app);
@@ -12,10 +13,12 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log(`A user connected: ${socket.id}`);
+  registerSocketHandlers(io, socket);
+
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log(`User disconnected: ${socket.id}`);
   });
 });
 
