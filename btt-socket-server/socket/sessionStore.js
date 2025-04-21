@@ -10,6 +10,11 @@ export function createSession(sessionCode, hostId) {
      });
 }
 
+export function getSession(sessionCode) {
+    return sessions.get(sessionCode);
+
+}
+
 export function addPlayerToSession(sessionCode, player){
     const session =sessions.get(sessionCode);
     if (session) {

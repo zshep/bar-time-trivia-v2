@@ -1,6 +1,6 @@
-import { db } from "../../app/server/api/firebase/firebaseConfig"; 
+import { db } from "../socket/firebaseAdmin.js"; 
 import { doc, setDoc } from 'firebase/firestore';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp } from "firebase/firestore";
 
 /**
  * Save final game session result to Firestore
