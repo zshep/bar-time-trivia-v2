@@ -6,14 +6,13 @@ import { deleteDoc, doc, getFirestore, collection, query, where, getDocs } from 
 export default function CreateTriviaSession(){
 
     const [userId, setUserId] = useState(null);
+    const [games, setGames] = useState([]);
     
     useEffect(() => {
         //grabbing users id
-    setUserId(auth.currentUser);
-    const gameList = grabUserData();
-    console.log("Current User", auth.currentUser);
-    console.log("User Id:", userId);
-    console.log("list of games", gameList);
+    setUserId(auth.currentUser.uid);
+    grabUserData();
+       
 
     }, []);
 
@@ -28,28 +27,53 @@ export default function CreateTriviaSession(){
             const querySnapshot = await getDocs(q);
             console.log("query",querySnapshot);
 
+            //converting FS docs to array of game objects
+            const gameList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            setGames(gameList);
+            console.log("games: ", gameList);
+
 
 
         } catch(err){
-            console.log("error: ", err)
+            console.log("error grabbing user's games: ", err)
         }
 
     }
 
-    grabUserData()
+    const handleBtnClick = () => {
+
+        console.log("the btn was clicked");
+        // generate a 6 digit code
+
+
+        //send code and 
+
+    }
+
+    
 
 
 
-    //grabs users games
+    
 
 
 
 
     return (
-        <div className="flex w-full justify-center mt-20">
+        <div className="flex flex-col w-full justify-center mt-20">
             <h1>Create Trivia Session!</h1>
-            <div className="mt-3">
-
+            <div className="self-center mt-3">
+                <div className="border border-black p-2">
+                    <p>Create a Join Code</p>
+                    
+                </div>
+                <button
+                    className="mt-3"
+                    onClick={handleBtnClick}>Create Trivia Session</button>
 
 
             </div>

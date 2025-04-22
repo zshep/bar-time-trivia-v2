@@ -38,9 +38,9 @@ export default function DashboardInfo() {
     }, []);
 
     return (
-        <div className="flex w-full justify-center mt-20" >
-            <div className="flex flex-col">
-                <div className="flex flex-col mx-4">
+        <div className="flex w-full justify-around mt-20" >
+            <div className="flex flex-row">
+                <div className="flex flex-col  mx-4">
                     <div className="border border-black p-2 text-center rounded mt-3">
                         <p>Welcome, {username}</p>
                     </div>
