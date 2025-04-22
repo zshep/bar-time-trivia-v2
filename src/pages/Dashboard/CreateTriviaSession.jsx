@@ -7,6 +7,7 @@ export default function CreateTriviaSession(){
 
     const [userId, setUserId] = useState(null);
     const [games, setGames] = useState([]);
+    const [selectedGame, setSelectedGame] = useState(null);
     
     useEffect(() => {
         //grabbing users id
@@ -25,7 +26,7 @@ export default function CreateTriviaSession(){
             const userGameInfo = collection(db, "games");
             const q = query(userGameInfo, where("user_id", "==", auth.currentUser.uid));
             const querySnapshot = await getDocs(q);
-            console.log("query",querySnapshot);
+            
 
             //converting FS docs to array of game objects
             const gameList = querySnapshot.docs.map(doc => ({
@@ -54,21 +55,39 @@ export default function CreateTriviaSession(){
 
     }
 
-    
-
-
-
-    
-
-
-
 
     return (
         <div className="flex flex-col w-full justify-center mt-20">
             <h1>Create Trivia Session!</h1>
             <div className="self-center mt-3">
-                <div className="border border-black p-2">
-                    <p>Create a Join Code</p>
+                <div className="flex flex-col">
+                    
+                    <label htmlFor="game">Select a Game</label>
+                    <select
+                        value={selectedGame}
+                        name="game"
+                        className="self-center text-center"
+                        required
+                        onChange={(e) => setSelectedGame(e.target.value)}
+                        >
+                            {
+                                games.map((game) => (
+
+                                    <option
+                                        key={game.id}
+                                        value={game.name}
+                                        >{game.name}
+                                        
+
+                                    </option>
+
+                                ))
+                                
+                                
+                                }
+                            
+
+                    </select>
                     
                 </div>
                 <button

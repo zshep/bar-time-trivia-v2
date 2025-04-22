@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import QuestionCard from "./QuestionCard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment} from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function EditRound() {
@@ -160,10 +160,10 @@ export default function EditRound() {
                             name="questionType"
                             className="border border-black mb-2"
                             required onChange={(e) => setQuestionType(e.target.value)}>
-                            <option disabled value="">-- Choose the Question Type --</option>
-                            <option value="multipleChoice">Multiple Choice</option>
-                            <option value="freeResponse">Free Response</option>
-                            <option value="sort" disabled>Sort (coming soon)</option>
+                                <option disabled value="">-- Choose the Question Type --</option>
+                                <option value="multipleChoice">Multiple Choice</option>
+                                <option value="freeResponse">Free Response</option>
+                                <option value="sort" disabled>Sort (coming soon)</option>
                         </select>
 
                         <div className="flex justify-end mt-4 ">
