@@ -7,24 +7,33 @@ export default function CreateTriviaSession(){
 
     const [userId, setUserId] = useState(null);
     const [games, setGames] = useState([]);
-    const [selectedGame, setSelectedGame] = useState(null);
+    const [selectedGame, setSelectedGame] = useState("");
     
+    //grabbing users data
     useEffect(() => {
-        //grabbing users id
-    setUserId(auth.currentUser.uid);
-    grabUserData();
-       
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+            if (user)
+            {
+                //console.log("user: ", user);
+                setUserId(user.uid);
+                grabUserData(user.uid);
+            } else {
+                console.log("there is no user");
+            }
 
+        });
+
+        return () => unsubscribe();
     }, []);
 
     
     
     //grab user Data
-    const grabUserData = async () => {
+    const grabUserData = async (id) => {
         try {
             
             const userGameInfo = collection(db, "games");
-            const q = query(userGameInfo, where("user_id", "==", auth.currentUser.uid));
+            const q = query(userGameInfo, where("user_id", "==", id));
             const querySnapshot = await getDocs(q);
             
 
@@ -47,17 +56,29 @@ export default function CreateTriviaSession(){
 
     const handleBtnClick = () => {
 
-        console.log("the btn was clicked");
-        // generate a 6 digit code
+        if (selectedGame === "") {
 
+            console.log("There is no game selected");
+            alert("You didn't select a game!");
+            return
 
-        //send code and 
+        } else {
+
+            console.log(`Session created for ${selectedGame} Game`);
+            
+            
+            // generate a 6 digit code
+            const joinCode = "123abc";
+                
+    
+            //send code and selectedGame to Session Lobby 
+        }
 
     }
 
 
     return (
-        <div className="flex flex-col w-full justify-center mt-20">
+        <div className="flex flex-col w-full mt-6">
             <h1>Create Trivia Session!</h1>
             <div className="self-center mt-3">
                 <div className="flex flex-col">
@@ -70,12 +91,15 @@ export default function CreateTriviaSession(){
                         required
                         onChange={(e) => setSelectedGame(e.target.value)}
                         >
+                                <option
+                                    disabled value=""
+                                    >-- Choose Game --</option>
                             {
                                 games.map((game) => (
-
+                                  
                                     <option
                                         key={game.id}
-                                        value={game.name}
+                                        value={game.name || ""}
                                         >{game.name}
                                         
 
@@ -91,8 +115,8 @@ export default function CreateTriviaSession(){
                     
                 </div>
                 <button
-                    className="mt-3"
-                    onClick={handleBtnClick}>Create Trivia Session</button>
+                    className="mt-3 w-24 bg-green-400 text-white"
+                    onClick={handleBtnClick}>Create Session</button>
 
 
             </div>
