@@ -15,6 +15,8 @@ import EditGame from './Trivia/EditGame';
 import EditRound from './Trivia/EditRound';
 import CreateQuestionPage from '../pages/Dashboard/CreateQuestionPage';
 import EditQuestion from '../pages/Dashboard/EditQuestionPage';
+import Lobby from '../pages/Session/Lobby';
+import LiveMainPage from '../pages/Session/LiveMainPage';
 
 
 
@@ -44,6 +46,15 @@ function AppRouter() {
 
             <Route path="join-session" element={<JoinTriviaSession />} />      
         
+          </Route>
+
+          {/* Routes for session */}
+          <Route path="/session">
+            <Route path="lobby" element={<Lobby/>}/>
+            <Route path="live" element={<LiveMainPage/>}/>
+
+
+
           </Route>
        
        {/* Wildcard for unmatched routes */}
