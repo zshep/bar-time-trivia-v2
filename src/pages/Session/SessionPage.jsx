@@ -1,17 +1,17 @@
 import { Outlet } from "react-router-dom";
-import sidebar from "../../components/sessions/sidebar";
+import Sidebar from "../../components/sessions/sidebar";
 
 
 export default function SessionPage() {
 
     return(
-        <div className="flex w-full h-full">
+        <div className="flex w-full h-full justify-between">
 
-            <sidebar></sidebar>
+            <Sidebar></Sidebar>
             
             <Outlet></Outlet>
 
-            <sidebar></sidebar>
+            <Sidebar></Sidebar>
 
         </div>
     )

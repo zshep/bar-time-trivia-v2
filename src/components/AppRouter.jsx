@@ -14,6 +14,7 @@ import ViewGamePage from '../pages/Dashboard/ViewGamePage';
 import EditGame from './Trivia/EditGame';
 import EditRound from './Trivia/EditRound';
 import CreateQuestionPage from '../pages/Dashboard/CreateQuestionPage';
+import SessionPage from '../pages/Session/SessionPage';
 import EditQuestion from '../pages/Dashboard/EditQuestionPage';
 import Lobby from '../pages/Session/Lobby';
 import LiveMainPage from '../pages/Session/LiveMainPage';
@@ -49,7 +50,7 @@ function AppRouter() {
           </Route>
 
           {/* Routes for session */}
-          <Route path="/session">
+          <Route path="/session" element={<SessionPage/>}>
             <Route path="lobby" element={<Lobby/>}/>
             <Route path="live" element={<LiveMainPage/>}/>
 
