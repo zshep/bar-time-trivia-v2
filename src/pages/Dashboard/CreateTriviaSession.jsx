@@ -92,7 +92,7 @@ export default function CreateTriviaSession() {
             });
 
             // Redirect user to lobby screen (assuming you have routing set up)
-            navigate(`/session-lobby/${joinCode}`, {
+            navigate(`/session/lobby/${joinCode}`, {
                 state: {
                     gameName: selectedGame,
                     sessionCode: joinCode

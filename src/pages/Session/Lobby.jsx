@@ -1,8 +1,13 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 
 export default function Lobby() {
 
+    const location = useLocation();
+    const gameName = location.state.gameName;
+    const joinCode = location.state.sessionCode;
+    
     const [players, setPlayers] = useState([]);
 
 
@@ -13,7 +18,7 @@ export default function Lobby() {
                 <p>Trivia Lobby</p>
             </div>
             <div>
-                <p>Game: {game.name || "unknown"}</p>
+                <p>Game: {gameName || "unknown"}</p>
             </div>
             <div>
                     <p>Joined Players</p>
