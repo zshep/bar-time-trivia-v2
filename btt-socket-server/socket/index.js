@@ -26,7 +26,7 @@ export function registerSocketHandlers(io, socket) {
                 name: playerName
             });
 
-            io.to(sessionCode).emit('player-joined', { playerName });
+            io.to(sessionCode).emit('player-list-update', { players: session.players });
     
             socket.emit('joined-successfully', { sessionCode });
         } else {

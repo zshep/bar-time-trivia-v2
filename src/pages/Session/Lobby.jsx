@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
+import socket from "../../main";
 
 export default function Lobby() {
 
@@ -12,6 +12,21 @@ export default function Lobby() {
     //parsing out hostData
     const userId = hostData.uid;
     const hostName = hostData.displayName;
+
+    useEffect(() => {
+
+        //listening for updates to players list
+        socket.on('player-list-update', ({ players }) => {
+            console.log("recieved updated players list: ", players);
+            setPlayers(players);
+        });
+        
+        //cleaning up socket listiner when component unmounts
+        return () => {
+            socket.off('player-list-update');
+        };
+
+    }, [])
 
 
 
@@ -33,13 +48,15 @@ export default function Lobby() {
             </div>
             <div className="mt-3">
                     <p>Joined Players</p>
-                    <div className="flex flex-row ">
+                    <div className="flex flex-col border p-3 gap-2">
 
-                        {/* players.map((player) => (
-                            <div className="flex flex-row border border-black">
+                        {   players.map((player) => (
+                            <div 
+                                key={player.id}
+                                className="border border-black p-2">
                             {player.name}
                             </div>
-                        )) */}
+                        )) }
                     </div>
             </div>
 
