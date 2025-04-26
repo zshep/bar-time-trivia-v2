@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function CreateTriviaSession() {
 
     const [userId, setUserId] = useState(null);
+    const [userData, setUserData] =useState({})
     const [games, setGames] = useState([]);
     const [selectedGame, setSelectedGame] = useState("");
     const navigate = useNavigate();
@@ -16,8 +17,9 @@ export default function CreateTriviaSession() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                //console.log("user: ", user);
+                console.log("user: ", user);
                 setUserId(user.uid);
+                setUserData(user);
                 grabUserData(user.uid);
             } else {
                 console.log("there is no user");
@@ -83,7 +85,14 @@ export default function CreateTriviaSession() {
             console.log("joincode:", joinCode)
 
 
-            //send code and selectedGame to Session Lobby 
+            //grab user data needed to send to sessionLobby
+            const minimalHostData = {
+                displayName: userData.displayName,
+                uid: userData.uid
+
+            };
+
+
             // Emit the socket event to create the session
             socket.emit("create-session", {
                 sessionCode: joinCode,
@@ -95,8 +104,9 @@ export default function CreateTriviaSession() {
             navigate(`/session/lobby/${joinCode}`, {
                 state: {
                     gameName: selectedGame,
-                    sessionCode: joinCode
-                }
+                    sessionCode: joinCode,
+                    hostData: minimalHostData
+                } 
             });
 
         }
