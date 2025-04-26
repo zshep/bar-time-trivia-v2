@@ -17,7 +17,7 @@ export default function CreateTriviaSession() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                console.log("user: ", user);
+                //console.log("user: ", user);
                 setUserId(user.uid);
                 setUserData(user);
                 grabUserData(user.uid);

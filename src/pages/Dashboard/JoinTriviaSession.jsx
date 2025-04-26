@@ -1,14 +1,55 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
+import socket from "../../main";
 
 export default function JoinTriviaSession() {
 
     
     const [joinCode, setJoinCode] = useState("");
+    const [userId, setUserId] = useState(null);
+    const [userName, setUserName] = useState("NOUSER")
+    const navigate = useNavigate();
+
+    
+    //grabbing users data
+        useEffect(() => {
+            const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log("user: ", user);
+                    setUserId(user.uid);
+                    setUserName(user.displayName);
+                    
+                } else {
+                    console.log("there is no user");
+                }
+    
+            });
+    
+            return () => unsubscribe();
+        }, []);
 
     const handleSubmitJoinCode = (event) => {
         event.preventDefault();
-        console.log("The joinCode is: ", joinCode);
+        console.log("submiting Join Code: ", joinCode);
+
+        //emit join code via socket
+        socket.emit('join-session', { sessionCode: joinCode, playerName: userName});
+
+        //if successful
+        socket.once('joined-successfully', ({ sessionCode }) => {
+            console.log("Joined Successful, navigating to lobby");
+            navigate(`/session/lobby/${sessionCode}`)
+        });
+
+        //if fail
+        socket.once('join-error', ( {message}) => {
+            console.error("Failed to join:", message);
+            alert("Failed to join: " + message);
+        });
+
+
+        
     }
 
 
@@ -25,7 +66,7 @@ export default function JoinTriviaSession() {
                     <input
                         className ="text-center"
                         value={joinCode}
-                        type="string"
+                        type="text"
                         autoFocus={false}
                         placeholder="XXXXXX"
                         onChange={(e) => setJoinCode(e.target.value)}></input>
