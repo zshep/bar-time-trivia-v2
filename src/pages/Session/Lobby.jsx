@@ -5,13 +5,14 @@ import socket from "../../main";
 export default function Lobby() {
 
     const location = useLocation();
+    const state = location.state || {};
     const gameName = location.state.gameName;
     const joinCode = location.state.sessionCode;
     const hostData = location.state.hostData;
     
     //parsing out hostData
-    const userId = hostData.uid;
-    const hostName = hostData.displayName;
+    const userId = hostData.uid || "";
+    const hostName = hostData.displayName || "Unkown Host";
 
     useEffect(() => {
 

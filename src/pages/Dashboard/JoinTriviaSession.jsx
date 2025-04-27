@@ -8,8 +8,11 @@ export default function JoinTriviaSession() {
     
     const [joinCode, setJoinCode] = useState("");
     const [userId, setUserId] = useState(null);
-    const [userName, setUserName] = useState("NOUSER")
+    const [userName, setUserName] = useState("NOUSER");
+    const [gameName, setGameName] = useState("Unknown Game");
+    const [hostId, setHostId] = useState("uknown host");
     const navigate = useNavigate();
+
 
     
     //grabbing users data
@@ -32,6 +35,7 @@ export default function JoinTriviaSession() {
     const handleSubmitJoinCode = (event) => {
         event.preventDefault();
         console.log("submiting Join Code: ", joinCode);
+        console.log("player: ", userName);
 
         //emit join code via socket
         socket.emit('join-session', { sessionCode: joinCode, playerName: userName});
@@ -39,7 +43,16 @@ export default function JoinTriviaSession() {
         //if successful
         socket.once('joined-successfully', ({ sessionCode }) => {
             console.log("Joined Successful, navigating to lobby");
-            navigate(`/session/lobby/${sessionCode}`)
+            navigate(`/session/lobby/${sessionCode}`, {
+                state: {
+                    sessionCode,
+                    gameName,
+                    hostData: {
+                        uid: hostId,
+                        displayName: userName
+                    }
+                }
+            });
         });
 
         //if fail

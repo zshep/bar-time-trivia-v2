@@ -13,7 +13,7 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`A user connected: ${socket.id}`);
+  console.log(`New client connected: ${socket.id}`);
   registerSocketHandlers(io, socket);
 
 

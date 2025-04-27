@@ -1,4 +1,4 @@
-import { getSession, deleteSession } from './sessionStore.js';
+import { getSession, deleteSession, createSession, addPlayerToSession } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -7,6 +7,7 @@ export function registerSocketHandlers(io, socket) {
     // Host creates a session
     socket.on('create-session', ({ sessionCode, hostId, gameName }) => {
         console.log(`Session created: ${sessionCode} by host ${hostId} for game ${gameName}`);
+        createSession(sessionCode, hostId, gameName);
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });
 
@@ -15,6 +16,9 @@ export function registerSocketHandlers(io, socket) {
     // Player joins a session
     socket.on('join-session', ({ sessionCode, playerName }) => {
         const session = getSession(sessionCode);
+        //console.log("session code:", sessionCode);
+        //console.log("session", session);
+        //console.log("Player joining: ", playerName)
 
         if (session) {
             socket.join(sessionCode);
@@ -28,7 +32,12 @@ export function registerSocketHandlers(io, socket) {
 
             io.to(sessionCode).emit('player-list-update', { players: session.players });
     
-            socket.emit('joined-successfully', { sessionCode });
+            socket.emit('joined-successfully', {
+                 sessionCode,
+                gameName: session.gameName,
+            hostId: session.hostId 
+        });
+        
         } else {
             //session doesn't exist
             socket.emit('join-error', { message: "Session not found"});

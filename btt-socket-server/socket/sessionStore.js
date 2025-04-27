@@ -1,8 +1,9 @@
 const sessions = new Map(); // key = sessionCode, value = sessionData object
 
-export function createSession(sessionCode, hostId) {
-    sessions.set(sessionCode,{
+export function createSession(sessionCode, hostId, gameName) {
+    sessions.set(sessionCode, {
         hostId,
+        gameName,
         players: [],
         currentRound: 1,
         currentQuestion: 0,
