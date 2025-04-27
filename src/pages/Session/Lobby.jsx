@@ -16,6 +16,17 @@ export default function Lobby() {
 
     useEffect(() => {
 
+
+        if (!gameName || !hostData) {
+            console.log("Requesting session info from server...");
+            socket.emit('request-session-info', { sessionCode: joinCode });
+          }
+        
+          socket.on('session-info', ({ gameName, hostId }) => {
+            console.log('Received session info:', gameName, hostId);
+            // Now you could set local state to show this info
+          });
+          
         //listening for updates to players list
         socket.on('player-list-update', ({ players }) => {
             console.log("recieved updated players list: ", players);

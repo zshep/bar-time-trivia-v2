@@ -41,7 +41,7 @@ export default function JoinTriviaSession() {
         socket.emit('join-session', { sessionCode: joinCode, playerName: userName});
 
         //if successful
-        socket.once('joined-successfully', ({ sessionCode }) => {
+        socket.once('joined-successfully', ({ sessionCode, gameName, hostId }) => {
             console.log("Joined Successful, navigating to lobby");
             navigate(`/session/lobby/${sessionCode}`, {
                 state: {

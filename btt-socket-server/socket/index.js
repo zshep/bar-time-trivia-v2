@@ -35,7 +35,7 @@ export function registerSocketHandlers(io, socket) {
             socket.emit('joined-successfully', {
                  sessionCode,
                 gameName: session.gameName,
-            hostId: session.hostId 
+                hostId: session.hostId 
         });
         
         } else {
@@ -45,6 +45,20 @@ export function registerSocketHandlers(io, socket) {
 
 
     });
+
+    // grab missing data for lobby
+    socket.on('request-session-info', ({ sessionCode }) => {
+        if (session) {
+            socket.emit('session-info', {
+                sessionCode,
+                gameName: session.gameName,
+                hostId: session.hostId
+            });
+        }
+
+
+    });
+
 
     // Start game
     socket.on(`start-game`, ({ sessionCode }) => {
