@@ -6,16 +6,18 @@ export default function Lobby() {
 
     const location = useLocation();
     const state = location.state || {};
-    const gameName = location.state.gameName;
-    const joinCode = location.state.sessionCode;
-    const hostData = location.state.hostData;
-    
+    const [gameName, setGameName] = useState(location.state.gameName);
+    const [joinCode, setJoinCode] = useState(location.state.sessionCode);
+    const [hostData, setHostData] = useState(location.state.hostData);
+    const [hostName, setHostName] = useState(location.state.hostData.displayName);
+    const [players, setPlayers] = useState([]);
     //parsing out hostData
     const userId = hostData.uid || "";
-    const hostName = hostData.displayName || "Unkown Host";
+    
 
     useEffect(() => {
 
+        console.log("The state:", state);c
 
         if (!gameName || !hostData) {
             console.log("Requesting session info from server...");
@@ -24,7 +26,11 @@ export default function Lobby() {
         
           socket.on('session-info', ({ gameName, hostId }) => {
             console.log('Received session info:', gameName, hostId);
-            // Now you could set local state to show this info
+            // setting local state with new info:
+            setGameName(gameName);
+            setHostName(hostId);
+
+
           });
           
         //listening for updates to players list
@@ -42,7 +48,7 @@ export default function Lobby() {
 
 
 
-    const [players, setPlayers] = useState([]);
+    
     
     //console.log("host data:", hostData);
 
