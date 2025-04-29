@@ -71,7 +71,7 @@ export default function Lobby() {
 
     
     
-    //console.log("host data:", hostData);
+
 
 
     return(
