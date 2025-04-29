@@ -85,14 +85,6 @@ export default function CreateTriviaSession() {
             console.log("joincode:", joinCode)
 
 
-            //grab user data needed to send to sessionLobby
-            const minimalHostData = {
-                displayName: userData.displayName,
-                uid: userData.uid
-
-            };
-
-
             // Emit the socket event to create the session
             socket.emit("create-session", {
                 sessionCode: joinCode,
@@ -105,7 +97,7 @@ export default function CreateTriviaSession() {
                 state: {
                     gameName: selectedGame,
                     sessionCode: joinCode,
-                    hostData: minimalHostData
+                    hostId: userData.uid
                 } 
             });
 

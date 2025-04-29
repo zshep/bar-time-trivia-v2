@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import socket from "../../main";
+import { db } from "../../../app/server/api/firebase/firebaseConfig";
+import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 
 export default function Lobby() {
 
@@ -8,30 +10,49 @@ export default function Lobby() {
     const state = location.state || {};
     const [gameName, setGameName] = useState(location.state.gameName);
     const [joinCode, setJoinCode] = useState(location.state.sessionCode);
-    const [hostData, setHostData] = useState(location.state.hostData);
-    const [hostName, setHostName] = useState(location.state.hostData.displayName);
+    const [hostId, setHostId] = useState(location.state.hostId);
+    const [hostName, setHostName] = useState("");
     const [players, setPlayers] = useState([]);
-    //parsing out hostData
-    const userId = hostData.uid || "";
+    
+    // grabing host data
+    const grabHostData = async (hostId) => {
+        console.log("hostId:", hostId);
+
+        const hostIdRef = doc(db, "users", hostId);
+        const hostIdDoc = await getDoc(hostIdRef)
+        
+        if( hostIdDoc.exists()){
+            const hostData = hostIdDoc.data();
+            console.log("host data:", hostData);
+            setHostName(hostData.username || "unknown Host");
+
+        } else {
+            console.log("No host found in firestore");
+        }
+    };
+    
     
 
     useEffect(() => {
 
-        console.log("The state:", state);c
+        console.log("The state:", state);
 
-        if (!gameName || !hostData) {
+        if (!gameName || !hostId) {
             console.log("Requesting session info from server...");
             socket.emit('request-session-info', { sessionCode: joinCode });
-          }
+         
+            socket.on('session-info', ({ gameName, hostId }) => {
+                console.log('Received session info:', gameName, hostId);
+                // setting local state with new info:
+                setHostId(hostId);
+                grabHostData(hostId);
+    
+              });
+        }
+
+        grabHostData(hostId);
         
-          socket.on('session-info', ({ gameName, hostId }) => {
-            console.log('Received session info:', gameName, hostId);
-            // setting local state with new info:
-            setGameName(gameName);
-            setHostName(hostId);
-
-
-          });
+         
           
         //listening for updates to players list
         socket.on('player-list-update', ({ players }) => {

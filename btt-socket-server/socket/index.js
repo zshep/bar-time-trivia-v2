@@ -33,7 +33,7 @@ export function registerSocketHandlers(io, socket) {
             io.to(sessionCode).emit('player-list-update', { players: session.players });
     
             socket.emit('joined-successfully', {
-                 sessionCode,
+                sessionCode,
                 gameName: session.gameName,
                 hostId: session.hostId 
         });
@@ -48,15 +48,17 @@ export function registerSocketHandlers(io, socket) {
 
     // grab missing data for lobby
     socket.on('request-session-info', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
+
         if (session) {
             socket.emit('session-info', {
                 sessionCode,
                 gameName: session.gameName,
                 hostId: session.hostId
             });
+        } else {
+            console.log("session does not exist");
         }
-
-
     });
 
 

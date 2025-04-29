@@ -37,23 +37,35 @@ export default function JoinTriviaSession() {
         console.log("submiting Join Code: ", joinCode);
         console.log("player: ", userName);
 
+        //emit requesting session info to grab needed data
+        socket.emit('request-session-info', { sessionCode: joinCode})
+
+        //listen for session-data response from server
+        socket.once('session-info', ({ gameName, hostId }) => {
+            console.log('Recieved session info:', gameName, hostId);
+            setGameName(gameName);
+            setHostId(hostId);
+            
+        
+            //if successful
+            socket.once('joined-successfully', ({ sessionCode, gameName, hostId }) => {
+                console.log("Joined Successful, navigating to lobby");
+                navigate(`/session/lobby/${sessionCode}`, {
+                    state: {
+                        sessionCode,
+                        gameName,
+                        hostData: {
+                            uid: hostId,
+                            displayName: userName
+                        }
+                    }
+                });
+            });
+        });
+
         //emit join code via socket
         socket.emit('join-session', { sessionCode: joinCode, playerName: userName});
 
-        //if successful
-        socket.once('joined-successfully', ({ sessionCode, gameName, hostId }) => {
-            console.log("Joined Successful, navigating to lobby");
-            navigate(`/session/lobby/${sessionCode}`, {
-                state: {
-                    sessionCode,
-                    gameName,
-                    hostData: {
-                        uid: hostId,
-                        displayName: userName
-                    }
-                }
-            });
-        });
 
         //if fail
         socket.once('join-error', ( {message}) => {
