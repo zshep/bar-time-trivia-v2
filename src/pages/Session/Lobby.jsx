@@ -52,17 +52,22 @@ export default function Lobby() {
 
         grabHostData(hostId);
         
+        const handlePlayerListUpdate = ({ players }) => {
+            console.log("recieved updated players list: ", players);
+            setPlayers(players);
+            console.log("players",players);
+
+        }
          
           
         //listening for updates to players list
-        socket.on('player-list-update', ({ players }) => {
-            console.log("recieved updated players list: ", players);
-            setPlayers(players);
-        });
+        socket.on('player-list-update', handlePlayerListUpdate);
+        socket.emit('request-player-list', { sessionCode: joinCode });
+
         
         //cleaning up socket listiner when component unmounts
         return () => {
-            socket.off('player-list-update');
+            socket.off('player-list-update', handlePlayerListUpdate);
         };
 
     }, [])

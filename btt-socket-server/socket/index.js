@@ -46,6 +46,16 @@ export function registerSocketHandlers(io, socket) {
 
     });
 
+    socket.on('request-player-list', ({ sessionCode }) =>{
+        const session = getSession( sessionCode );
+
+
+        if (session) {
+            socket.emit('player-list-update', { players: session.players });
+        }
+
+    });
+
     // grab missing data for lobby
     socket.on('request-session-info', ({ sessionCode }) => {
         const session = getSession(sessionCode);
