@@ -5,6 +5,7 @@ import { auth, db } from "../../app/server/api/firebase/firebaseConfig.js"; // I
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
+import PasswordInput from "../components/PasswordInput.jsx";
 
 
 export default function Signup() {
@@ -13,6 +14,7 @@ export default function Signup() {
     const [username, setUsername] = useState("");
     const [password2, setPassword2] = useState("");
     const [error, setError] = useState(null);
+
     const navigate = useNavigate();
 
     //setting up db to firestore
@@ -26,7 +28,7 @@ export default function Signup() {
             return;
         }
 
-    
+
         try {
 
             console.log("starting username query");
@@ -34,18 +36,18 @@ export default function Signup() {
             // Check for unique username
             const usersRef = collection(db, "users");
             console.log("usersRef initialized:", usersRef);
-        
-            
+
+
             const q = query(usersRef, where("username", "==", username));
             console.log("Query object created:", q);
-             
-            
+
+
             //debugging
             // const q = query(usersRef, where())
 
             const querySnapshot = await getDocs(q);
             console.log("QuerySnapshot:", querySnapshot);
-            
+
 
             if (!querySnapshot.empty) {
                 console.log("Username exists:", querySnapshot.docs.map(doc => doc.data()));
@@ -77,11 +79,11 @@ export default function Signup() {
             setError(err.message);
             console.error("Error during signup:", err);
         }
-             
+
     };
 
     return (
-        <div className="flex flex-col self-center w-80 mb-20 pb-10">
+        <div className="flex flex-col justify-self-center w-80 mb-20 pb-10">
             <div>
                 <p>Sign up today to create an account</p>
             </div>
@@ -121,34 +123,21 @@ export default function Signup() {
                                 </label>
                             </div>
                             <div className="d-flex flex-row justify-content-space-evenly">
-                                <input
-                                    className="border ml-2 text-center"
+                                <PasswordInput
                                     id="password"
-                                    type="password"
+                                    label="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter password"
-                                    required
-                                    minLength={3}
                                 />
-                                <label className="ml-3 text-xs font-medium hidden" htmlFor="password">
-                                    Password
-                                </label>
                             </div>
-                            <div className="d-flex flex-row justify-content-space-evenly mt-2">
-                                <input
-                                    className="border ml-2 text-center"
+                            <div className="d-flex flex-row justify-content-center mt-2">
+                                <PasswordInput
                                     id="password2"
-                                    type="password"
+                                    label="Re-enter Password"
                                     value={password2}
                                     onChange={(e) => setPassword2(e.target.value)}
-                                    placeholder="Re-enter password"
-                                    required
-                                    minLength={3}
                                 />
-                                <label className="ml-3 text-xs font-medium hidden" htmlFor="password2">
-                                    Retype Password
-                                </label>
+
                             </div>
                         </div>
                         <div className="d-flex justify-content-center mb-2 mt-4">
