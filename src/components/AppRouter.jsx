@@ -52,7 +52,7 @@ function AppRouter() {
           {/* Routes for session */}
           <Route path="/session" element={<SessionPage/>}>
             <Route path="lobby/*" element={<Lobby/>}/>
-            <Route path="live" element={<LiveMainPage/>}/>
+            <Route path="live/*" element={<LiveMainPage/>}/>
 
 
 
