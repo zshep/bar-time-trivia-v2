@@ -16,6 +16,9 @@ export default function Lobby() {
     const [hostName, setHostName] = useState("");
     const [players, setPlayers] = useState([]);
     const [isHost, setIsHost] = useState(false);
+    const [showCountdown, setShowCountdown] = useState(false);
+    const [countdown, setCountDown] = useState(3);
+
 
     // grabing host data
     const grabHostData = async (hostId) => {
@@ -79,7 +82,7 @@ export default function Lobby() {
             socket.off('player-list-update', handlePlayerListUpdate);
         };
 
-        
+
 
     }, []);
 
@@ -97,8 +100,32 @@ export default function Lobby() {
     useEffect(() => {
         const handleGameStarted = () => {
             console.log("Game has started!");
-            // navigate to gameplay screen
-            navigate(`/session/live/${joinCode}`);
+            setShowCountdown(true);
+
+            let current = 3;
+            setCountDown(current);
+
+            const interval = setInterval(() => {
+                current--;
+                setCountDown(current);
+
+                if (current <= 0) {
+                    clearInterval(interval);
+
+                    // navigate to gameplay screen
+                    navigate(`/session/live/${joinCode}`, {
+                        state: {
+                            gameName: gameName,
+                            sessionCode: joinCode,
+                            hostId: hostId
+                        }
+                    });
+                }
+            }, 1000);
+
+
+
+
 
         };
         socket.on('game-started', handleGameStarted);
@@ -116,7 +143,16 @@ export default function Lobby() {
 
     return (
 
+
         <div className="flex flex-col w-full">
+            {showCountdown && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+                    <div className="bg-white p-8 rounded shadow-lg text-center">
+                        <p className="text-2xl font-bold">Get Ready!</p>
+                        <p className="text-6xl font-extrabold mt-4">{countdown > 0 ? countdown : "GO!"}</p>
+                    </div>
+                </div>
+            )}
             <div className="text-3xl ">
                 <p>Trivia Lobby</p>
             </div>

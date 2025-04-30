@@ -1,6 +1,22 @@
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
+
 export default function LiveMainPage() {
 
-    // grab
+    // grab state from Lobby
+    const location = useLocation();
+    const gameName = location.state.gameName;
+    const sessionCode = location.state.sessionCode;
+    const hostId = location.state.hostId;
+
+    //variables for game logic
+    const [questionNumber, setQuestionNumber] = useState(1);
+    const [roundNumber, setRoundNumber] = useState(1);
+    const [questions, setQuestions] = useState([]);
+    const [players, setPlayers] = useState([]);
+
+    // logic to grab game data
+
 
 
     return (
@@ -9,13 +25,13 @@ export default function LiveMainPage() {
             <div className="flex border border-black">
                 {/* 
                     <div>
-                        <p>Game: {game.name}</p>
+                        <p>Game: {gameName}</p>
                     </div>
                     <div>
                         <p>Round: {game.roundNumber}</p>
                     </div>
                     <div>
-                        <p>Host: {game.host}</p>
+                        <p>Host: {hostId}</p>
                     </div>
                                 */}
             </div>
