@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../../main";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
-import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
+import {  getDoc, doc } from "firebase/firestore";
 import { auth } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function Lobby() {
