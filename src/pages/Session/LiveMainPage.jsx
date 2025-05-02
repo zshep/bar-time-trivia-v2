@@ -3,68 +3,63 @@ import { useLocation } from "react-router-dom";
 import socket from "../../main";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import { getDoc, getDocs, collection, query, where } from "firebase/firestore";
+import { doc } from "firebase/firestore/lite";
 
 
 export default function LiveMainPage() {
 
-    // grab state from Lobby
-    const location = useLocation();
-    const gameName = location.state.gameName;
-    const sessionCode = location.state.sessionCode;
-    const hostId = location.state.hostId;
+    const { state } = useLocation();
+    const { gameName, sessionCode, hostId } = state;
 
     //variables for game logic
+    const [gameData, setGameData] = useState(null);
     const [questionNumber, setQuestionNumber] = useState(1);
     const [roundNumber, setRoundNumber] = useState(1);
     const [questions, setQuestions] = useState([]);
     const [players, setPlayers] = useState([]);
 
     // logic to grab game data
-    const grabGameData = async () => {
-        console.log("grabing game data for ", gameName);
-
-        try {
-            const gameInfo = collection(db, "games");
-            const q = query(gameInfo, where ("name", "==", gameName));
-            const querySnapshot = await getDocs(q);
-            const gameData = querySnapshot.data();
-            console.log("game Data: ", gameData);
-            
-            return gameData;
-
-
-        } catch(err){
-            console.error("could not grab Game data")
-        }
-
-    };
-
     useEffect(() => {
+        (async () => {
+          try {
+            // 1) reference your "games" collection
+            const gamesCol = collection(db, "games");
+            // 2) build a query on the "name" field
+            const q = query(gamesCol, where("name", "==", gameName));
+            // 3) run it
+            const snap = await getDocs(q);
+            if (snap.empty) {
+              console.warn(`No game found with name "${gameName}"`);
+              return;
+            }
+            // 4) grab the first matching doc
+            const docSnap = snap.docs[0];
+            setGameData({ id: docSnap.id, ...docSnap.data() });
+            console.log("docs", gameData);
+          } catch (err) {
+            console.error("Error fetching game:", err);
+          }
+        })();
+      }, [gameName]);
 
-        console.log("Initalizing Data grab");
-        const gameStuff = grabGameData();
-        console.log("gamestuff:", gameStuff);
-
-    },[] )
+      useEffect(() =>{
+        console.log("gameData", gameData);
+      },[gameData]);
 
 
 
     return (
 
         <div className="flex flex-col w-full">
-            <div className="flex border border-black">
-                
-                    <div>
-                        <p>Game: {gameName}</p>
-                    </div>
-                    <div>
-                        <p>Round: {roundNumber}</p>
-                    </div>
-                    <div>
-                        <p>Host: {hostId}</p>
-                    </div>
-                                
-            </div>
+            <div className="flex border border-black justify-around">
+
+                <div>
+                    <p>Game: {gameName}</p>
+                </div>
+                <div>
+                    <p>Round: {roundNumber}</p>
+                </div>
+                            </div>
             <div>
                 <p>I am the question</p>
                 <p>I am the answer choices</p>
