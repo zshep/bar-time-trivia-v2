@@ -8,29 +8,29 @@ import { doc } from "firebase/firestore/lite";
 
 export default function LiveMainPage() {
 
-    const { state } = useLocation();
-    const { gameName, gameId, sessionCode, hostId } = state;
+  const { state } = useLocation();
+  const { gameName, gameId, sessionCode, hostId } = state;
 
-    //variables for game logic
-    const [roundData, setRoundData] = useState({});
-    const [roundId, setRoundId] = useState('');
-    const [questionData, setQuestionData] =useState([]);
-    const [questionType, setQuestionType] = useState("");
-    const [questionCategory, setQuestionCatergory] = useState("");
-    const [questionNumber, setQuestionNumber] = useState(1);
-    const [roundNumber, setRoundNumber] = useState(1);
-    const [question, setQuestion] = useState([]);
-    const [players, setPlayers] = useState([]);
+  //variables for game logic
+  const [roundData, setRoundData] = useState({});
+  const [roundId, setRoundId] = useState('');
+  const [questionData, setQuestionData] = useState([]);
+  const [questionType, setQuestionType] = useState("");
+  const [questionCategory, setQuestionCatergory] = useState("");
+  const [questionNumber, setQuestionNumber] = useState(1);
+  const [roundNumber, setRoundNumber] = useState(1);
+  const [question, setQuestion] = useState([]);
+  const [players, setPlayers] = useState([]);
 
-    
-     // fetch rounds
+
+  // fetch rounds
   useEffect(() => {
     if (!gameId) return;
     (async () => {
       const col = collection(db, "rounds");
-      const q   = query(col,
-                        where("gameId", "==", gameId),
-                        orderBy("roundNumber", "asc"));
+      const q = query(col,
+        where("gameId", "==", gameId),
+        orderBy("roundNumber", "asc"));
       const snap = await getDocs(q);
       const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       console.log("Round List:", list);
@@ -50,14 +50,14 @@ export default function LiveMainPage() {
     if (!roundId) return;
     (async () => {
       const col = collection(db, "questions");
-      const q   = query(col,
-                        where("roundId", "==", roundId),
-                        orderBy("questionNumber","asc"));
+      const q = query(col,
+        where("roundId", "==", roundId),
+        orderBy("questionNumber", "asc"));
       const snap = await getDocs(q);
       setQuestionData(snap.docs.map(d => (
         { id: d.id, ...d.data() }
       )));
-        console.log("QuestionData:", questionData);
+      console.log("QuestionData:", questionData);
     })();
   }, [roundId]);
 
@@ -72,36 +72,58 @@ export default function LiveMainPage() {
       setQuestion(questionData[questionNumber - 1].question);
       //grabing question type
       setQuestionType(questionData[questionNumber - 1].questionType);
+
     }
   }, [questionData, questionNumber]);
 
-    return (
+  useEffect(() => {
+    if (questionType == 'multipleChoice') {
+      console.log("It's MC");
+      /* 
+      // check if mcFinalAnswer is in mcAnswers
+      console.log("mcChoices: ", mcChoices);
+      console.log("mcAnswers: ", mcAnswers);
+      */   
+    }
+  })
 
-        <div className="flex flex-col w-full items-center">
-            <div className="flex border border-black justify-around w-1/3">
+  return (
 
-                <div>
-                    <p>Game: {gameName}</p>
-                </div>
-                <div>
-                    <p>Round: {roundNumber}</p>
-                </div>
-                            </div>
-            <div>
-                <div className="mt-10 text-2xl">
-                  <p>{question || "Loading Question..."}</p>
-                </div>
-                <div>
+    <div className="flex flex-col w-full items-center">
+      <div className="flex border border-black justify-around w-1/3">
 
-                  <p>I am the answer choices</p>
-
-                </div>
-
-            </div>
-
-
-
-
+        <div>
+          <p>Game: {gameName}</p>
         </div>
-    )
+        <div>
+          <p>Round: {roundNumber}</p>
+        </div>
+      </div>
+      <div className="">
+        <div className="mt-10 text-2xl">
+          <p>{question || "Loading Question..."}</p>
+        </div>
+        <div className="flex justify-center mt-24">
+          
+          {questionType === "freeResponse" && ( <p>I am a question choice</p>
+           /* <CreateQuestionFr answer={frAnswer} setAnswer={setFrAnswer} /> */
+          )}
+          {questionType === "multipleChoice" && (
+            <p>I am a question choice</p>
+          /*  <CreateQuestionMc answers={mcAnswers} setAnswers={setMcAnswers} choices={mcChoices} setChoices={setMcChoices} /> */
+          )}
+          {questionType === "sort" && (
+            <p>I am a question choice</p> /*
+            <CreateQuestionSort />
+            */
+          )}
+        </div>
+
+      </div>
+
+
+
+
+    </div>
+  )
 }
