@@ -9,7 +9,7 @@ import { doc } from "firebase/firestore/lite";
 export default function LiveMainPage() {
 
     const { state } = useLocation();
-    const { gameName, sessionCode, hostId } = state;
+    const { gameName, gameId, sessionCode, hostId } = state;
 
     //variables for game logic
     const [gameData, setGameData] = useState(null);
@@ -18,6 +18,8 @@ export default function LiveMainPage() {
     const [questions, setQuestions] = useState([]);
     const [players, setPlayers] = useState([]);
 
+
+    /* 
     // logic to grab game data
     useEffect(() => {
         (async () => {
@@ -41,10 +43,13 @@ export default function LiveMainPage() {
           }
         })();
       }, [gameName]);
+      */
 
       useEffect(() =>{
-        console.log("gameData", gameData);
-      },[gameData]);
+        console.log("gameName", gameName);
+        console.log("gameId:", gameId);
+
+      },[]);
 
 
 
@@ -57,7 +62,7 @@ export default function LiveMainPage() {
                     <p>Game: {gameName}</p>
                 </div>
                 <div>
-                    <p>Round: {roundNumber}</p>
+                    <p>Round: {/*roundNumber*/}</p>
                 </div>
                             </div>
             <div>

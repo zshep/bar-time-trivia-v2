@@ -8,9 +8,9 @@ import { useNavigate } from "react-router-dom";
 export default function CreateTriviaSession() {
 
     const [userId, setUserId] = useState(null);
-    const [userData, setUserData] =useState({})
+    const [userData, setUserData] = useState({})
     const [games, setGames] = useState([]);
-    const [selectedGame, setSelectedGame] = useState("");
+    const [selectedGameId, setSelectedGameId] = useState("");
     const navigate = useNavigate();
 
     //grabbing users data
@@ -69,39 +69,46 @@ export default function CreateTriviaSession() {
 
     const handleBtnClick = () => {
 
-        if (selectedGame === "") {
+        if (!selectedGameId) {
 
             console.log("There is no game selected");
             alert("You didn't select a game!");
-            return
-
-        } else {
-
-            console.log(`Session created for ${selectedGame} Game`);
-
-
-            // generate a 6 digit code
-            const joinCode = generateJoinCode();
-            console.log("joincode:", joinCode)
-
-
-            // Emit the socket event to create the session
-            socket.emit("create-session", {
-                sessionCode: joinCode,
-                hostId: userId,
-                gameName: selectedGame
-            });
-
-            // Redirect user to lobby screen (assuming you have routing set up)
-            navigate(`/session/lobby/${joinCode}`, {
-                state: {
-                    gameName: selectedGame,
-                    sessionCode: joinCode,
-                    hostId: userData.uid
-                } 
-            });
+            return;
 
         }
+
+        console.log(`Session created for ${selectedGameId} Game`);
+
+        const game = games.find(g => g.id === selectedGameId);
+        if (!game) {
+            console.error("Selected game not found in state!");
+            return;
+        }
+
+        // generate a 6 digit code
+        const joinCode = generateJoinCode();
+        console.log("joincode:", joinCode)
+
+
+        // Emit the socket event to create the session
+        socket.emit("create-session", {
+            sessionCode: joinCode,
+            hostId: userId,
+            gameId: game.id,
+            gameName: game.name,
+        });
+
+        // Redirect user to lobby screen (assuming you have routing set up)
+        navigate(`/session/lobby/${joinCode}`, {
+            state: {
+                gameName: game.name,
+                gameId: game.id,
+                sessionCode: joinCode,
+                hostId: userData.uid
+            }
+        });
+
+
 
     }
 
@@ -114,11 +121,11 @@ export default function CreateTriviaSession() {
 
                     <label htmlFor="game">Select a Game</label>
                     <select
-                        value={selectedGame}
+                        value={selectedGameId}
                         name="game"
                         className="self-center text-center"
                         required
-                        onChange={(e) => setSelectedGame(e.target.value)}
+                        onChange={(e) => setSelectedGameId(e.target.value)}
                     >
                         <option
                             disabled value=""
@@ -128,15 +135,13 @@ export default function CreateTriviaSession() {
 
                                 <option
                                     key={game.id}
-                                    value={game.name || ""}
+                                    value={game.id}
                                 >{game.name}
 
 
                                 </option>
 
                             ))
-
-
                         }
 
 

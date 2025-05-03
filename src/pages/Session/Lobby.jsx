@@ -11,6 +11,7 @@ export default function Lobby() {
     const location = useLocation();
     const state = location.state || {};
     const [gameName, setGameName] = useState(location.state.gameName);
+    const [gameId, setGameId] = useState(location.state.gameId);
     const [joinCode, setJoinCode] = useState(location.state.sessionCode);
     const [hostId, setHostId] = useState(location.state.hostId);
     const [hostName, setHostName] = useState("");
@@ -116,16 +117,13 @@ export default function Lobby() {
                     navigate(`/session/live/${joinCode}`, {
                         state: {
                             gameName: gameName,
+                            gameId: gameId,
                             sessionCode: joinCode,
                             hostId: hostId
                         }
                     });
                 }
             }, 1000);
-
-
-
-
 
         };
         socket.on('game-started', handleGameStarted);
