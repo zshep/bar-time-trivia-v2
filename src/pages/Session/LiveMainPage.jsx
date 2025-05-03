@@ -15,6 +15,8 @@ export default function LiveMainPage() {
     const [roundData, setRoundData] = useState({});
     const [roundId, setRoundId] = useState('');
     const [questionData, setQuestionData] =useState([]);
+    const [questionType, setQuestionType] = useState("");
+    const [questionCategory, setQuestionCatergory] = useState("");
     const [questionNumber, setQuestionNumber] = useState(1);
     const [roundNumber, setRoundNumber] = useState(1);
     const [question, setQuestion] = useState([]);
@@ -31,6 +33,7 @@ export default function LiveMainPage() {
                         orderBy("roundNumber", "asc"));
       const snap = await getDocs(q);
       const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      console.log("Round List:", list);
       setRoundData(list);
     })();
   }, [gameId]);
@@ -51,14 +54,24 @@ export default function LiveMainPage() {
                         where("roundId", "==", roundId),
                         orderBy("questionNumber","asc"));
       const snap = await getDocs(q);
-      setQuestionData(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setQuestionData(snap.docs.map(d => (
+        { id: d.id, ...d.data() }
+      )));
+        console.log("QuestionData:", questionData);
     })();
   }, [roundId]);
+
+  //extract questionType
+  useEffect(() => {
+
+  })
 
   //extract the single question when questionData or questionNumber change
   useEffect(() => {
     if (questionData.length >= questionNumber) {
       setQuestion(questionData[questionNumber - 1].question);
+      //grabing question type
+      setQuestionType(questionData[questionNumber - 1].questionType);
     }
   }, [questionData, questionNumber]);
 
