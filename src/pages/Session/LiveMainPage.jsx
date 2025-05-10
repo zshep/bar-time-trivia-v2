@@ -14,14 +14,15 @@ export default function LiveMainPage() {
   const { gameName, gameId, sessionCode, hostId } = state;
 
   //variables for game logic
-  const [roundData, setRoundData] = useState({});
+  const [roundData, setRoundData] = useState([]);
   const [roundId, setRoundId] = useState('');
   const [questionData, setQuestionData] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const [questionType, setQuestionType] = useState("");
   const [questionCategory, setQuestionCatergory] = useState("");
   const [questionNumber, setQuestionNumber] = useState(1);
   const [roundNumber, setRoundNumber] = useState(1);
-  const [question, setQuestion] = useState([]);
+  const [questionText, setQuestionText] = useState("");
   const [answer, setAnswer] = useState([]);
   const [players, setPlayers] = useState([]);
 
@@ -62,43 +63,50 @@ export default function LiveMainPage() {
   //fetch all questions for that roundId
   useEffect(() => {
     if (!roundId) return;
-    (async () => {
-      const col = collection(db, "questions");
-      const q = query(col,
-        where("roundId", "==", roundId),
-        orderBy("questionNumber", "asc"));
-      const snap = await getDocs(q);
-      setQuestionData(snap.docs.map(d => (
-        { id: d.id, ...d.data() }
-      )));
-      console.log("QuestionData:", questionData);
-    })();
+    const col = collection(db, "questions");
+    const q = query(col,
+      where("roundId", "==", roundId),
+      orderBy("questionNumber", "asc"));
+    getDocs(q).then(snap => {
+      setQuestionData(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setQuestionNumber(1);              // reset to first question of the round
+    });
   }, [roundId]);
 
 
   //extract the single question when questionData or questionNumber change
   useEffect(() => {
-    console.log("setting question")
-    if (questionData.length >= questionNumber) {
-      setQuestion(questionData[questionNumber - 1].question);
-      //grabing question type
-      setQuestionType(questionData[questionNumber - 1].questionType);
 
+    if (questionData.length >= questionNumber) {
+      const cq = questionData[questionNumber - 1];
+      setCurrentQuestion(cq);
+      setQuestionText(cq.question);
+      setQuestionType(cq.questionType);
     } else {
-      console.log("there's nothing here");
+      setCurrentQuestion(null);
+      setQuestionText("");
+      setQuestionType("");
     }
   }, [questionData, questionNumber]);
+
+  //emitting "send-question"
+  useEffect(() => {
+    if (currentQuestion /*&& userId === hostId*/) {
+      socket.emit("send-question", {
+        roundNumber,
+        questionNumber,
+        question: currentQuestion,
+        sessionCode
+      });
+    }
+  }, [currentQuestion]);
 
   useEffect(() => {
     if (questionType == 'multipleChoice') {
       console.log("It's MC");
 
-      setMcChoices(questionData[0].answers)
-
-      // check if mcFinalAnswer is in mcAnswers
-      console.log("mcChoices: ", mcChoices);
-      console.log("mcAnswers: ", mcAnswers);
-
+      setMcChoices(currentQuestion.answers);
+      setMcPlayerChoice([]);
     }
 
     else if (questionType == 'freeResponse') {
@@ -112,15 +120,19 @@ export default function LiveMainPage() {
 
   const handleSubmitAnswer = () => {
 
-    console.log("Question Type:", questionType);
-    let finalAnswerData = null;
-    try {
+    const finalAnswer =
+      questionType === "multipleChoice"
+        ? mcPlayerChoice
+        : frAnswer;
 
-      
 
-    }catch(err) {
-      console.error("Could not submit answer", err);
-    }
+    socket.emit("player-answer", {
+      sessionCode,
+      roundNumber,
+      questionNumber,
+      answer: finalAnswer,
+      playerId: myPlayerId
+    });
 
   }
 
@@ -138,15 +150,22 @@ export default function LiveMainPage() {
       </div>
       <div className="">
         <div className="mt-10 text-2xl">
-          <p>{question || "Loading Question..."}</p>
+          <p>{questionText || "Loading Question..."}</p>
         </div>
         <div className="flex justify-center mt-24">
 
           {questionType === "freeResponse" && (
-            <QuestionFc answer={frAnswer} setAnswer={setFrAnswer} />
+            <QuestionFc
+              answer={frAnswer}
+              setAnswer={setFrAnswer}
+            />
           )}
-          {questionType === "multipleChoice" && (
-            <QuestionMc choices={mcChoices} playerChoice={mcPlayerChoice} setPlayerChoice={setMcPlayerChoice} />
+          {questionType === "multipleChoice" && currentQuestion && (
+            <QuestionMc
+              choices={mcChoices}
+              playerChoice={mcPlayerChoice}
+              setPlayerChoice={setMcPlayerChoice}
+            />
           )}
           {questionType === "sort" && (
             <QuestionSort />
