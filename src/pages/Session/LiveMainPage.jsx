@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import socket from "../../main";
-import { db } from "../../../app/server/api/firebase/firebaseConfig";
+import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
-import { doc } from "firebase/firestore/lite";
 import QuestionMc from "../../components/sessions/questionMc";
 import QuestionFc from "../../components/sessions/questionFc";
 import QuestionSort from "../../components/sessions/questionsort";
@@ -25,6 +24,8 @@ export default function LiveMainPage() {
   const [questionText, setQuestionText] = useState("");
   const [answer, setAnswer] = useState([]);
   const [players, setPlayers] = useState([]);
+  const [userData, setUserData] =useState([]);
+  const [userId, setUserId] =useState(null);
 
   //variables based on Question type
   //For MC, storing array of an answer choices
@@ -33,9 +34,26 @@ export default function LiveMainPage() {
   const [mcAnswers, setMcAnswers] = useState([]);
   // for FR, storing single string
   const [frAnswer, setFrAnswer] = useState("");
+  
 
   // for Sort, store it in as array of objects???
   const [sortAnswers, setSortAnswers] = useState({});
+
+  //grabbing users data
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log("user: ", user);
+                setUserId(user.uid);
+                setUserData(user);
+               
+            } else {
+                console.log("there is no user");
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
 
   // fetch rounds
@@ -91,7 +109,7 @@ export default function LiveMainPage() {
 
   //emitting "send-question"
   useEffect(() => {
-    if (currentQuestion /*&& userId === hostId*/) {
+    if (currentQuestion && userId === hostId) {
       socket.emit("send-question", {
         roundNumber,
         questionNumber,
@@ -102,21 +120,24 @@ export default function LiveMainPage() {
   }, [currentQuestion]);
 
   useEffect(() => {
-    if (questionType == 'multipleChoice') {
+    if (questionType == 'multipleChoice' && currentQuestion) {
       console.log("It's MC");
 
-      setMcChoices(currentQuestion.answers);
+      setMcChoices(currentQuestion.answer.mcChoices);
       setMcPlayerChoice([]);
     }
 
     else if (questionType == 'freeResponse') {
-      console.log("it's a FR")
+      console.log("it's a FR");
+      setFrAnswer(currentQuestion.answer);
+
     }
 
     else if (questionType == 'sort') {
-      console.log("it's a sort")
+      console.log("it's a sort");
+      console.log("That shouldn't happen...");
     }
-  }, [])
+  }, [questionType, currentQuestion])
 
   const handleSubmitAnswer = () => {
 
@@ -152,7 +173,7 @@ export default function LiveMainPage() {
         <div className="mt-10 text-2xl">
           <p>{questionText || "Loading Question..."}</p>
         </div>
-        <div className="flex justify-center mt-24">
+        <div className="flex justify-center mt-4">
 
           {questionType === "freeResponse" && (
             <QuestionFc

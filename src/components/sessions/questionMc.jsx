@@ -26,7 +26,7 @@ export default function QuestionMc({ choices, playerChoice, setPlayerChoice }) {
 
 
                 {choices.map((choice, idx) => (
-                    <div className="flex justify-center" key={idx}>
+                    <div className="flex justify-between" key={idx}>
 
                         <p
                             className="border p-2 border-black text-center my-1"
