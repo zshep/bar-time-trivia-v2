@@ -29,12 +29,12 @@ export default function QuestionMc({ choices, playerChoice, setPlayerChoice }) {
                     <div className="flex justify-between" key={idx}>
 
                         <p
-                            className="border p-2 border-black text-center my-1"
+                            className="border p-2 border-black text-center my-1 w-1/2"
                             id={idx}
 
                         > {choice || "Some Thing"} </p>
                         <input
-                            className="ml-4"
+                            className="ml-4 "
                             type="checkbox"
                             checked={playerChoice.includes(choice)}
                             onChange={(e) => handleCheckboxChange(idx, e.target.checked)}
