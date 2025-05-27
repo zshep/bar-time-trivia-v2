@@ -12,23 +12,7 @@ export default function LiveMainPage() {
   const { state } = useLocation();
   const { gameName, gameId, sessionCode, hostId } = state;
 
-  const handleSubmitAnswer = () => {
-
-    const finalAnswer =
-      questionType === "multipleChoice"
-        ? mcPlayerChoice
-        : frAnswer;
-
-
-    socket.emit("player-answer", {
-      sessionCode,
-      roundNumber,
-      questionNumber,
-      answer: finalAnswer,
-      playerId: myPlayerId
-    });
-
-  }
+ 
 
   return (
 

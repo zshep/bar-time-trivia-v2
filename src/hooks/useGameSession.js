@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import socket from "../main";
 import { db, auth } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { useAuth } from "./useAuth";
 
 export function useGameSession({ gameId, sessionCode, hostId }) {
 
   //----------      states:     ----------
   //user data
+  const user = useAuth();
+  const userId = user?.uid;
   const [userData, setUserData] = useState([]);
 
   //general trivia info
@@ -33,38 +36,6 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
   const [sortAnswers, setSortAnswers] = useState({});
 
   // ----- useEffects: -----
-
-  function nextQuestion(){
-    setQuestionNumber(q => q + 1);
-  }
-
-  function prevQuestion() {
-    setQuestionNumber( q => Math.max(q - 1));
-  }
-  function endRound() {
-    socket.emit("end-round", {sessionCode, roundNumber})
-    setRoundNumber(r => r + 1);
-  }
-  function submitAnswer(finalAnswer) {
-    socket.emit("player-answer", {sessionCode, roundNumber, questionNumber, answer:finalAnswer, playerId: userId});
-  }
-
-
-  //grabbing users data
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        console.log("user: ", user);
-        setUserId(user.uid);
-        setUserData(user);
-
-      } else {
-        console.log("there is no user");
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   // fetch rounds
   useEffect(() => {
@@ -132,10 +103,28 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
 
 //------ handlers -----
 
+  function nextQuestion(){
+    setQuestionNumber(q => q + 1);
+  }
+
+  function prevQuestion() {
+    setQuestionNumber( q => Math.max(q - 1));
+  }
+  function endRound() {
+    socket.emit("end-round", {sessionCode, roundNumber})
+    setRoundNumber(r => r + 1);
+  }
+  function submitAnswer(finalAnswer) {
+    socket.emit("player-answer", {sessionCode, roundNumber, questionNumber, answer:finalAnswer, playerId: userId});
+  }
+
+  
+
 
   return {
     // state
     currentQuestion,
+    questionText,
     questionType,
     mcChoices,
     frAnswer,
