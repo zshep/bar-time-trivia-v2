@@ -6,6 +6,8 @@ import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
 import QuestionMc from "../../components/sessions/questionMc";
 import QuestionFc from "../../components/sessions/questionFc";
 import QuestionSort from "../../components/sessions/questionsort";
+import PlayerView from "../../components/sessions/PlayerView";
+
 
 export default function LiveMainPage() {
 
