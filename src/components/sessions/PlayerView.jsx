@@ -2,7 +2,7 @@ import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 
 
-export function PlayerView({
+export default function PlayerView({
     currentQuestion,
     questionType,
     questionText,
@@ -18,10 +18,10 @@ export function PlayerView({
               <div className="flex border border-black justify-around w-1/3">
         
                 <div>
-                  <p>Game: {gameName}</p>
+                  <p>Game: {/*gameName*/}</p>
                 </div>
                 <div>
-                  <p>Round: {roundNumber}</p>
+                  <p>Round: {/*roundNumber*/}</p>
                 </div>
               </div>
               <div className="">
