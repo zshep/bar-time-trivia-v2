@@ -14,7 +14,7 @@ export default function PlayerView({
 }) {
     return (
 
-        <div className="flex flex-col w-full items-center">
+        <div className="flex flex-col w-full items-center mt-5">
           <p>This is PlayerView</p>
               
               <div className="">
@@ -27,7 +27,7 @@ export default function PlayerView({
                       setAnswer={setFrAnswer}
                     />
                   )}
-                  {questionType === "multipleChoice" && currentQuestion && (
+                  {questionType === "multipleChoice" && (
                     <QuestionMc
                       choices={mcChoices}
                       playerChoice={mcPlayerChoice}

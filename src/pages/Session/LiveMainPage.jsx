@@ -20,21 +20,22 @@ export default function LiveMainPage() {
 
   console.log("session:", session);
 
-
   // socket to grab question data
   useEffect(() => {
-      if (!session) {
-        console.log("You ain't got no session, Jack!");
-        // complete socket handler to listen and deal with data
+    if (!session) {
+      console.log("You ain't got no session, Jack!");
+      // complete socket handler to listen and deal with data
 
-        //socket.on('send-question')
-      }
-      else {
-        console.log("You're the host")
-      }
+      socket.on('new-question', ({ questionData }) => {
+        console.log("here's the new data", questionData);
+      })
+    }
+    else {
+      console.log("You're the host")
+    }
 
-  }, []) 
-  
+  }, [])
+
   //finding host
   const isHost = session.userId === session.hostId;
   console.log("isHost??", isHost);
@@ -43,6 +44,12 @@ export default function LiveMainPage() {
   const isPresenter = Boolean(
     new URLSearchParams(window.location.search).get("presenter")
   );
+
+  // protecting with conditional rendering
+    if (!gameId || !sessionCode || !hostId || session.loading) {
+      console.log("Waiting for session data...")
+      return <p>Loading...</p>;
+    }
 
   return (
     <div className="flex flex-col w-full items-center">
@@ -54,10 +61,10 @@ export default function LiveMainPage() {
           <p>Round: {/*roundNumber*/}</p>
         </div>
       </div>
-      
-    <div className="mt-10 text-2xl">
-                  <p>{session.questionText || "Loading Question..."}</p>
-                </div>
+
+      <div className="mt-10 text-2xl">
+        <p>{session.questionText || "Loading Question..."}</p>
+      </div>
 
 
       <div>
@@ -72,7 +79,7 @@ export default function LiveMainPage() {
 
       </div>
 
-     
+
 
     </div>
 

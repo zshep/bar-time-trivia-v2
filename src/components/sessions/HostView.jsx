@@ -22,8 +22,9 @@ export default function HostView({
             <div>
                 <h2>{/*currentQuestion.question*/}</h2>
                 {questionType === "multipleChoice" && (
-                    /*<QuestionMc choices={mcChoices} /> */
-                    <p>I'm a MC SEction!!</p>
+                   /* <QuestionMc choices={mcChoices} />*/
+                   <p>I'm a MC TAG</p>
+                   
                 )}
                 {questionType === "freeResponse" && (
                     /*<QuestionFc /> */

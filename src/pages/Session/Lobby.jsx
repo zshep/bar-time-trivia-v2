@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../../main";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
-import {  getDoc, doc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 import { auth } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function Lobby() {
@@ -40,7 +40,7 @@ export default function Lobby() {
 
     //start game logic
     const handleStartGame = () => {
-        
+
         socket.emit('start-game', { sessionCode: joinCode });
 
     };
@@ -62,9 +62,11 @@ export default function Lobby() {
                 grabHostData(hostId);
 
             });
+        } else {
+
+            grabHostData(hostId);
         }
 
-        grabHostData(hostId);
 
         const handlePlayerListUpdate = ({ players }) => {
             console.log("recieved updated players list: ", players);
@@ -82,10 +84,8 @@ export default function Lobby() {
         //cleaning up socket listiner when component unmounts
         return () => {
             socket.off('player-list-update', handlePlayerListUpdate);
+            socket.off('session-info')
         };
-
-
-
     }, []);
 
     //checking if user is host or not
@@ -114,28 +114,31 @@ export default function Lobby() {
                 if (current <= 0) {
                     clearInterval(interval);
 
-                    // navigate to gameplay screen
-                    navigate(`/session/live/${joinCode}`, {
-                        state: {
-                            gameName: gameName,
-                            gameId: gameId,
-                            sessionCode: joinCode,
-                            hostId: hostId
-                        }
-                    });
+                    // Double-check critical state before navigating
+                    if (gameName && gameId && joinCode && hostId) {
+                        console.log("Navigating to live session with complete state.");
+                        navigate(`/session/live/${joinCode}`, {
+                            state: {
+                                gameName,
+                                gameId,
+                                sessionCode: joinCode,
+                                hostId,
+                            },
+                        });
+                    } else {
+                        console.log("Missing session data, retrying navigation in 500ms.");
+                        setTimeout(handleGameStarted, 500);
+                    }
                 }
             }, 1000);
-
         };
+
         socket.on('game-started', handleGameStarted);
 
         return () => {
             socket.off('game-started', handleGameStarted);
-        }
-
-    }, []);
-
-
+        };
+    }, [gameName, gameId, joinCode, hostId]);
 
 
 

@@ -1,144 +1,89 @@
 import { useState, useEffect } from "react";
 import socket from "../main";
-import { db, auth } from "../../app/server/api/firebase/firebaseConfig";
+import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth";
 
 export function useGameSession({ gameId, sessionCode, hostId }) {
-
-  //----------      states:     ----------
-  //user data
   const user = useAuth();
   const userId = user?.uid;
-  const [userData, setUserData] = useState([]);
 
-  //general trivia info
-  const [players, setPlayers] = useState([]);
   const [roundData, setRoundData] = useState([]);
-  const [roundId, setRoundId] = useState('');
-  const [roundNumber, setRoundNumber] = useState(1);
-  const [questionCategory, setQuestionCatergory] = useState("");
   const [questionData, setQuestionData] = useState([]);
-  const [questionNumber, setQuestionNumber] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [questionType, setQuestionType] = useState("");
+
   const [questionText, setQuestionText] = useState("");
-  const [answer, setAnswer] = useState([]);
+  const [questionType, setQuestionType] = useState("");
 
-  //For MC, storing array of an answer choices
-  const [mcChoices, setMcChoices] = useState(["", "", "", ""]);
-  const [mcPlayerChoice, setMcPlayerChoice] = useState([]);
-  const [mcAnswers, setMcAnswers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // for FR, storing single string
-  const [frAnswer, setFrAnswer] = useState("");
-  // for Sort, store it in as array of objects???
-  const [sortAnswers, setSortAnswers] = useState({});
-
-  // ----- useEffects: -----
-
-  // fetch rounds
+  // ---- Fetch Rounds ----
   useEffect(() => {
     if (!gameId) return;
-    (async () => {
-      const col = collection(db, "rounds");
-      const q = query(col,
-        where("gameId", "==", gameId),
-        orderBy("roundNumber", "asc"));
-      const snap = await getDocs(q);
-      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      //console.log("Round List:", list);
-      setRoundData(list);
-    })();
+
+    const fetchRounds = async () => {
+      try {
+        const col = collection(db, "rounds");
+        const q = query(col, where("gameId", "==", gameId), orderBy("roundNumber", "asc"));
+        const snap = await getDocs(q);
+        const rounds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setRoundData(rounds);
+      } catch (err) {
+        console.error("Error fetching rounds:", err);
+      }
+    };
+
+    fetchRounds();
   }, [gameId]);
 
-  //pick the correct roundId whenever rounds or roundNumber change
+  // ---- Fetch Questions ----
   useEffect(() => {
-    if (roundData.length >= roundNumber) {
-      setRoundId(roundData[roundNumber - 1].id);
-    }
-  }, [roundData, roundNumber]);
-
-  //fetch all questions for that roundId
-  useEffect(() => {
+    if (!roundData.length) return;
+    const roundId = roundData[0]?.id;
     if (!roundId) return;
-    const col = collection(db, "questions");
-    const q = query(col,
-      where("roundId", "==", roundId),
-      orderBy("questionNumber", "asc"));
-    getDocs(q).then(snap => {
-      setQuestionData(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      setQuestionNumber(1);              // reset to first question of the round
+
+    const fetchQuestions = async () => {
+      try {
+        const col = collection(db, "questions");
+        const q = query(col, where("roundId", "==", roundId), orderBy("questionNumber", "asc"));
+        const snap = await getDocs(q);
+        const questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setQuestionData(questions);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching questions:", err);
+      }
+    };
+
+    fetchQuestions();
+  }, [roundData]);
+
+  // ---- Set Current Question ----
+  useEffect(() => {
+    if (!questionData.length) return;
+    const cq = questionData[0];
+    setCurrentQuestion(cq);
+    setQuestionText(cq.question);
+    setQuestionType(cq.questionType);
+  }, [questionData]);
+
+  // ---- Emit Question if Host ----
+  useEffect(() => {
+    if (!currentQuestion || !userId || userId !== hostId) return;
+
+    console.log("Host emitting question to players...");
+    socket.emit("send-question", {
+      sessionCode,
+      question: currentQuestion,
     });
-  }, [roundId]);
-
-  //extract the single question when questionData or questionNumber change
-  useEffect(() => {
-
-    if (questionData.length >= questionNumber) {
-      const cq = questionData[questionNumber - 1];
-      setCurrentQuestion(cq);
-      setQuestionText(cq.question);
-      setQuestionType(cq.questionType);
-      console.log("Question Data set");
-    } else {
-      setCurrentQuestion(null);
-      setQuestionText("");
-      setQuestionType("");
-      console.log("Question Data not set! ERROR")
-    }
-  }, [questionData, questionNumber]);
-
-
-//----- sockets -----
-  //emitting "send-question"
-  useEffect(() => {
-    if (currentQuestion && userId === hostId) {
-      console.log("emiting question")
-      socket.emit("send-question", {
-        roundNumber,
-        questionNumber,
-        question: currentQuestion,
-        sessionCode
-      });
-    }
-  }, [currentQuestion]);
-
-//------ handlers -----
-
-  function nextQuestion(){
-    setQuestionNumber(q => q + 1);
-  }
-
-  function prevQuestion() {
-    setQuestionNumber( q => Math.max(q - 1));
-  }
-  function endRound() {
-    socket.emit("end-round", {sessionCode, roundNumber})
-    setRoundNumber(r => r + 1);
-  }
-  function submitAnswer(finalAnswer) {
-    socket.emit("player-answer", {sessionCode, roundNumber, questionNumber, answer:finalAnswer, playerId: userId});
-  }
-
-  
-
+  }, [currentQuestion, userId, hostId, sessionCode]);
 
   return {
-    // state
+    loading,
     currentQuestion,
     questionText,
     questionType,
-    mcChoices,
-    frAnswer,
-    players,
-    // metadata
     userId,
     hostId,
-    // actions
-    submitAnswer,
-    nextQuestion,
-    prevQuestion,
-    endRound,
   };
 }
