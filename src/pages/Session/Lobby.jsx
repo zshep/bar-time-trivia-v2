@@ -40,6 +40,7 @@ export default function Lobby() {
 
     //start game logic
     const handleStartGame = () => {
+        
         socket.emit('start-game', { sessionCode: joinCode });
 
     };
@@ -68,7 +69,7 @@ export default function Lobby() {
         const handlePlayerListUpdate = ({ players }) => {
             console.log("recieved updated players list: ", players);
             setPlayers(players);
-            console.log("players", players);
+            //console.log("players", players);
 
         }
 
@@ -89,12 +90,12 @@ export default function Lobby() {
 
     //checking if user is host or not
     useEffect(() => {
-        const unsubscripe = auth.onAuthStateChanged((user) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user && hostId) {
                 setIsHost(user.uid === hostId);
             }
         });
-        return () => unsubscripe();
+        return () => unsubscribe();
     }, [hostId])
 
     // setting up socket handlers for starting game

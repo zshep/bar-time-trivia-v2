@@ -47,7 +47,7 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
         orderBy("roundNumber", "asc"));
       const snap = await getDocs(q);
       const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      console.log("Round List:", list);
+      //console.log("Round List:", list);
       setRoundData(list);
     })();
   }, [gameId]);
@@ -80,10 +80,12 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
       setCurrentQuestion(cq);
       setQuestionText(cq.question);
       setQuestionType(cq.questionType);
+      console.log("Question Data set");
     } else {
       setCurrentQuestion(null);
       setQuestionText("");
       setQuestionType("");
+      console.log("Question Data not set! ERROR")
     }
   }, [questionData, questionNumber]);
 
@@ -92,6 +94,7 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
   //emitting "send-question"
   useEffect(() => {
     if (currentQuestion && userId === hostId) {
+      console.log("emiting question")
       socket.emit("send-question", {
         roundNumber,
         questionNumber,

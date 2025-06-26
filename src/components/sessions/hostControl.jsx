@@ -13,13 +13,7 @@ export default function hostControl() {
 
     return(
         <div>
-            <p>This is the host control </p>
-            <div className="flex justify-between">
-                <button>Next Question</button>
-                <button>Previous Question</button>
-                <button>End Round</button>
-
-            </div>
+            
 
         </div>
     )

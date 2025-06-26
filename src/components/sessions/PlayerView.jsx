@@ -15,19 +15,10 @@ export default function PlayerView({
     return (
 
         <div className="flex flex-col w-full items-center">
-              <div className="flex border border-black justify-around w-1/3">
-        
-                <div>
-                  <p>Game: {/*gameName*/}</p>
-                </div>
-                <div>
-                  <p>Round: {/*roundNumber*/}</p>
-                </div>
-              </div>
+          <p>This is PlayerView</p>
+              
               <div className="">
-                <div className="mt-10 text-2xl">
-                  <p>{questionText || "Loading Question..."}</p>
-                </div>
+                
                 <div className="flex justify-center mt-4">
         
                   {questionType === "freeResponse" && (

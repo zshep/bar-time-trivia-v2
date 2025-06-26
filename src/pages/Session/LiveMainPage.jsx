@@ -15,20 +15,70 @@ export default function LiveMainPage() {
 
   const { state } = useLocation();
   const { gameName, gameId, sessionCode, hostId } = state;
-  const [roundNumber, setRoundNumber] = useState(1);
+
   const session = useGameSession({ gameId, sessionCode, hostId });
 
+  console.log("session:", session);
 
-  const isHost = sessionCode.userId === hostId;
+
+  // socket to grab question data
+  useEffect(() => {
+      if (!session) {
+        console.log("You ain't got no session, Jack!");
+        // complete socket handler to listen and deal with data
+
+        //socket.on('send-question')
+      }
+      else {
+        console.log("You're the host")
+      }
+
+  }, []) 
+  
+  //finding host
+  const isHost = session.userId === session.hostId;
+  console.log("isHost??", isHost);
+
+  // determining who is the presenter
   const isPresenter = Boolean(
     new URLSearchParams(window.location.search).get("presenter")
   );
 
-  if (isHost) {
-    return <HostView {...session} />;
-  } else {
-    return <PlayerView {...session} />;
-  }
+  return (
+    <div className="flex flex-col w-full items-center">
+      <div className="flex border border-black justify-around w-1/3">
+        <div>
+          <p>Game: {gameName}</p>
+        </div>
+        <div>
+          <p>Round: {/*roundNumber*/}</p>
+        </div>
+      </div>
+      
+    <div className="mt-10 text-2xl">
+                  <p>{session.questionText || "Loading Question..."}</p>
+                </div>
+
+
+      <div>
+
+        {isHost && (
+          <HostView {...session} />
+        )}
+        {!isHost && (
+          <PlayerView {...session} />
+        )}
+
+
+      </div>
+
+     
+
+    </div>
+
+  )
+
+
 
 
 }
