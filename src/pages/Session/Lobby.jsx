@@ -46,7 +46,7 @@ export default function Lobby() {
 
   // ----- Countdown & navigation -----
   const handleGameStarted = useCallback(() => {
-    console.log("🎮 Game has started!");
+    console.log("Game has started!");
     setShowCountdown(true);
     let current = 3;
     setCountDown(current);
@@ -58,16 +58,18 @@ export default function Lobby() {
       if (current <= 0) {
         clearInterval(interval);
 
+        
+
         if (gameName && gameId && joinCode && hostId) {
-          console.log("✅ Navigating to live session.");
+          console.log("Navigating to live session.");
           navigate(`/session/live/${joinCode}`, {
             state: { gameName, gameId, sessionCode: joinCode, hostId },
           });
         } else {
-          console.warn("⚠️ Missing session data at end of countdown.");
+          console.warn("Missing session data at end of countdown.");
 
           if (!sessionInfoRequestedRef.current && joinCode) {
-            console.log("🔁 Retrying session-info request...");
+            console.log("Retrying session-info request...");
             socket.emit("request-session-info", { sessionCode: joinCode });
             sessionInfoRequestedRef.current = true;
           }
@@ -85,7 +87,7 @@ export default function Lobby() {
   // ----- Get session info if needed -----
   useEffect(() => {
     const handleSessionInfo = ({ gameName, hostId }) => {
-      console.log("📩 Received session info:", gameName, hostId);
+      console.log("Received session info:", gameName, hostId);
       setGameName(gameName);
       setHostId(hostId);
       grabHostData(hostId);
@@ -94,11 +96,12 @@ export default function Lobby() {
     socket.on("session-info", handleSessionInfo);
 
     if (!gameName || !hostId) {
-      console.log("📨 Requesting session info from server...");
+      console.log("Requesting session info from server...");
       socket.emit("request-session-info", { sessionCode: joinCode });
-    } else {
+    } 
+     /* else {
       grabHostData(hostId);
-    }
+    } */
 
     return () => {
       socket.off("session-info", handleSessionInfo);
@@ -108,7 +111,7 @@ export default function Lobby() {
   // ----- Player list sync -----
   useEffect(() => {
     const handlePlayerListUpdate = ({ players }) => {
-      console.log("👥 Player list updated:", players);
+      console.log("Player list updated:", players);
       setPlayers(players);
     };
 
@@ -132,11 +135,11 @@ export default function Lobby() {
 
   // ----- Game started event listener -----
   useEffect(() => {
-    console.log("🔌 Listening for game-started...");
+    console.log("Listening for game-started...");
     socket.on("game-started", handleGameStarted);
 
     return () => {
-      console.log("🔌 Unsubscribed from game-started");
+      console.log("Unsubscribed from game-started");
       socket.off("game-started", handleGameStarted);
     };
   }, [handleGameStarted]);

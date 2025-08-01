@@ -1,4 +1,4 @@
-import { getSession, deleteSession, createSession, addPlayerToSession } from './sessionStore.js';
+import { getSession, deleteSession, createSession, addPlayerToSession, startGame } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -58,22 +58,29 @@ export function registerSocketHandlers(io, socket) {
 
     // grab missing data for lobby
     socket.on('request-session-info', ({ sessionCode }) => {
+        console.log("Session Info request for session:", sessionCode);
+        
         const session = getSession(sessionCode);
 
         if (session) {
+            console.log("session found for", sessionCode, ":", session);
             socket.emit('session-info', {
                 sessionCode,
                 gameName: session.gameName,
-                hostId: session.hostId
+                hostId: session.hostId,
+                gameStarted: session.gameStarted
             });
         } else {
-            console.log("session does not exist");
+            console.log("session does not exist for sessionCode", sessionCode);
+            console.log("current session store keys:", Array.from(sessionStorage.keys()));
         }
     });
 
 
     // Start game
     socket.on(`start-game`, ({ sessionCode }) => {
+        console.log("start-game initiated ")
+        startGame(sessionCode);
         io.to(sessionCode).emit('game-started');
     });
 
