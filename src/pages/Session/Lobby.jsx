@@ -169,23 +169,29 @@ export default function Lobby() {
       </div>
 
       <div className="mt-3">
-        <p>Joined Players</p>
-        <div className="flex flex-col border p-3 gap-2">
-          {players.map((player) => (
+        <div className="flex flex-col p-3 gap-2">
+        
+          { players.length > 0 ? (players.map((player) => (
+            <div>
+            <p>Joined Players</p>
             <div key={player.id} className="border border-black p-2">
               {player.name}
             </div>
-          ))}
+            </div>
+          )) ) : (<p>No Players Have Joined</p>) }
         </div>
       </div>
 
       {isHost && (
+        players.length > 0 ? (
+
         <button
           onClick={handleStartGame}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-40 place-self-center"
         >
           Start Game
         </button>
+        )  : (<p></p>)
       )}
     </div>
   );
