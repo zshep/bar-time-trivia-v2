@@ -84,10 +84,14 @@ export function registerSocketHandlers(io, socket) {
         io.to(sessionCode).emit('game-started');
     });
 
-    // Recieve and forward question
-    socket.on('send-question', ({ sessionCode, questionData }) => {
-        io.to(sessionCode).emit('new-question', questionData);
+    // Recieve and forward question from Host
+    socket.on('send-question', ({ sessionCode, question }) => {
+        console.log("Working with session:", sessionCode);
+        console.log("receving request from host to send out question data", question);
+        io.to(sessionCode).emit('new-question', question);
     });
+
+    
 
     // Handle answer submission
     socket.on('submit-answer', ({ sessionCode, playerId, answer }) => {

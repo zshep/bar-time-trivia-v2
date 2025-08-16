@@ -71,12 +71,20 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
   useEffect(() => {
     if (!currentQuestion || !userId || userId !== hostId) return;
 
-    console.log("Host emitting question to players...");
+    console.log("Host emitting question to players...", currentQuestion);
     socket.emit("send-question", {
       sessionCode,
       question: currentQuestion,
     });
   }, [currentQuestion, userId, hostId, sessionCode]);
+
+  // Client player recieving question
+    socket.on('new-question', ({question}) => {
+        console.log("player getting new data:", question);
+        setQuestionText(question);
+        setLoading(false);
+        
+    });
 
   return {
     loading,

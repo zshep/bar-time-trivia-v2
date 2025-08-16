@@ -25,19 +25,13 @@ export default function LiveMainPage() {
     if (!session) {
       console.log("You ain't got no session, Jack!");
       // complete socket handler to listen and deal with data
-
-      socket.on('new-question', ({ questionData }) => {
-        console.log("here's the new data", questionData);
-      })
-      
-
     }
     else {
       console.log("You have a session");
-     
+      
     }
 
-  }, [])
+  }, [session])
 
   //finding host
   const isHost = session.userId === session.hostId;
@@ -53,15 +47,7 @@ export default function LiveMainPage() {
       console.log("Waiting for session data...")
       console.log("what we do have:", gameId, sessionCode, hostId, session.loading)
       //need socket handler in order to listen for question details
-
-      socket.on('new-question', ({questionData}) => {
-        console.log("Here's the new question", questionData);
-        
-      })
       
-      
-      
-
       return <p>Loading...</p>;
     }
 
