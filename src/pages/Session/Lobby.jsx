@@ -86,11 +86,30 @@ export default function Lobby() {
 
   // ----- Get session info if needed -----
   useEffect(() => {
-    const handleSessionInfo = ({ gameName, hostId }) => {
-      console.log("Received session info:", gameName, hostId);
+    const handleSessionInfo = ({ gameName, hostId, gameStarted }) => {
+      console.log("Received session info:", gameName, hostId, gameStarted);
       setGameName(gameName);
       setHostId(hostId);
       grabHostData(hostId);
+      console.log("gameName, HostId", gameName, hostId);
+
+      //deteremining if host or player
+      const user = auth.currentUser;
+      const isHostUser = user?.uid === hostId;
+
+      if (gameStarted && !isHostUser) {
+        console.log("Game has already started and I'm a player — navigating now.");
+        navigate(`/session/live/${joinCode}`, {
+          state: {
+            gameName,
+            gameId,
+            sessionCode: joinCode,
+            hostId,
+          },
+        });
+        console.log("player navigating to live game");
+      }
+
     };
 
     socket.on("session-info", handleSessionInfo);
@@ -173,9 +192,9 @@ export default function Lobby() {
 
           <p>Joined Players</p>
           {players.length > 0 ? (players.map((player) => (
-            
-              <div key={player.id} className="border border-black p-2">
-                {player.name}
+
+            <div key={player.id} className="border border-black p-2">
+              {player.name}
             </div>
           ))) : (<p>No Players Have Joined</p>)}
         </div>

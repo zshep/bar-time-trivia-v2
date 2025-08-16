@@ -29,9 +29,12 @@ export default function LiveMainPage() {
       socket.on('new-question', ({ questionData }) => {
         console.log("here's the new data", questionData);
       })
+      
+
     }
     else {
-      console.log("You're the host")
+      console.log("You have a session");
+     
     }
 
   }, [])
@@ -48,8 +51,20 @@ export default function LiveMainPage() {
   // protecting with conditional rendering
     if (!gameId || !sessionCode || !hostId || session.loading) {
       console.log("Waiting for session data...")
+      console.log("what we do have:", gameId, sessionCode, hostId, session.loading)
+      //need socket handler in order to listen for question details
+
+      socket.on('new-question', ({questionData}) => {
+        console.log("Here's the new question", questionData);
+        
+      })
+      
+      
+      
+
       return <p>Loading...</p>;
     }
+
 
   return (
     <div className="flex flex-col w-full items-center">
