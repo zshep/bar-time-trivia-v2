@@ -12,6 +12,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [gameId, setGameId] = useState(initialGameId || "");
+  const [gameName, setGameName] = useState("");
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("");
 
@@ -89,6 +90,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
         console.log("Player getting new data:", questionObj);
 
         setGameId(questionObj.gameId);
+        setGameName(questionObj.gameName);
         setCurrentQuestion(questionObj);
         setQuestionText(questionObj.question);
         setQuestionType(questionObj.questionType);
@@ -113,5 +115,6 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     userId,
     hostId,
     gameId,
+    roundData
   };
 }

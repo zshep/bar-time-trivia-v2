@@ -17,6 +17,8 @@ export default function LiveMainPage() {
   const { gameName, gameId, sessionCode, hostId } = state;
 
   const session = useGameSession({ gameId, sessionCode, hostId });
+  const currentRound = session.roundData?.[0]?.roundNumber || 1;
+
 
   console.log("session:", session);
   console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
@@ -30,7 +32,7 @@ export default function LiveMainPage() {
     }
     else {
       console.log("You have a session");
-      
+
     }
 
   }, [session])
@@ -45,12 +47,19 @@ export default function LiveMainPage() {
   );
 
   // protecting with conditional rendering
-    if (!sessionCode || !hostId || session.loading) {
-      
-      console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId} session.loading: ${session.loading}`)
-      
-      return <p>Loading...</p>;
-    }
+  if (!sessionCode || !hostId || session.loading) {
+
+    console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId} session.loading: ${session.loading}`)
+
+    return (
+      <div>
+        <p>Loading session...</p>
+        <p>SessionCode: {sessionCode}</p>
+        <p>HostId: {hostId}</p>
+        <p>Loading status: {session.loading ? "true" : "false"}</p>
+      </div>
+    );
+  }
 
 
   return (
@@ -60,7 +69,7 @@ export default function LiveMainPage() {
           <p>Game: {gameName}</p>
         </div>
         <div>
-          <p>Round: {/*roundNumber*/}</p>
+          <p>Round: {currentRound}</p>
         </div>
       </div>
 
