@@ -4,14 +4,14 @@ import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth";
 
-export function useGameSession({ gameId, sessionCode, hostId }) {
+export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const user = useAuth();
   const userId = user?.uid;
 
   const [roundData, setRoundData] = useState([]);
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-
+  const [gameId, setGameId] = useState(initialGameId || "");
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("");
 
@@ -36,9 +36,9 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
     fetchRounds();
   }, [gameId]);
 
-  // ---- Fetch Questions ----
+  // ---- Fetch Questions for host only ----
   useEffect(() => {
-    if (!roundData.length) return;
+    if (!roundData.length || userId !== hostId) return;
     const roundId = roundData[0]?.id;
     if (!roundId) return;
 
@@ -56,7 +56,7 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
     };
 
     fetchQuestions();
-  }, [roundData]);
+  }, [roundData, userId, hostId]);
 
   // ---- Set Current Question ----
   useEffect(() => {
@@ -79,12 +79,31 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
   }, [currentQuestion, userId, hostId, sessionCode]);
 
   // Client player recieving question
-    socket.on('new-question', ({question}) => {
-        console.log("player getting new data:", question);
-        setQuestionText(question);
+  useEffect(() => {
+
+    const isHost = userId === hostId;
+
+    if (!isHost) {
+
+      const handleNewQuestion = (questionObj) => {
+        console.log("Player getting new data:", questionObj);
+
+        setGameId(questionObj.gameId);
+        setCurrentQuestion(questionObj);
+        setQuestionText(questionObj.question);
+        setQuestionType(questionObj.questionType);
         setLoading(false);
-        
-    });
+      };
+
+      socket.on('new-question', handleNewQuestion);
+
+      return () => socket.off("new-question", handleNewQuestion);
+
+    }
+
+
+  }, [userId, hostId]);
+
 
   return {
     loading,
@@ -93,5 +112,6 @@ export function useGameSession({ gameId, sessionCode, hostId }) {
     questionType,
     userId,
     hostId,
+    gameId,
   };
 }

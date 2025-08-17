@@ -68,6 +68,7 @@ export function registerSocketHandlers(io, socket) {
                 sessionCode,
                 gameName: session.gameName,
                 hostId: session.hostId,
+                gameId: session.gamerId,
                 gameStarted: session.gameStarted
             });
         } else {
@@ -86,8 +87,7 @@ export function registerSocketHandlers(io, socket) {
 
     // Recieve and forward question from Host
     socket.on('send-question', ({ sessionCode, question }) => {
-        console.log("Working with session:", sessionCode);
-        console.log("receving request from host to send out question data", question);
+        console.log("Host sent question for session:", sessionCode);
         io.to(sessionCode).emit('new-question', question);
     });
 

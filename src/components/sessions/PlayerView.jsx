@@ -28,11 +28,8 @@ export default function PlayerView({
                     />
                   )}
                   {questionType === "multipleChoice" && (
-                    <QuestionMc
-                      choices={mcChoices}
-                      playerChoice={mcPlayerChoice}
-                      setPlayerChoice={setMcPlayerChoice}
-                    />
+                   /* <QuestionMc choices={mcChoices} />*/
+                   <p>I'm a MC TAG</p>
                   )}
                   {questionType === "sort" && (
                     <QuestionSort />

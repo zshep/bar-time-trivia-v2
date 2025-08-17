@@ -19,6 +19,8 @@ export default function LiveMainPage() {
   const session = useGameSession({ gameId, sessionCode, hostId });
 
   console.log("session:", session);
+  console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
+
 
   // socket to grab question data
   useEffect(() => {
@@ -43,10 +45,9 @@ export default function LiveMainPage() {
   );
 
   // protecting with conditional rendering
-    if (!gameId || !sessionCode || !hostId || session.loading) {
-      console.log("Waiting for session data...")
-      console.log("what we do have:", gameId, sessionCode, hostId, session.loading)
-      //need socket handler in order to listen for question details
+    if (!sessionCode || !hostId || session.loading) {
+      
+      console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId} session.loading: ${session.loading}`)
       
       return <p>Loading...</p>;
     }
