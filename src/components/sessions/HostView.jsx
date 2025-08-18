@@ -1,5 +1,8 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
+import { useEffect } from "react";
+import socket from "../../main";
+useEffect
 
 
 export default function HostView({
@@ -11,8 +14,20 @@ export default function HostView({
     const currentChoices = currentQuestion?.answer?.mcChoices || [];
     const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
 
-    //console.log("currentChoices:", currentChoices);
-    //console.log("correct Answer:", correctAnswers);
+    useEffect(() => {
+
+        const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
+            console.log(`We have player ${playerId} give the answer ${choice} for session ${sessionCode} `);
+
+
+        }
+        
+        socket.on("player-answer", handleNewPlayerAnswer);
+
+        return () => {
+            socket.off("player-answer", handleNewPlayerAnswer );
+        }
+    }, [])
 
 
 
