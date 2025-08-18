@@ -5,26 +5,26 @@ import QuestionFc from "./questionFc";
 export default function HostView({
     currentQuestion,
     questionType,
-    mcChoices,
-    players,
-    nextQuestion,
-    prevQuestion,
-    endRound,
 }) {
-    //console.log("question Type:", questionType);
+
+    console.log("current Question:", currentQuestion);
+    const currentChoices = currentQuestion?.answer?.mcChoices || [];
+    const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
+
+    //console.log("currentChoices:", currentChoices);
+    //console.log("correct Answer:", correctAnswers);
+
+
+
     return (
         <div>
-            <div className="flex flex-col w-full items-center mt-5">
-                <p>This is Host View</p>
 
-
-            </div>
             <div>
-                <h2>{/*currentQuestion.question*/}</h2>
+
                 {questionType === "multipleChoice" && (
-                   /* <QuestionMc choices={mcChoices} />*/
-                   <p>I'm a MC TAG</p>
-                   
+                    <QuestionMc choices={currentChoices} correctAnswers={correctAnswers} isHost />
+
+
                 )}
                 {questionType === "freeResponse" && (
                     /*<QuestionFc /> */
@@ -33,13 +33,15 @@ export default function HostView({
             </div>
 
             <div className="mt-10">
-           
-            <div className="flex justify-between mt-4">
-                <button className="">Next Question</button>
-                <button>Previous Question</button>
-                <button>End Round</button>
+                <div>
+                    <p>I should list out players and status</p>
+                </div>
+                <div className="flex justify-between mt-4">
+                    <button className="">Next Question</button>
+                    <button>Previous Question</button>
+                    <button>End Round</button>
 
-            </div>
+                </div>
             </div>
 
         </div>
