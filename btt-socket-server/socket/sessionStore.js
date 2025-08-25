@@ -1,7 +1,7 @@
 const sessions = new Map(); // key = sessionCode, value = sessionData object
 
-export function createSession(sessionCode, hostId, gameName, gameId) {
-    console.log("storing session:", sessionCode, hostId, gameName, gameId);
+export function createSession(sessionCode, hostId, gameName, gameId, hostSocketId) {
+    console.log("storing session:", sessionCode, hostId, gameName, gameId, hostSocketId);
     sessions.set(sessionCode, {
         hostId,
         gameName,
@@ -9,7 +9,8 @@ export function createSession(sessionCode, hostId, gameName, gameId) {
         players: [],
         currentRound: 1,
         currentQuestion: 0,
-        gameStarted: false
+        gameStarted: false,
+        hostSocketId
      });
 }
 
