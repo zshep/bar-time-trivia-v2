@@ -9,7 +9,12 @@ const socket = io('http://localhost:3001'); // backend server
 
 socket.on('connect', () => {
     console.log('connected to socket server:', socket.id);
-})
+});
+
+//debugging socketlistener
+socket.onAny((event, ...args) => {
+  console.log("🔍 Received event:", event, args);
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 <React.StrictMode>

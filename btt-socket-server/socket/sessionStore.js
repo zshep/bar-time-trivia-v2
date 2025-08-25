@@ -29,15 +29,15 @@ export function addPlayerToSession(sessionCode, player){
 export function startGame(sessionCode) {
   const session = sessions.get(sessionCode);
   if (session) {
-    console.log("🔧 BEFORE setting gameStarted:", session.gameStarted);
+    console.log("BEFORE setting gameStarted:", session.gameStarted);
     session.gameStarted = true;
-    console.log("✅ AFTER setting gameStarted:", session.gameStarted);
+    console.log("AFTER setting gameStarted:", session.gameStarted);
 
     // Double-check what the map has stored
     const reread = sessions.get(sessionCode);
-    console.log("🧪 Re-read from Map:", reread.gameStarted);
+    console.log("Re-read from Map:", reread.gameStarted);
   } else {
-    console.warn("⚠️ Tried to start game for non-existent session:", sessionCode);
+    console.warn("Tried to start game for non-existent session:", sessionCode);
   }
 }
 

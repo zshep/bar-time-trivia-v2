@@ -2,7 +2,7 @@ import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 import { useEffect } from "react";
 import socket from "../../main";
-useEffect
+
 
 
 export default function HostView({
@@ -17,17 +17,15 @@ export default function HostView({
     useEffect(() => {
 
         const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
-            console.log(`We have player ${playerId} give the answer ${choice} for session ${sessionCode} `);
-
-
+            console.log(`Recieved answer from player ${playerId} give the answer ${choice} for session ${sessionCode} `);
         }
         
-        socket.on("player-answer", handleNewPlayerAnswer);
+        socket.on('submit-answer', handleNewPlayerAnswer);
 
         return () => {
-            socket.off("player-answer", handleNewPlayerAnswer );
+            socket.off('player-answer', handleNewPlayerAnswer );
         }
-    }, [])
+    }, []);
 
 
 

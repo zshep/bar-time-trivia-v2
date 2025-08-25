@@ -4,6 +4,7 @@ import { useState } from "react";
 import socket from "../../main";
 
 export default function PlayerView({
+  sessionCode,
   currentQuestion,
   questionType,
   userId
@@ -24,9 +25,9 @@ export default function PlayerView({
     } else {
       console.log("submitAnswer hit");
       console.log("Submitting these answers:", playerChoice);
-
+      
       //socket handler emiting player answer
-      socket.emit("player-answer", { userId, playerChoice, sessionCode })
+      socket.emit("player-answer", { playerId: userId, choice: playerChoice, sessionCode })
     }
 
 

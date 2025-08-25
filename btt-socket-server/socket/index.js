@@ -31,23 +31,23 @@ export function registerSocketHandlers(io, socket) {
             });
 
             io.to(sessionCode).emit('player-list-update', { players: session.players });
-    
+
             socket.emit('joined-successfully', {
                 sessionCode,
                 gameName: session.gameName,
-                hostId: session.hostId 
-        });
-        
+                hostId: session.hostId
+            });
+
         } else {
             //session doesn't exist
-            socket.emit('join-error', { message: "Session not found"});
+            socket.emit('join-error', { message: "Session not found" });
         }
 
 
     });
 
-    socket.on('request-player-list', ({ sessionCode }) =>{
-        const session = getSession( sessionCode );
+    socket.on('request-player-list', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
 
 
         if (session) {
@@ -59,7 +59,7 @@ export function registerSocketHandlers(io, socket) {
     // grab missing data for lobby
     socket.on('request-session-info', ({ sessionCode }) => {
         console.log("Session Info request for session:", sessionCode);
-        
+
         const session = getSession(sessionCode);
 
         if (session) {
@@ -77,6 +77,15 @@ export function registerSocketHandlers(io, socket) {
         }
     });
 
+    //player sending answer to host
+    socket.on("player-answer", ({ playerId, choice, sessionCode }) => {
+        console.log(`Server received answer from ${playerId}: ${choice} in ${sessionCode}`);
+
+        //rebroadcasting answer submission
+        
+        io.to(sessionCode).emit("submit-answer", { playerId, choice, sessionCode });
+    })
+
 
     // Start game
     socket.on(`start-game`, ({ sessionCode }) => {
@@ -91,13 +100,6 @@ export function registerSocketHandlers(io, socket) {
         io.to(sessionCode).emit('new-question', question);
     });
 
-    
-
-    // Handle answer submission
-    socket.on('submit-answer', ({ sessionCode, playerId, answer }) => {
-        console.log(`Answer received from ${playerId}: ${answer}`);
-
-    });
 
     socket.on('end-game', async ({ sessionCode }) => {
         const session = getSession(sessionCode);
