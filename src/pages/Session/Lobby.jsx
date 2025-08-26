@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../../main";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
+import { useReconnect } from "../../hooks/useReconnect";
 
 export default function Lobby() {
   const navigate = useNavigate();
@@ -19,10 +20,11 @@ export default function Lobby() {
   const [isHost, setIsHost] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountDown] = useState(3);
+  const [userId, setUserId] = useState("");
 
   // ----- Ref to prevent session spam -----
   const sessionInfoRequestedRef = useRef(false);
-
+  useReconnect();
   // ----- Firestore lookup -----
   const grabHostData = async (hostId) => {
     try {
@@ -148,6 +150,7 @@ export default function Lobby() {
       if (user && hostId) {
         setIsHost(user.uid === hostId);
       }
+      setUserId(user.uid);
     });
     return () => unsubscribe();
   }, [hostId]);
@@ -163,7 +166,12 @@ export default function Lobby() {
     };
   }, [handleGameStarted]);
 
-  // ----- JSX -----
+
+  // save data to local store for reconnect issues
+  localStorage.setItem("sessionCode", joinCode);
+  localStorage.setItem("userId", userId);
+  localStorage.setItem("isHost", isHost);
+
   return (
     <div className="flex flex-col w-full">
       {showCountdown && (

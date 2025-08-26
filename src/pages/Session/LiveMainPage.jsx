@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import socket from "../../main";
+import { useReconnect } from "../../hooks/useReconnect";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
 import { useGameSession } from "../../hooks/useGameSession";
@@ -22,7 +23,8 @@ export default function LiveMainPage() {
 
   console.log("session:", session);
   console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
-
+  //reconnect hook
+  useReconnect();
 
   // socket to grab question data
   useEffect(() => {
@@ -50,6 +52,7 @@ export default function LiveMainPage() {
   if (!sessionCode || !hostId || session.loading) {
 
     console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId} session.loading: ${session.loading}`)
+    
 
     return (
       <div>
