@@ -109,6 +109,12 @@ export function registerSocketHandlers(io, socket) {
         io.to(sessionCode).emit('new-question', question);
     });
 
+    //Reconnecting host/player
+    socket.on("reconnect-player", ({ sessionCode, userId }) =>
+    {
+        //need to set up socket listener 
+    })
+
 
     socket.on('end-game', async ({ sessionCode }) => {
         const session = getSession(sessionCode);
