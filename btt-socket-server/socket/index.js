@@ -105,14 +105,49 @@ export function registerSocketHandlers(io, socket) {
 
     // Recieve and forward question from Host
     socket.on('send-question', ({ sessionCode, question }) => {
+        const session = getSession(sessionCode);
         console.log("Host sent question for session:", sessionCode);
+        //store question for reconnects
+        session.currentQuestion = question;
+
         io.to(sessionCode).emit('new-question', question);
     });
 
-    //Reconnecting host/player
+    //Reconnecting player
     socket.on("reconnect-player", ({ sessionCode, userId }) =>
     {
-        //need to set up socket listener 
+        console.log("session code:", sessionCode);
+        const session = getSession(sessionCode);
+        if (session) {
+            socket.join(sessionCode);
+            console.log(`Player ${userId} reconnected to session ${sessionCode}`);
+
+            //grabbing round data???
+            const currentRound = session.currentRound || 1;
+            const currentQuestionIndex = session.currentQuestion || 0;
+            console.log(`The current round is ${currentRound} and the question we are on is ${currentQuestionIndex}`);
+
+            //emit the current question to the reconnected player
+            const question = session.currentQuestion;
+
+            if (question) {
+                socket.emit("new-question", question);
+            } else {
+                console.warn("No current question during reconnect");
+            }
+
+        }
+        console.log("the user session cannot be found");
+
+    })
+
+    socket.on("reconnect-host", ({sessionCode, userId}) => {
+        const session = getSession(sessionCode);
+        if (session){
+            socket.join(sessionCode);
+            console.log("Host should have rejoined session");
+
+        }
     })
 
 

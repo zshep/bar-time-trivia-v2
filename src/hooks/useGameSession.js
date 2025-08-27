@@ -3,7 +3,7 @@ import socket from "../main";
 import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth";
-import { getSession } from "../../btt-socket-server/socket/sessionStore";
+
 
 export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const user = useAuth();
@@ -107,24 +107,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
 
   }, [userId, hostId]);
 
-  //reconnecting player or host
-  socket.on("reconnect-host", ({ sessionCode, userId}) => {
-    const session = getSession(sessionCode);
-    if(session && session.hostId === userId) {
-      session.hostSocketId = socket.id;
-      socket.join(sessionCode);
-      console.log(`host reconnected to session ${sessionCode}`);
-    }
-  });
-
-  socket.on("reconnect-player", ({ sessionCode, userId }) =>{
-    const session = getSession(sessionCode);
-    if(session) {
-      socket.join(sessionCode);
-      setLoading(false);
-      console.log(`Player ${userId} reconnected to session ${sessionCode}`)
-    }
-  });
+ 
 
   return {
     sessionCode,
