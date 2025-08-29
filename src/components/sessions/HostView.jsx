@@ -1,6 +1,6 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import socket from "../../main";
 
 
@@ -10,6 +10,9 @@ export default function HostView({
     questionType,
 }) {
 
+    //states for holding player data
+    const [ playerdata, setPlayerData ] = useState({});
+
     console.log("current Question:", currentQuestion);
     const currentChoices = currentQuestion?.answer?.mcChoices || [];
     const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
@@ -18,6 +21,8 @@ export default function HostView({
 
         const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
             console.log(`Recieved answer from player ${playerId} give the answer ${choice} for session ${sessionCode} `);
+
+            setPlayerData({playerId, choice});
         }
         
         socket.on('submit-answer', handleNewPlayerAnswer);
