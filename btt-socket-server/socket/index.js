@@ -1,4 +1,4 @@
-import { getSession, deleteSession, createSession, addPlayerToSession, startGame } from './sessionStore.js';
+import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -101,6 +101,7 @@ export function registerSocketHandlers(io, socket) {
         console.log("start-game initiated ")
         startGame(sessionCode);
         io.to(sessionCode).emit('game-started');
+        nextQuestion();
     });
 
     // Recieve and forward question from Host

@@ -19,14 +19,15 @@ export default function LiveMainPage() {
 
   const session = useGameSession({ gameId, sessionCode, hostId });
   const currentRound = session.roundData?.[0]?.roundNumber || 1;
+  
 
 
   console.log("session:", session);
-  console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
+  //console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
   //reconnect hook
   useReconnect();
 
-  // socket to grab question data
+ 
   useEffect(() => {
     if (!session) {
       console.log("You ain't got no session, Jack!");
@@ -34,9 +35,7 @@ export default function LiveMainPage() {
     }
     else {
       console.log("You have a session");
-
     }
-
   }, [session])
 
   //finding host

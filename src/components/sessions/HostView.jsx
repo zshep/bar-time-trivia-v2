@@ -11,7 +11,8 @@ export default function HostView({
 }) {
 
     //states for holding player data
-    const [ playerdata, setPlayerData ] = useState({});
+    const [ playerData, setPlayerData ] = useState({});
+    const playerAnsweredList = [];
 
     console.log("current Question:", currentQuestion);
     const currentChoices = currentQuestion?.answer?.mcChoices || [];
@@ -21,16 +22,23 @@ export default function HostView({
 
         const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
             console.log(`Recieved answer from player ${playerId} give the answer ${choice} for session ${sessionCode} `);
-
             setPlayerData({playerId, choice});
+            playerAnsweredList.push(playerId);
+            console.log("playerData:", playerData);
+
         }
         
         socket.on('submit-answer', handleNewPlayerAnswer);
-
+        
         return () => {
             socket.off('player-answer', handleNewPlayerAnswer );
         }
-    }, []);
+    }, [playerData]);
+
+    //checking what the player data is
+    useEffect(() =>{
+        console.log("playerData:", playerData);
+    },[playerData])
 
 
 
@@ -52,7 +60,16 @@ export default function HostView({
 
             <div className="mt-10">
                 <div>
-                    <p>I should list out players and status</p>
+                    {playerData.length > 0 ? (playerData.map((player) => (
+                        <div key={player.playerid}>
+                            <div> 
+                                {player}
+                            </div>
+                            <div> 
+                                <p>Answered??</p>
+                            </div>
+                        </div>
+                    ))) : (<p>Players have not answered</p>)}
                 </div>
                 <div className="flex justify-between mt-4">
                     <button className="">Next Question</button>

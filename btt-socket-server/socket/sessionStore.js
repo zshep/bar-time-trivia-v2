@@ -27,29 +27,23 @@ export function addPlayerToSession(sessionCode, player){
     }
 }
 
-export function startGame(sessionCode) {
-  const session = sessions.get(sessionCode);
-  if (session) {
-    console.log("BEFORE setting gameStarted:", session.gameStarted);
-    session.gameStarted = true;
-    console.log("AFTER setting gameStarted:", session.gameStarted);
 
-    // Double-check what the map has stored
-    const reread = sessions.get(sessionCode);
-    console.log("Re-read from Map:", reread.gameStarted);
-  } else {
-    console.warn("Tried to start game for non-existent session:", sessionCode);
-  }
-}
-
-/*
 export function startGame(sessionCode) {
     const session =sessions.get(sessionCode);
     if (session) {
         session.gameStarted = true;
+        console.log("The game has started");
     }
 }
-*/
+
+//update current question:
+export function nextQuestion(sessionCode) {
+    const session =sessions.get(sessionCode);
+    if(session) {
+        session.question = session.question + 1
+    }
+}
+
 
 export function deleteSession(sessionCode) {
     sessions.delete(sessionCode);
