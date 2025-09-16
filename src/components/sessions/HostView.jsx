@@ -1,6 +1,6 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import socket from "../../main";
 
 
@@ -8,37 +8,59 @@ import socket from "../../main";
 export default function HostView({
     currentQuestion,
     questionType,
+    sessionCode
 }) {
 
     //states for holding player data
-    const [ playerData, setPlayerData ] = useState({});
-    const playerAnsweredList = [];
+    const [ answers, setAnswers ] = useState({});
+    const [ isLocked, setIsLocked] = useState(false);
+
 
     console.log("current Question:", currentQuestion);
     const currentChoices = currentQuestion?.answer?.mcChoices || [];
     const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
+    const questionId = currentQuestion?.id || "no-ID";
+
+    // latest references 
+    const sessionCodeRef = useRef(sessionCode);
+    const questionIdRef =useRef(questionId);
+    const isLockedRef =useRef(isLocked);
+    
+
+    useEffect(() => { sessionCodeRef.current = sessionCode; }, [sessionCode]);
+    useEffect(() => { questionIdRef.current = questionId}, [questionId]);
+
+
+
+
 
     useEffect(() => {
 
         const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
             console.log(`Recieved answer from player ${playerId} give the answer ${choice} for session ${sessionCode} `);
-            setPlayerData({playerId, choice});
-            playerAnsweredList.push(playerId);
-            console.log("playerData:", playerData);
-
-        }
+            setAnswers(prev => ({
+                ...prev,
+                [playerId] : {
+                    choice,
+                    updatedAt: Date.now(),
+                },
+            }));
+        };
         
         socket.on('submit-answer', handleNewPlayerAnswer);
         
         return () => {
-            socket.off('player-answer', handleNewPlayerAnswer );
+            socket.off('submit-answer', handleNewPlayerAnswer );
         }
-    }, [playerData]);
+    }, []);
 
-    //checking what the player data is
-    useEffect(() =>{
-        console.log("playerData:", playerData);
-    },[playerData])
+    // clear answers when question changes
+    useEffect(() => {
+        setAnswers({});
+        setIsLocked(false);
+    }, [questionId]);
+
+    const answeredIds = useMemo(() => Object.keys(answers, [answers]));
 
 
 
@@ -57,10 +79,10 @@ export default function HostView({
                     <p>I'm a FR Section</p>
                 )}
             </div>
-
+        {/* TO DO!!!!! REFACTOR THIS CRAP BELOW TO DISPLAY PLAYER ANSWER PROPERLY*/}
             <div className="mt-10">
                 <div>
-                    {playerData.length > 0 ? (playerData.map((player) => (
+                    {answeredIds.length > 0 ? (answeredIds.map((player) => (
                         <div key={player.playerid}>
                             <div> 
                                 {player}
