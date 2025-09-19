@@ -14,6 +14,7 @@ export default function HostView({
     //states for holding player data
     const [ answers, setAnswers ] = useState({});
     const [ isLocked, setIsLocked] = useState(false);
+    const [ players, setPlayers ] = useState([]);
 
 
     console.log("current Question:", currentQuestion);
@@ -30,10 +31,27 @@ export default function HostView({
     useEffect(() => { sessionCodeRef.current = sessionCode; }, [sessionCode]);
     useEffect(() => { questionIdRef.current = questionId}, [questionId]);
 
+    //socket handlers to grab list of players
+    useEffect(() => {
+        if (!sessionCode) return;
+
+        const handlePlayerListUpdate = ({ players }) => {
+            setPlayers(players || []);
+            console.log("players", players);
+        };
+
+        socket.emit("request-player-list", { sessionCode });
+        socket.on("player-list-update", handlePlayerListUpdate);
+
+        return() => {
+            socket.off("player-list-update", handlePlayerListUpdate);
+        };
+    }, [sessionCode]);
 
 
 
 
+    // Socket handlers for getting player answers
     useEffect(() => {
 
         const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
@@ -60,10 +78,7 @@ export default function HostView({
         setIsLocked(false);
     }, [questionId]);
 
-    const answeredIds = useMemo(() => Object.keys(answers, [answers]));
-
-
-
+  
     return (
         <div>
 
@@ -79,19 +94,16 @@ export default function HostView({
                     <p>I'm a FR Section</p>
                 )}
             </div>
-        {/* TO DO!!!!! REFACTOR THIS CRAP BELOW TO DISPLAY PLAYER ANSWER PROPERLY*/}
+      
             <div className="mt-10">
                 <div>
-                    {answeredIds.length > 0 ? (answeredIds.map((player) => (
-                        <div key={player.playerid}>
-                            <div> 
-                                {player}
-                            </div>
-                            <div> 
-                                <p>Answered??</p>
-                            </div>
+                    {players.map(p => (
+                        <div key={p.id} className="flex justify-center gap-2"> 
+                        <span className="font-mono">{p.name}</span>
+                        <span>{answers[p.id] ? "answered" : "waiting"}</span>
+
                         </div>
-                    ))) : (<p>Players have not answered</p>)}
+                    )) }
                 </div>
                 <div className="flex justify-between mt-4">
                     <button className="">Next Question</button>
