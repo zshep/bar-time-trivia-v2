@@ -16,6 +16,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const [gameName, setGameName] = useState("");
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("");
+  const [ quetionId, setQuestionId ] = useState("");
 
   const [loading, setLoading] = useState(true);
 

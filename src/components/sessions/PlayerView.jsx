@@ -12,6 +12,7 @@ export default function PlayerView({
 }) {
 
   const currentChoices = currentQuestion?.answer?.mcChoices || [];
+  const currentQuestionId = currentQuestion?.id || "no-ID";
   const [playerChoice, setPlayerChoice] = useState([]);
 
   // make submitAnswerHadler
@@ -25,9 +26,10 @@ export default function PlayerView({
     } else {
       console.log("submitAnswer hit");
       console.log("Submitting these answers:", playerChoice);
+      console.log("questionId:", currentQuestionId)
       
       //socket handler emiting player answer
-      socket.emit("player-answer", { playerId: userId, choice: playerChoice, sessionCode })
+      socket.emit("player-answer", { choice: playerChoice, sessionCode, questionId: currentQuestionId });
     }
 
 

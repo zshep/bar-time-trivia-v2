@@ -9,7 +9,6 @@ export function registerSocketHandlers(io, socket) {
         console.log(`Session created: ${sessionCode} by host ${hostId} for game ${gameName}`);
         createSession(sessionCode, hostId, gameName, gameId, socket.id);
 
-
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });
 
@@ -80,19 +79,21 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //player sending answer to host
-    socket.on("player-answer", ({ playerId, choice, sessionCode }) => {
+    socket.on("player-answer", ({ choice, sessionCode, questionId }) => {
         const session = getSession(sessionCode);
 
         if(!session || !session.hostSocketId){
 
             return console.error("No session or host socket ID found");
         }
+        //grabbing user socketID
+        const playerSocketId = socket.id;
 
-        console.log(`Server received answer from ${playerId}: ${choice} in ${sessionCode}`);
+        console.log(`Server received answer from ${playerSocketId}: ${choice} in ${sessionCode}`);
 
         //rebroadcasting answer submission
         
-        io.to(session.hostSocketId).emit("submit-answer", { playerId, choice, sessionCode });
+        io.to(session.hostSocketId).emit("submit-answer", { playerId: playerSocketId, choice, sessionCode, questionId });
     })
 
 

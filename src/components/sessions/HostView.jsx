@@ -30,6 +30,7 @@ export default function HostView({
 
     useEffect(() => { sessionCodeRef.current = sessionCode; }, [sessionCode]);
     useEffect(() => { questionIdRef.current = questionId}, [questionId]);
+    useEffect(() => { isLockedRef.current = isLocked }, [isLocked]);
 
     //socket handlers to grab list of players
     useEffect(() => {
@@ -51,11 +52,19 @@ export default function HostView({
 
 
 
-    // Socket handlers for getting player answers
+    // getting player answers
     useEffect(() => {
 
-        const handleNewPlayerAnswer = ({playerId, choice, sessionCode}) => {
-            console.log(`Recieved answer from player ${playerId} give the answer ${choice} for session ${sessionCode} `);
+        const handleNewPlayerAnswer = ({playerId, choice, sessionCode, questionId}) => {
+
+            //guards
+            if (sessionCode && sessionCode !== sessionCodeRef.current) return;
+            if (questionId && questionId !== questionIdRef.current) return;
+            if (isLockedRef.current) return;
+
+            //debug
+            console.log(`Answer from ${playerId} for question ${questionId} playerids:`, players.map(p => p.id));
+
             setAnswers(prev => ({
                 ...prev,
                 [playerId] : {
