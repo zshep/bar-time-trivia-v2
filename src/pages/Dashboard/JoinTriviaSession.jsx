@@ -80,7 +80,11 @@ export default function JoinTriviaSession() {
 
         //emiting to socket
         socket.emit('request-session-info', { sessionCode: joinCode })
-        socket.emit('join-session', { sessionCode: joinCode, playerName: userName });
+        socket.emit('join-session', { 
+            sessionCode: joinCode, 
+            playerName: userName, 
+            userId 
+        });
 
 
     };

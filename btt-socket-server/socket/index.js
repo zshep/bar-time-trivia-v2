@@ -15,7 +15,7 @@ export function registerSocketHandlers(io, socket) {
     });
 
     // Player joins a session
-    socket.on('join-session', ({ sessionCode, playerName }) => {
+    socket.on('join-session', ({ sessionCode, playerName, userId }) => {
         const session = getSession(sessionCode);
         //console.log("session code:", sessionCode);
         //console.log("session", session);
@@ -23,12 +23,15 @@ export function registerSocketHandlers(io, socket) {
 
         if (session) {
             socket.join(sessionCode);
-            console.log(`${playerName} joined session ${sessionCode}`);
+            console.log(`${playerName} with userId: ${userId} joined session ${sessionCode}`);
 
             //updating in-memory session
             addPlayerToSession(sessionCode, {
                 id: socket.id,
-                name: playerName
+                userId,
+                name: playerName,
+                connected: true,
+                disconnectedTimerId: null
             });
 
             io.to(sessionCode).emit('player-list-update', { players: session.players });
@@ -69,7 +72,7 @@ export function registerSocketHandlers(io, socket) {
                 sessionCode,
                 gameName: session.gameName,
                 hostId: session.hostId,
-                gameId: session.gamerId,
+                gameId: session.gameId,
                 gameStarted: session.gameStarted
             });
         } else {
@@ -143,11 +146,14 @@ export function registerSocketHandlers(io, socket) {
 
     })
 
+    //reconnect host
     socket.on("reconnect-host", ({sessionCode, userId}) => {
         const session = getSession(sessionCode);
         if (session){
+            session.hostSocketId = socket.id;
             socket.join(sessionCode);
-            console.log("Host should have rejoined session");
+
+            socket.emit("player-list-update", { players: session.players });
 
         }
     })
