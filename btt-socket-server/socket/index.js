@@ -1,4 +1,4 @@
-import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion } from './sessionStore.js';
+import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion, addOrAttachPlayer, setHostSocket, setCurrentQuestion } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -26,13 +26,16 @@ export function registerSocketHandlers(io, socket) {
             console.log(`${playerName} with userId: ${userId} joined session ${sessionCode}`);
 
             //updating in-memory session
-            addPlayerToSession(sessionCode, {
-                id: socket.id,
+            const player = addOrAttachPlayer(sessionCode, {
+                socketId: socket.id,
                 userId,
                 name: playerName,
-                connected: true,
-                disconnectedTimerId: null
             });
+
+            //sync for late joiner
+            if (session.currentQuestion) {
+                socket.emit("new-question", session.currentQuestion);
+            }
 
             io.to(sessionCode).emit('player-list-update', { players: session.players });
 
@@ -83,22 +86,30 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //player sending answer to host
-    socket.on("player-answer", ({ choice, sessionCode, questionId }) => {
+    socket.on("player-answer", ({ choice, sessionCode, questionId }, ack) => {
         const session = getSession(sessionCode);
 
-        if(!session || !session.hostSocketId){
+        if (!session) return ack?.({ ok: false, error: "no-session" });
 
-            return console.error("No session or host socket ID found");
+        //checking if player is part of current session:
+        const isMember = session.players.some(p => p.id === socket.id);
+        if (!isMember) return ack?.({ ok: false, error: "not-in-room" });
+
+        if (questionId && questionId !== session.currentQuestion?.id) {
+            return ack?.({ ok: false, error: "stale-question" });
         }
-        //grabbing user socketID
-        const playerSocketId = socket.id;
-
-        console.log(`Server received answer from ${playerSocketId}: ${choice} in ${sessionCode}`);
 
         //rebroadcasting answer submission
-        
-        io.to(session.hostSocketId).emit("submit-answer", { playerId: playerSocketId, choice, sessionCode, questionId });
-    })
+
+        io.to(session.hostSocketId).emit("submit-answer", { 
+            playerId: socket.id, 
+            choice, 
+            sessionCode, 
+            questionId 
+        });
+
+        ack?.({ ok: true });
+    });
 
 
     // Start game
@@ -112,16 +123,15 @@ export function registerSocketHandlers(io, socket) {
     // Recieve and forward question from Host
     socket.on('send-question', ({ sessionCode, question }) => {
         const session = getSession(sessionCode);
-        console.log("Host sent question for session:", sessionCode);
-        //store question for reconnects
-        session.currentQuestion = question;
+        if (!session) return;
 
+        //setting current question
+        setCurrentQuestion(sessionCode, question);
         io.to(sessionCode).emit('new-question', question);
     });
 
     //Reconnecting player
-    socket.on("reconnect-player", ({ sessionCode, userId }) =>
-    {
+    socket.on("reconnect-player", ({ sessionCode, userId }) => {
         console.log("session code:", sessionCode);
         const session = getSession(sessionCode);
         if (session) {
@@ -148,14 +158,19 @@ export function registerSocketHandlers(io, socket) {
     })
 
     //reconnect host
-    socket.on("reconnect-host", ({sessionCode, userId}) => {
+    socket.on("reconnect-host", ({ sessionCode, userId }) => {
         const session = getSession(sessionCode);
-        if (session){
-            session.hostSocketId = socket.id;
+        if (session) {
+            setHostSocket(sessionCode, socket.id);
             socket.join(sessionCode);
 
+            //push current state to host
             socket.emit("player-list-update", { players: session.players });
 
+            if (session.currentQuestion) {
+                socket.emit("new-question", session.currentQuestion);
+            }
+            io.to(sessionCode).emit("host-status", { connected: true });
         }
     })
 
