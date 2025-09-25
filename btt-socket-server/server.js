@@ -17,8 +17,18 @@ io.on('connection', (socket) => {
   registerSocketHandlers(io, socket);
 
 
-  socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.id}`);
+ socket.on("disconnect", () => {
+    console.log("disconnected:", socket.id);
+    const res = markDisconnected(socket.id, { graceMs: 120_000 });
+    if (!res) return;
+
+    const { sessionCode, session, isHost } = res;
+    if (isHost) {
+      // Optional: notify room host is reconnecting
+      io.to(sessionCode).emit("host-status", { connected: false });
+    } else {
+      io.to(sessionCode).emit("player-list-update", { players: session.players });
+    }
   });
 });
 

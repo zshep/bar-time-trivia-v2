@@ -45,6 +45,7 @@ export function registerSocketHandlers(io, socket) {
         } else {
             //session doesn't exist
             socket.emit('join-error', { message: "Session not found" });
+            return;
         }
 
 
