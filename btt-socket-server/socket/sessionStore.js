@@ -1,5 +1,3 @@
-import { Underline } from "lucide-react";
-
 const sessions = new Map(); // key = sessionCode, value = sessionData object
 
 export function createSession(sessionCode, hostId, gameName, gameId, hostSocketId) {
@@ -8,30 +6,35 @@ export function createSession(sessionCode, hostId, gameName, gameId, hostSocketI
         hostId,
         gameName,
         gameId,
-        players: [{ id: Socket.id, userId, userName }],
-        currentRound: 1,
-        currentQuestion: 0,
+        players: [],
+        currentRound: null,
+        currentQuestion: null,
         gameStarted: false,
-        hostSocketId
+        hostSocketId,
+        startedAt: Date.now(),
     });
 }
 
+export function deleteSession(sessionCode) {
+    sessions.delete(sessionCode);
+}
+
 export function getSession(sessionCode) {
-    console.log("Gettings session:", sessionCode);
+    console.log("Getting session:", sessionCode);
     return sessions.get(sessionCode);
 
 }
 
 export function addPlayerToSession(sessionCode, player) {
     const session = sessions.get(sessionCode);
-    if (session) {
-        session.players.push(player);
-    }
+    if (!session) return;
+
+    session.players.push(player);
 
 }
 
-export function findSessionBySocketId() {
-    for (const [sessionCode, session] of session.entries()) {
+export function findSessionBySocketId(socketId) {
+    for (const [sessionCode, session] of sessions.entries()) {
         const player = session.players.find(p => p.id === socketId);
         if (player) {
             return { sessionCode, session, player };
@@ -44,7 +47,7 @@ export function findSessionBySocketId() {
 }
 
 export function findSessionByUserId(userId) {
-    for (const [sessionCode, session] of session.entries()) {
+    for (const [sessionCode, session] of sessions.entries()) {
         const player = session.players.find(p => p.userId === userId);
         if (player) return { sessionCode, session, player };
     }
@@ -56,7 +59,9 @@ export function addOrAttachPlayer(sessionCode, { socketId, userId, name }) {
     const session = sessions.get(sessionCode);
     if (!session) return null;
 
-    let player = session.players.find(p => p.userId === userId);
+     let player = userId
+    ? session.players.find(p => p.userId === userId)
+    : session.players.find(p => p.id === socketId);
 
     if (player) {
 
@@ -110,33 +115,43 @@ export function markDisconnected(socketId, { graceMs = 120_000 } = {}) {
 
 
 export function startGame(sessionCode) {
-    const session = sessions.get(sessionCode);
-    if (session) {
-        session.gameStarted = true;
-        console.log("The game has started");
-    }
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+  session.gameStarted = true;
+  if (session.currentQuestionIndex == null) session.currentQuestionIndex = -1; // before first question
 }
 
-//update current question:
-export function nextQuestion(sessionCode) {
-    const session = sessions.get(sessionCode);
-    if (session) {
-        session.question = session.question + 1
-    }
-}
 
 export function setCurrentQuestion(sessionCode, questionObj) {
   const session = sessions.get(sessionCode);
-  if (session) session.currentQuestion = questionObj || null;
+  if (!session) return;
+  
+  session.currentQuestion = questionObj || null;
+}
+
+export function setCurrentQuestionIndex(sessionCode, idx) {
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+  session.currentQuestionIndex = idx;
+}
+
+export function nextQuestion(sessionCode) {
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+  if (session.currentQuestionIndex == null) session.currentQuestionIndex = 0;
+  else session.currentQuestionIndex += 1;
 }
 
 export function setHostSocket(sessionCode, hostSocketId) {
   const session = sessions.get(sessionCode);
-  if (session) session.hostSocketId = hostSocketId;
+  if (!session) return;
+  session.hostSocketId = hostSocketId;
+}
+
+// debugging
+export function _debugListSessionCodes() {
+  return Array.from(sessions.keys());
 }
 
 
 
-export function deleteSession(sessionCode) {
-    sessions.delete(sessionCode);
-}

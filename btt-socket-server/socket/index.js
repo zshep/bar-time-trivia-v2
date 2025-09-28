@@ -12,6 +12,9 @@ export function registerSocketHandlers(io, socket) {
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });
 
+        // sending initial state to host
+        socket.emit('player-list-update', { players: [] });
+
     });
 
     // Player joins a session
@@ -81,7 +84,7 @@ export function registerSocketHandlers(io, socket) {
             });
         } else {
             console.log("session does not exist for sessionCode", sessionCode);
-            console.log("current session store keys:", Array.from(sessionStorage.keys()));
+            console.log("current session store keys:", Array.from(session.keys()));
         }
     });
 
@@ -90,6 +93,7 @@ export function registerSocketHandlers(io, socket) {
         const session = getSession(sessionCode);
 
         if (!session) return ack?.({ ok: false, error: "no-session" });
+        if (!session.hostSocketId) return ack?.({ ok: false, error: "no-host" });
 
         //checking if player is part of current session:
         const isMember = session.players.some(p => p.id === socket.id);
@@ -101,11 +105,11 @@ export function registerSocketHandlers(io, socket) {
 
         //rebroadcasting answer submission
 
-        io.to(session.hostSocketId).emit("submit-answer", { 
-            playerId: socket.id, 
-            choice, 
-            sessionCode, 
-            questionId 
+        io.to(session.hostSocketId).emit("submit-answer", {
+            playerId: socket.id,
+            choice,
+            sessionCode,
+            questionId
         });
 
         ack?.({ ok: true });
@@ -113,49 +117,41 @@ export function registerSocketHandlers(io, socket) {
 
 
     // Start game
-    socket.on(`start-game`, ({ sessionCode }) => {
-        console.log("start-game initiated ")
+    socket.on('start-game', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
+        if (!session) return;
+
+        // host-only guard 
+        if (session.hostSocketId !== socket.id) return;
+
         startGame(sessionCode);
         io.to(sessionCode).emit('game-started');
-        nextQuestion();
+        nextQuestion(sessionCode);
     });
 
     // Recieve and forward question from Host
     socket.on('send-question', ({ sessionCode, question }) => {
         const session = getSession(sessionCode);
+
+        // guards
         if (!session) return;
+        if (session.hostSocketId !== socket.id) return;
 
         //setting current question
         setCurrentQuestion(sessionCode, question);
         io.to(sessionCode).emit('new-question', question);
     });
 
-    //Reconnecting player
-    socket.on("reconnect-player", ({ sessionCode, userId }) => {
-        console.log("session code:", sessionCode);
+    // reconnecting player
+    socket.on("reconnect-player", ({ sessionCode, userId, playerName }) => {
         const session = getSession(sessionCode);
-        if (session) {
-            socket.join(sessionCode);
-            console.log(`Player ${userId} reconnected to session ${sessionCode}`);
+        if (!session) return;
 
-            //grabbing round data???
-            const currentRound = session.currentRound || 1;
-            const currentQuestionIndex = session.currentQuestion || 0;
-            console.log(`The current round is ${currentRound} and the question we are on is ${currentQuestionIndex}`);
-
-            //emit the current question to the reconnected player
-            const question = session.currentQuestion;
-
-            if (question) {
-                socket.emit("new-question", question);
-            } else {
-                console.warn("No current question during reconnect");
-            }
-
-        }
-        console.log("the user session cannot be found");
-
-    })
+        socket.join(sessionCode);
+        addOrAttachPlayer(sessionCode, { socketId: socket.id, userId, name: playerName });
+        socket.emit("player-list-update", { players: session.players });
+        if (session.currentQuestion) socket.emit("new-question", session.currentQuestion);
+    });
 
     //reconnect host
     socket.on("reconnect-host", ({ sessionCode, userId }) => {

@@ -1,7 +1,8 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { registerSocketHandlers } from './socket/index.js'
+import { registerSocketHandlers } from './socket/index.js';
+import { markDisconnected } from './socket/sessionStore.js';
 
 const app = express();
 const server = createServer(app);
