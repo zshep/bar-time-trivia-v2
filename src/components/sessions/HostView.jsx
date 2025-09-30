@@ -8,7 +8,8 @@ import socket from "../../main";
 export default function HostView({
     currentQuestion,
     questionType,
-    sessionCode
+    sessionCode,
+    roundData
 }) {
 
     //states for holding player data
@@ -87,6 +88,20 @@ export default function HostView({
         setIsLocked(false);
     }, [questionId]);
 
+    //handle next question
+    const handleNextQuestion = () => {
+        console.log("Host click next question");
+
+        //lock question
+
+        //compute nextIndex
+        
+        //read const nextQ = questions[nextIndex]
+
+        //emit to server
+
+    }
+
   
     return (
         <div>
@@ -115,7 +130,10 @@ export default function HostView({
                     )) }
                 </div>
                 <div className="flex justify-between mt-4">
-                    <button className="">Next Question</button>
+                    <button 
+                        onClick={handleNextQuestion}
+                        className="">
+                            Next Question</button>
                     <button>Previous Question</button>
                     <button>End Round</button>
 
