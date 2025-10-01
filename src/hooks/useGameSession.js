@@ -113,6 +113,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   return {
     sessionCode,
     loading,
+    questionData,
     currentQuestion,
     questionText,
     questionType,

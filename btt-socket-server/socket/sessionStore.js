@@ -9,6 +9,7 @@ export function createSession(sessionCode, hostId, gameName, gameId, hostSocketI
         players: [],
         currentRound: null,
         currentQuestion: null,
+        currentQuestionIndex: null,
         gameStarted: false,
         hostSocketId,
         startedAt: Date.now(),
@@ -133,6 +134,15 @@ export function setCurrentQuestionIndex(sessionCode, idx) {
   const session = sessions.get(sessionCode);
   if (!session) return;
   session.currentQuestionIndex = idx;
+}
+
+export function getCurrentQuestionIndex(sessionCode) {
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+
+  return session.currentQuestionIndex;
+
+
 }
 
 export function nextQuestion(sessionCode) {

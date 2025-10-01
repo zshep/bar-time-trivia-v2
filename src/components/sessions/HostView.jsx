@@ -1,6 +1,7 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 import { useEffect, useState, useMemo, useRef } from "react";
+import { nextQuestion, getCurrentQuestionIndex } from "../../../btt-socket-server/socket/sessionStore";
 import socket from "../../main";
 
 
@@ -13,9 +14,9 @@ export default function HostView({
 }) {
 
     //states for holding player data
-    const [ answers, setAnswers ] = useState({});
-    const [ isLocked, setIsLocked] = useState(false);
-    const [ players, setPlayers ] = useState([]);
+    const [answers, setAnswers] = useState({});
+    const [isLocked, setIsLocked] = useState(false);
+    const [players, setPlayers] = useState([]);
 
 
     console.log("current Question:", currentQuestion);
@@ -25,12 +26,12 @@ export default function HostView({
 
     // latest references 
     const sessionCodeRef = useRef(sessionCode);
-    const questionIdRef =useRef(questionId);
-    const isLockedRef =useRef(isLocked);
-    
+    const questionIdRef = useRef(questionId);
+    const isLockedRef = useRef(isLocked);
+
 
     useEffect(() => { sessionCodeRef.current = sessionCode; }, [sessionCode]);
-    useEffect(() => { questionIdRef.current = questionId}, [questionId]);
+    useEffect(() => { questionIdRef.current = questionId }, [questionId]);
     useEffect(() => { isLockedRef.current = isLocked }, [isLocked]);
 
     //socket handlers to grab list of players
@@ -45,7 +46,7 @@ export default function HostView({
         socket.emit("request-player-list", { sessionCode });
         socket.on("player-list-update", handlePlayerListUpdate);
 
-        return() => {
+        return () => {
             socket.off("player-list-update", handlePlayerListUpdate);
         };
     }, [sessionCode]);
@@ -56,7 +57,7 @@ export default function HostView({
     // getting player answers
     useEffect(() => {
 
-        const handleNewPlayerAnswer = ({playerId, choice, sessionCode, questionId}) => {
+        const handleNewPlayerAnswer = ({ playerId, choice, sessionCode, questionId }) => {
 
             //guards
             if (sessionCode && sessionCode !== sessionCodeRef.current) return;
@@ -68,17 +69,17 @@ export default function HostView({
 
             setAnswers(prev => ({
                 ...prev,
-                [playerId] : {
+                [playerId]: {
                     choice,
                     updatedAt: Date.now(),
                 },
             }));
         };
-        
+
         socket.on('submit-answer', handleNewPlayerAnswer);
-        
+
         return () => {
-            socket.off('submit-answer', handleNewPlayerAnswer );
+            socket.off('submit-answer', handleNewPlayerAnswer);
         }
     }, []);
 
@@ -93,16 +94,30 @@ export default function HostView({
         console.log("Host click next question");
 
         //lock question
+        setIsLocked(true);
 
         //compute nextIndex
-        
-        //read const nextQ = questions[nextIndex]
+        nextQuestion(sessionCode);
+        const nextIndex = getCurrentQuestionIndex(sessionCode);
+
+        //const nextQ = questions[nextIndex]
 
         //emit to server
+        socket.emit("send-question", {
+            sessionCode,
+            question: {
+                id: nextQ.id,               // required so we can guard stale answers
+                questionNumber: nextIndex + 1,
+                questionType: nextQ.type,
+                text: nextQ.text,
+                answer: nextQ.answer,       // include what your player needs to render
+                // ...anything else your PlayerView needs (choices, etc.)
+            }
+        });
 
     }
 
-  
+
     return (
         <div>
 
@@ -118,22 +133,22 @@ export default function HostView({
                     <p>I'm a FR Section</p>
                 )}
             </div>
-      
+
             <div className="mt-10">
                 <div>
                     {players.map(p => (
-                        <div key={p.id} className="flex justify-center gap-2"> 
-                        <span className="font-mono">{p.name}</span>
-                        <span>{answers[p.id] ? "answered" : "waiting"}</span>
+                        <div key={p.id} className="flex justify-center gap-2">
+                            <span className="font-mono">{p.name}</span>
+                            <span>{answers[p.id] ? "answered" : "waiting"}</span>
 
                         </div>
-                    )) }
+                    ))}
                 </div>
                 <div className="flex justify-between mt-4">
-                    <button 
+                    <button
                         onClick={handleNextQuestion}
                         className="">
-                            Next Question</button>
+                        Next Question</button>
                     <button>Previous Question</button>
                     <button>End Round</button>
 
