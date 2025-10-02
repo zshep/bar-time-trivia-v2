@@ -12,11 +12,12 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const [roundData, setRoundData] = useState([]);
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const [gameId, setGameId] = useState(initialGameId || "");
   const [gameName, setGameName] = useState("");
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("");
-  const [ quetionId, setQuestionId ] = useState("");
+  
 
   const [loading, setLoading] = useState(true);
 
@@ -64,11 +65,37 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   // ---- Set Current Question ----
   useEffect(() => {
     if (!questionData.length) return;
+    setCurrentIndex(0);
     const cq = questionData[0];
     setCurrentQuestion(cq);
     setQuestionText(cq.question);
     setQuestionType(cq.questionType);
   }, [questionData]);
+
+  // ---- helper to jump to specific index ----
+  const goToQuestionIndex = (idx) => {
+    //guards
+    if (!questionData.length) return;
+    if (idx < 0 || idx >= questionData.length) return;
+
+    setCurrentIndex(idx);
+    const q = questionData[idx];
+    setCurrentQuestion(q);
+    setQuestionText(q.question);
+    setQuestionType(q.questionType);
+  };
+
+  // ---- helper to go to next question ----
+  const goToNextQuestion = () => {
+    if (currentIndex == null || !questionData.length) return;
+    const next = currentIndex + 1;
+    if (next >= questionData.length) {
+      console.log("reach the last question of round");
+      return;
+    }
+
+    goToQuestionIndex(next);
+  };
 
   // ---- Emit Question if Host ----
   useEffect(() => {
@@ -120,6 +147,9 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     userId,
     hostId,
     gameId,
-    roundData
+    roundData,
+    currentIndex,
+    goToQuestionIndex,
+    goToNextQuestion,
   };
 }

@@ -1,7 +1,6 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 import { useEffect, useState, useMemo, useRef } from "react";
-import { nextQuestion, getCurrentQuestionIndex } from "../../../btt-socket-server/socket/sessionStore";
 import socket from "../../main";
 
 
@@ -10,7 +9,8 @@ export default function HostView({
     currentQuestion,
     questionType,
     sessionCode,
-    roundData
+    roundData,
+    goToNextQuestion,
 }) {
 
     //states for holding player data
@@ -95,25 +95,8 @@ export default function HostView({
 
         //lock question
         setIsLocked(true);
-
         //compute nextIndex
-        nextQuestion(sessionCode);
-        const nextIndex = getCurrentQuestionIndex(sessionCode);
-
-        //const nextQ = questions[nextIndex]
-
-        //emit to server
-        socket.emit("send-question", {
-            sessionCode,
-            question: {
-                id: nextQ.id,               // required so we can guard stale answers
-                questionNumber: nextIndex + 1,
-                questionType: nextQ.type,
-                text: nextQ.text,
-                answer: nextQ.answer,       // include what your player needs to render
-                // ...anything else your PlayerView needs (choices, etc.)
-            }
-        });
+        goToNextQuestion(sessionCode);
 
     }
 
