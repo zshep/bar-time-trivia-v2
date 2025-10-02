@@ -23,6 +23,7 @@ export default function HostView({
     const currentChoices = currentQuestion?.answer?.mcChoices || [];
     const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
     const questionId = currentQuestion?.id || "no-ID";
+    const frAnswer = currentQuestion?.answer || "";
 
     // latest references 
     const sessionCodeRef = useRef(sessionCode);
@@ -112,8 +113,8 @@ export default function HostView({
 
                 )}
                 {questionType === "freeResponse" && (
-                    /*<QuestionFc /> */
-                    <p>I'm a FR Section</p>
+                    <QuestionFc answer={frAnswer} isHost /> 
+                    
                 )}
             </div>
 

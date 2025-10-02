@@ -14,12 +14,13 @@ export default function PlayerView({
   const currentChoices = currentQuestion?.answer?.mcChoices || [];
   const currentQuestionId = currentQuestion?.id || "no-ID";
   const [playerChoice, setPlayerChoice] = useState([]);
+  const [playerFrAnswer, setPlayerFrAnswer] = useState("");
 
   // make submitAnswerHadler
   const handleSubmitAnswer = () => {
 
-
-    if (playerChoice.length < 1) {
+    if (questionType === "multipleChoice") {
+      if (playerChoice.length < 1) {
       console.log("Please select at least one answer");
       alert("Please select at least one answer");
       return;
@@ -32,7 +33,25 @@ export default function PlayerView({
       socket.emit("player-answer", { choice: playerChoice, sessionCode, questionId: currentQuestionId });
     }
 
+    }
 
+    if (questionType === "freeResponse") {
+      if (playerFrAnswer === "") {
+      console.log("Please fill out answer");
+      alert("Please fill out answer");
+      return;
+    } else {
+      console.log("submitAnswer hit");
+      console.log("Submitting these answers:", playerFrAnswer);
+      console.log("questionId:", currentQuestionId)
+      
+      //socket handler emiting player answer
+      socket.emit("player-answer", { choice: playerFrAnswer, sessionCode, questionId: currentQuestionId });
+    }
+
+    }
+
+    
 
   };
 
@@ -50,11 +69,11 @@ export default function PlayerView({
           )}
 
           {questionType === "freeResponse" && (
-            /*<QuestionFc
-              answer={frAnswer}
-              setAnswer={setFrAnswer}
-            />*/
-            <p>I'm a FR component</p>
+            <QuestionFc
+              setAnswer={setPlayerFrAnswer}
+              playerAnswer={playerFrAnswer}
+            />
+       
           )}
 
           {questionType === "sort" && (
