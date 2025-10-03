@@ -168,7 +168,9 @@ export function registerSocketHandlers(io, socket) {
             }
             io.to(sessionCode).emit("host-status", { connected: true });
         }
-    })
+    });
+
+    //end round
 
 
     socket.on('end-game', async ({ sessionCode }) => {

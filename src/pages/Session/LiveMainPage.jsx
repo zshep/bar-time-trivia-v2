@@ -83,7 +83,7 @@ export default function LiveMainPage() {
       <div>
 
         {isHost && (
-          <HostView {...session} goToNextQuestin={session.goToNextQuestion} />
+          <HostView {...session} goToNextQuestion={session.goToNextQuestion} goToPreviousQuestion={session.goToPrevQuestion} />
         )}
         {!isHost && (
           <PlayerView {...session} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function QuestionFc({ answer, setAnswer, playerAnswer, isHost = false }) {
+    const [ answered, setAnswered] = useState(false);
 
     return (
         <div className="flex flex-col justify-center w-full">
@@ -11,6 +12,7 @@ export default function QuestionFc({ answer, setAnswer, playerAnswer, isHost = f
                     <p>Correct Answers: {answer}</p>
                 )}
                 {!isHost && (
+                    
                     <input
                         className="w-full text-center"
                         name="FrQuestion"

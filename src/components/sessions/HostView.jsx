@@ -11,6 +11,7 @@ export default function HostView({
     sessionCode,
     roundData,
     goToNextQuestion,
+    goToPrevQuestion,
 }) {
 
     //states for holding player data
@@ -98,9 +99,21 @@ export default function HostView({
         setIsLocked(true);
         //compute nextIndex
         goToNextQuestion(sessionCode);
+    };
 
+    //handle previous question
+    const handlePreviousQuestion = () => {
+        console.log("host clicked previous next question");
+        setIsLocked(true);
+        // compute previousIndex
+        goToPrevQuestion()
+    };
+
+    const handleEndRound = () => {
+        console.log("host has clicked End Round");
+        setIsLocked(true);
+        // end Round
     }
-
 
     return (
         <div>
@@ -133,8 +146,11 @@ export default function HostView({
                         onClick={handleNextQuestion}
                         className="">
                         Next Question</button>
-                    <button>Previous Question</button>
-                    <button>End Round</button>
+                    <button
+                        onClick={handlePreviousQuestion}>Previous Question</button>
+                    <button
+                        onClick={handleEndRound}
+                        >End Round</button>
 
                 </div>
             </div>

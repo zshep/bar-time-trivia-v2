@@ -70,6 +70,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     setCurrentQuestion(cq);
     setQuestionText(cq.question);
     setQuestionType(cq.questionType);
+    
   }, [questionData]);
 
   // ---- helper to jump to specific index ----
@@ -85,17 +86,36 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     setQuestionType(q.questionType);
   };
 
-  // ---- helper to go to next question ----
+  // ---- go to next question handler ----
   const goToNextQuestion = () => {
     if (currentIndex == null || !questionData.length) return;
+
+    console.log("current index is:", currentIndex);
     const next = currentIndex + 1;
+
     if (next >= questionData.length) {
       console.log("reach the last question of round");
       return;
     }
 
+    setCurrentIndex(next);
     goToQuestionIndex(next);
   };
+
+  // ---- go to previous question handler ----
+  const goToPrevQuestion = () => {
+     if (currentIndex == null || !questionData.length) return;
+     console.log("The current index is:", currentIndex);
+    const prev = currentIndex - 1;
+    if (prev < 0 ) {
+      console.log("already at index 0");
+      return;
+    }
+    setCurrentIndex(prev);
+    goToQuestionIndex(prev);
+  }
+
+
 
   // ---- Emit Question if Host ----
   useEffect(() => {
@@ -135,6 +155,11 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
 
   }, [userId, hostId]);
 
+  // end Round
+  useEffect(() => {
+
+  })
+
  
 
   return {
@@ -151,5 +176,6 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     currentIndex,
     goToQuestionIndex,
     goToNextQuestion,
+    goToPrevQuestion,
   };
 }
