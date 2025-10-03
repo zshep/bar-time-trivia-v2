@@ -5,9 +5,6 @@ import { useReconnect } from "../../hooks/useReconnect";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
 import { useGameSession } from "../../hooks/useGameSession";
-import QuestionMc from "../../components/sessions/questionMc";
-import QuestionFc from "../../components/sessions/questionFc";
-import QuestionSort from "../../components/sessions/questionsort";
 import PlayerView from "../../components/sessions/PlayerView";
 import HostView from "../../components/sessions/HostView";
 

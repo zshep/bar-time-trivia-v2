@@ -3,6 +3,7 @@ import socket from "../main";
 import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth";
+import { toWireQuestion } from "../utils/toWireQuestion";
 
 
 export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
@@ -52,7 +53,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
         const q = query(col, where("roundId", "==", roundId), orderBy("questionNumber", "asc"));
         const snap = await getDocs(q);
         const questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setQuestionData(questions);
+        const wireQuestions = questions.map(toWireQuestion);
+        setQuestionData(wireQuestions);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching questions:", err);
@@ -68,8 +70,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     setCurrentIndex(0);
     const cq = questionData[0];
     setCurrentQuestion(cq);
-    setQuestionText(cq.question);
-    setQuestionType(cq.questionType);
+    setQuestionText(cq.text);
+    setQuestionType(cq.type);
     
   }, [questionData]);
 
@@ -82,19 +84,19 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     setCurrentIndex(idx);
     const q = questionData[idx];
     setCurrentQuestion(q);
-    setQuestionText(q.question);
-    setQuestionType(q.questionType);
+    setQuestionText(q.text);
+    setQuestionType(q.type);
   };
 
   // ---- go to next question handler ----
   const goToNextQuestion = () => {
     if (currentIndex == null || !questionData.length) return;
 
-    console.log("current index is:", currentIndex);
+    //console.log("current index is:", currentIndex);
     const next = currentIndex + 1;
 
     if (next >= questionData.length) {
-      console.log("reach the last question of round");
+      console.log("reached the last question of round");
       return;
     }
 
@@ -105,7 +107,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   // ---- go to previous question handler ----
   const goToPrevQuestion = () => {
      if (currentIndex == null || !questionData.length) return;
-     console.log("The current index is:", currentIndex);
+     //console.log("The current index is:", currentIndex);
     const prev = currentIndex - 1;
     if (prev < 0 ) {
       console.log("already at index 0");
@@ -157,8 +159,11 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
 
   // end Round
   useEffect(() => {
+    if (!userId || userId !== hostId) return;
 
-  })
+    //socket to send end round
+
+  }, [])
 
  
 

@@ -2,6 +2,7 @@ import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 import { useEffect, useState, useMemo, useRef } from "react";
 import socket from "../../main";
+import endRound from "./endRound";
 
 
 
@@ -18,6 +19,10 @@ export default function HostView({
     const [answers, setAnswers] = useState({});
     const [isLocked, setIsLocked] = useState(false);
     const [players, setPlayers] = useState([]);
+
+    //modal states
+    const [isEndRoundModalOpen, setIsEndRoundModalOpen] = useState(false);
+
 
 
     console.log("current Question:", currentQuestion);
@@ -98,7 +103,7 @@ export default function HostView({
         //lock question
         setIsLocked(true);
         //compute nextIndex
-        goToNextQuestion(sessionCode);
+        goToNextQuestion();
     };
 
     //handle previous question
@@ -112,8 +117,18 @@ export default function HostView({
     const handleEndRound = () => {
         console.log("host has clicked End Round");
         setIsLocked(true);
+        setIsEndRoundModalOpen(true);
         // end Round
+    };
+
+    const endRound = () => {
+        console.log("Host has ended Round");
+        setIsEndRoundModalOpen(false);
+
+        //navigate to endRound page??? or component 
+
     }
+
 
     return (
         <div>
@@ -154,6 +169,25 @@ export default function HostView({
 
                 </div>
             </div>
+
+            {isEndRoundModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold">Confirm End Round</h3>
+                        <p>Are you sure you want to end the round </p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setIsEndRoundModalOpen(false)} className="mr-2 px-4 py-2 bg-red-300 rounded-full">
+                                Cancel
+                            </button>
+                            <button onClick={endRound} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                                End Round
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
 
         </div>
 
