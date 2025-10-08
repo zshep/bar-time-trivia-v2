@@ -138,6 +138,7 @@ export function registerSocketHandlers(io, socket) {
         if (session.hostSocketId !== socket.id) return;
 
         //setting current question
+        console.log("server storing question", question);
         setCurrentQuestion(sessionCode, question);
         io.to(sessionCode).emit('new-question', question);
     });

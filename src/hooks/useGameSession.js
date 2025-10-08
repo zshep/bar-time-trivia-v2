@@ -56,6 +56,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
         const wireQuestions = questions.map(toWireQuestion);
         setQuestionData(wireQuestions);
         setLoading(false);
+        console.log("Wired Questions",wireQuestions);
       } catch (err) {
         console.error("Error fetching questions:", err);
       }
@@ -69,6 +70,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     if (!questionData.length) return;
     setCurrentIndex(0);
     const cq = questionData[0];
+    console.log("wired questions", questionData[0]);
     setCurrentQuestion(cq);
     setQuestionText(cq.text);
     setQuestionType(cq.type);
@@ -143,8 +145,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
         setGameId(questionObj.gameId);
         setGameName(questionObj.gameName);
         setCurrentQuestion(questionObj);
-        setQuestionText(questionObj.question);
-        setQuestionType(questionObj.questionType);
+        setQuestionText(questionObj.text);
+        setQuestionType(questionObj.type);
         setLoading(false);
       };
 

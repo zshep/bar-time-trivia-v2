@@ -6,7 +6,7 @@ export default function QuestionFc({ answer, setAnswer, playerAnswer, isHost = f
     return (
         <div className="flex flex-col justify-center w-full">
 
-            <div className="self-center">
+            <div className="self-center mt-6">
 
                 {isHost && (
                     <p>Correct Answers: {answer}</p>
@@ -14,7 +14,7 @@ export default function QuestionFc({ answer, setAnswer, playerAnswer, isHost = f
                 {!isHost && (
                     
                     <input
-                        className="w-full text-center"
+                        className="w-full text-center rounded-sm"
                         name="FrQuestion"
                         type="text"
 

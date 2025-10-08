@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function QuestionMc({ choices, playerChoice = [], setPlayerChoice, isHost = false, correctAnswers = [] }) {
+export default function QuestionMc({ choices={}, playerChoice = [], setPlayerChoice, isHost = false, correctAnswers = [] }) {
 
     //console.log("choices", choices);
 

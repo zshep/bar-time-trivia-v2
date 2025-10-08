@@ -1,5 +1,6 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
 import socket from "../../main";
 import endRound from "./endRound";
@@ -15,6 +16,8 @@ export default function HostView({
     goToPrevQuestion,
 }) {
 
+    const navigate =useNavigate();
+
     //states for holding player data
     const [answers, setAnswers] = useState({});
     const [isLocked, setIsLocked] = useState(false);
@@ -26,8 +29,8 @@ export default function HostView({
 
 
     console.log("current Question:", currentQuestion);
-    const currentChoices = currentQuestion?.answer?.mcChoices || [];
-    const correctAnswers = currentQuestion?.answer?.mcAnswers || [];
+    const currentChoices = currentQuestion?.choices || [];
+    const correctAnswers = currentQuestion?.correct || [];
     const questionId = currentQuestion?.id || "no-ID";
     const frAnswer = currentQuestion?.answer || "";
 
@@ -113,12 +116,11 @@ export default function HostView({
         // compute previousIndex
         goToPrevQuestion()
     };
-
+    // end round btn handler
     const handleEndRound = () => {
         console.log("host has clicked End Round");
         setIsLocked(true);
-        setIsEndRoundModalOpen(true);
-        // end Round
+        setIsEndRoundModalOpen(true);   
     };
 
     const endRound = () => {
@@ -126,7 +128,11 @@ export default function HostView({
         setIsEndRoundModalOpen(false);
 
         //navigate to endRound page??? or component 
-
+          navigate(`/session/live/${sessionCodeRef}/endRound`, {
+          state: {
+            sessionCode: sessionCodeRef
+          },
+        });
     }
 
 
@@ -135,13 +141,13 @@ export default function HostView({
 
             <div>
 
-                {questionType === "multipleChoice" && (
-                    <QuestionMc choices={currentChoices} correctAnswers={correctAnswers} isHost />
+                {currentQuestion?.type === "multipleChoice" && (
+                    <QuestionMc choices={currentQuestion.choices.map(c => c.label)} correctAnswers={currentQuestion.correct} isHost />
 
 
                 )}
-                {questionType === "freeResponse" && (
-                    <QuestionFc answer={frAnswer} isHost /> 
+                {currentQuestion?.type === "freeResponse" && (
+                    <QuestionFc answer={currentQuestion.correctText} isHost /> 
                     
                 )}
             </div>
@@ -175,13 +181,14 @@ export default function HostView({
                     <div className="bg-white p-6 rounded-lg shadow-lg">
                         <h3 className="text-lg font-bold">Confirm End Round</h3>
                         <p>Are you sure you want to end the round </p>
-                        <div className="flex justify-end mt-4">
+                        <div className="flex justify-between mt-4">
+                             <button onClick={endRound} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
+                                End Round
+                            </button>
                             <button onClick={() => setIsEndRoundModalOpen(false)} className="mr-2 px-4 py-2 bg-red-300 rounded-full">
                                 Cancel
                             </button>
-                            <button onClick={endRound} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
-                                End Round
-                            </button>
+                           
                         </div>
                     </div>
                 </div>

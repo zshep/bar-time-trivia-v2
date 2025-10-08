@@ -11,7 +11,7 @@ export default function PlayerView({
 
 }) {
 
-  const currentChoices = currentQuestion?.answer?.mcChoices || [];
+  const currentChoices = currentQuestion?.choices || [];
   const currentQuestionId = currentQuestion?.id || "no-ID";
   const [playerChoice, setPlayerChoice] = useState([]);
   const [playerFrAnswer, setPlayerFrAnswer] = useState("");
@@ -19,7 +19,7 @@ export default function PlayerView({
   // make submitAnswerHadler
   const handleSubmitAnswer = () => {
 
-    if (questionType === "multipleChoice") {
+    if (currentQuestion?.type === "multipleChoice") {
       if (playerChoice.length < 1) {
       console.log("Please select at least one answer");
       alert("Please select at least one answer");
@@ -35,7 +35,7 @@ export default function PlayerView({
 
     }
 
-    if (questionType === "freeResponse") {
+    if (currentQuestion?.type === "freeResponse") {
       if (playerFrAnswer === "") {
       console.log("Please fill out answer");
       alert("Please fill out answer");
@@ -64,11 +64,11 @@ export default function PlayerView({
 
         <div className="flex justify-center mt-4">
 
-          {questionType === "multipleChoice" && (
-            <QuestionMc choices={currentChoices} playerChoice={playerChoice} setPlayerChoice={setPlayerChoice} />
+          {currentQuestion?.type === "multipleChoice" && (
+            <QuestionMc choices={currentQuestion.choices.map(c => c.label)} playerChoice={playerChoice} setPlayerChoice={setPlayerChoice} />
           )}
 
-          {questionType === "freeResponse" && (
+          {currentQuestion?.type === "freeResponse" && (
             <QuestionFc
               setAnswer={setPlayerFrAnswer}
               playerAnswer={playerFrAnswer}
@@ -76,7 +76,7 @@ export default function PlayerView({
        
           )}
 
-          {questionType === "sort" && (
+          {currentQuestion?.type === "sort" && (
             <QuestionSort />
           )}
         </div>
