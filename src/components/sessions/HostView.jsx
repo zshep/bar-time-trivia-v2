@@ -3,13 +3,12 @@ import QuestionFc from "./questionFc";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
 import socket from "../../main";
-import endRound from "./endRound";
+
 
 
 
 export default function HostView({
     currentQuestion,
-    questionType,
     sessionCode,
     roundData,
     goToNextQuestion,
@@ -126,13 +125,10 @@ export default function HostView({
     const endRound = () => {
         console.log("Host has ended Round");
         setIsEndRoundModalOpen(false);
+        socket.emit('end-round', { sessionCode });
 
-        //navigate to endRound page??? or component 
-          navigate(`/session/live/${sessionCodeRef}/endRound`, {
-          state: {
-            sessionCode: sessionCodeRef
-          },
-        });
+        //navigate to endRound component 
+          navigate(`/session/live/${sessionCodeRef.current}/end`);
     }
 
 

@@ -1,7 +1,8 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import socket from "../../main";
+import { useNavigate } from "react-router-dom";
 
 export default function PlayerView({
   sessionCode,
@@ -11,10 +12,25 @@ export default function PlayerView({
 
 }) {
 
+  const navigate = useNavigate();
   const currentChoices = currentQuestion?.choices || [];
   const currentQuestionId = currentQuestion?.id || "no-ID";
   const [playerChoice, setPlayerChoice] = useState([]);
   const [playerFrAnswer, setPlayerFrAnswer] = useState("");
+
+  // end Round
+    useEffect(() => {
+      
+      const endRoundHandler = ({ sessionCode }) => {
+        console.log("The host is ending the round")
+        navigate(`/session/live/${sessionCode}/end`);
+      };
+      socket.on('round-ended', endRoundHandler);
+      return () => {
+        socket.off('round-ended', endRoundHandler);
+      }
+  
+    }, [navigate]);
 
   // make submitAnswerHadler
   const handleSubmitAnswer = () => {

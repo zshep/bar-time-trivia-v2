@@ -9,10 +9,13 @@ import PlayerView from "../../components/sessions/PlayerView";
 import HostView from "../../components/sessions/HostView";
 
 
+
+
 export default function LiveMainPage() {
 
   const { state } = useLocation();
   const { gameName, gameId, sessionCode, hostId } = state;
+  
 
   const session = useGameSession({ gameId, sessionCode, hostId });
   const currentRound = session.roundData?.[0]?.roundNumber || 1;

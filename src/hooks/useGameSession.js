@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import socket from "../main";
+import { useNavigate } from "react-router-dom";
 import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth";
@@ -9,7 +10,7 @@ import { toWireQuestion } from "../utils/toWireQuestion";
 export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const user = useAuth();
   const userId = user?.uid;
-
+  const navigate = useNavigate();
   const [roundData, setRoundData] = useState([]);
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -161,11 +162,16 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
 
   // end Round
   useEffect(() => {
-    if (!userId || userId !== hostId) return;
+    
+    const endRoundHandler = ({ sessionCode }) => {
+      navigate(`/session/live/${sessionCode}/end`);
+    };
+    socket.on('end-round', endRoundHandler);
+    return () => {
+      socket.off('round-ended', endRoundHandler);
+    }
 
-    //socket to send end round
-
-  }, [])
+  }, [navigate]);
 
  
 

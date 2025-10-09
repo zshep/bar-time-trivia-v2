@@ -172,8 +172,12 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //end round
+    socket.on('end-round', ({ sessionCode}) =>{
+        console.log("user has ended round")
+        io.to(sessionCode).emit('round-ended', { sessionCode });
+    });
 
-
+    //end game
     socket.on('end-game', async ({ sessionCode }) => {
         const session = getSession(sessionCode);
 
