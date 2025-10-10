@@ -23,7 +23,11 @@ export default function PlayerView({
       
       const endRoundHandler = ({ sessionCode }) => {
         console.log("The host is ending the round")
-        navigate(`/session/live/${sessionCode}/end`);
+        navigate(`/session/live/${sessionCode}/end`, {
+          state: {
+            isHost: false,
+          },
+        });
       };
       socket.on('round-ended', endRoundHandler);
       return () => {
@@ -64,11 +68,7 @@ export default function PlayerView({
       //socket handler emiting player answer
       socket.emit("player-answer", { choice: playerFrAnswer, sessionCode, questionId: currentQuestionId });
     }
-
     }
-
-    
-
   };
 
 

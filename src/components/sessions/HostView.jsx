@@ -128,7 +128,11 @@ export default function HostView({
         socket.emit('end-round', { sessionCode });
 
         //navigate to endRound component 
-          navigate(`/session/live/${sessionCodeRef.current}/end`);
+          navigate(`/session/live/${sessionCodeRef.current}/end`, {
+            state: {
+                isHost: true,
+            },
+          });
     }
 
 
