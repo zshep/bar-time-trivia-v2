@@ -92,6 +92,10 @@ export default function HostView({
         }
     }, []);
 
+    //--------TO DO!--------
+    //make function to bundle all player answers and send them server? or send them with host to end resoults
+
+
     // clear answers when question changes
     useEffect(() => {
         setAnswers({});

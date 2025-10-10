@@ -1,6 +1,7 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useGameSession } from "../../hooks/useGameSession";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import socket from "../../main";
 
 export default function EndRound() {
 
@@ -10,12 +11,36 @@ export default function EndRound() {
     //states
     const [resultsReady, setResultsReady] = useState(false);
     const [isHost, setIsHost] =useState(state.isHost);
+    const [playersList, setPlayersList] = useState([]);
 
 
 
     //logic for talling up scores
+    useEffect( () =>{
+        if (!isHost) return;
+        //send socket to grab player list
+        socket.emit('request-player-list', {sessionCode});
 
-    //next
+        //grab list of players
+        const handlePlayerAnswers = ({ players }) => {
+            console.log("our list of players:", players);
+            setPlayersList(players);
+        }
+
+        socket.on('player-list-update', handlePlayerAnswers);
+        return () => {
+            socket.off('player-list-updated', handlePlayerAnswers);
+        }
+    },[])
+
+    //finalize round
+    const handleFinalizeResults = () => {
+        console.log("host has finalized results");
+
+    }
+
+    //grade FR question
+
     
     //next round
     const handleNextRound = () => {
@@ -44,7 +69,7 @@ export default function EndRound() {
 
 
             </div>
-            {isHost && (
+            {isHost && !resultsReady  && (
                 <div>
                     <div>
                         <p>You need to go through the results</p>
@@ -59,6 +84,13 @@ export default function EndRound() {
                 </div>
 
             )}
+            {isHost && resultsReady &&(
+                <div>
+                    <p>These are the results</p>
+                </div>
+            )
+
+            }
 
 
 
