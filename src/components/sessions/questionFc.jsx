@@ -18,7 +18,7 @@ export default function QuestionFc({ answer, setAnswer, playerAnswer, isHost = f
                         name="FrQuestion"
                         type="text"
 
-                        value={answer}
+                        value={playerAnswer}
                         placeholder="Answer"
                         onChange={(e) => setAnswer(e.target.value)}
                     />

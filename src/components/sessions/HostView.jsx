@@ -19,6 +19,7 @@ export default function HostView({
 
     //states for holding player data
     const [answers, setAnswers] = useState({});
+    const [roundAnswers, setRoundAnswers] = useState({})
     const [isLocked, setIsLocked] = useState(false);
     const [players, setPlayers] = useState([]);
 
@@ -74,7 +75,7 @@ export default function HostView({
             if (isLockedRef.current) return;
 
             //debug
-            console.log(`Answer from ${playerId} for question ${questionId} playerids:`, players.map(p => p.id));
+            console.log(`Answer from ${playerId} for question ${questionId} playerids with this answer ${choice}:`, players.map(p => p.id));
 
             setAnswers(prev => ({
                 ...prev,
@@ -98,6 +99,10 @@ export default function HostView({
 
     // clear answers when question changes
     useEffect(() => {
+        setRoundAnswers(prev => ({
+            ...prev,
+            answers
+        }));
         setAnswers({});
         setIsLocked(false);
     }, [questionId]);
@@ -135,6 +140,7 @@ export default function HostView({
           navigate(`/session/live/${sessionCodeRef.current}/end`, {
             state: {
                 isHost: true,
+                answers: roundAnswers,
             },
           });
     }

@@ -12,7 +12,7 @@ export default function EndRound() {
     const [resultsReady, setResultsReady] = useState(false);
     const [isHost, setIsHost] =useState(state.isHost);
     const [playersList, setPlayersList] = useState([]);
-
+    const [answers, setAnswers] = useState(state.answers ||{});
 
 
     //logic for talling up scores
@@ -25,6 +25,7 @@ export default function EndRound() {
         const handlePlayerAnswers = ({ players }) => {
             console.log("our list of players:", players);
             setPlayersList(players);
+            console.log("here are the answers", answers);
         }
 
         socket.on('player-list-update', handlePlayerAnswers);
@@ -78,19 +79,15 @@ export default function EndRound() {
                         <button
                         onClick={handleNextRound}
                         >Start Next Round</button>
-                    </div>
-                    
-                
+                    </div>               
                 </div>
 
             )}
-            {isHost && resultsReady &&(
+            {isHost && resultsReady && (
                 <div>
                     <p>These are the results</p>
                 </div>
-            )
-
-            }
+            )}
 
 
 

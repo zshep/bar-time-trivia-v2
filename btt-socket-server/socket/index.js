@@ -104,7 +104,7 @@ export function registerSocketHandlers(io, socket) {
         }
 
         //rebroadcasting answer submission
-
+        console.log(`player ${socket.id} has submitted ${choice} for question ${questionId}`)
         io.to(session.hostSocketId).emit("submit-answer", {
             playerId: socket.id,
             choice,
