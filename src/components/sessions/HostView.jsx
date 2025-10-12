@@ -19,25 +19,26 @@ export default function HostView({
 
     //states for holding player data
     const [answers, setAnswers] = useState({});
-    const [roundAnswers, setRoundAnswers] = useState({})
+    const [roundAnswers, setRoundAnswers] = useState({});
+
+
     const [isLocked, setIsLocked] = useState(false);
     const [players, setPlayers] = useState([]);
-
-    //modal states
     const [isEndRoundModalOpen, setIsEndRoundModalOpen] = useState(false);
 
-
-
-    console.log("current Question:", currentQuestion);
-    const currentChoices = currentQuestion?.choices || [];
-    const correctAnswers = currentQuestion?.correct || [];
     const questionId = currentQuestion?.id || "no-ID";
+   
+    console.log("current Question:", currentQuestion);
+  
     const frAnswer = currentQuestion?.answer || "";
 
     // latest references 
     const sessionCodeRef = useRef(sessionCode);
     const questionIdRef = useRef(questionId);
     const isLockedRef = useRef(isLocked);
+
+    // refrence to previous question meta
+    const lastQuestionRef = useRef(currentQuestion || null);
 
 
     useEffect(() => { sessionCodeRef.current = sessionCode; }, [sessionCode]);
@@ -50,7 +51,7 @@ export default function HostView({
 
         const handlePlayerListUpdate = ({ players }) => {
             setPlayers(players || []);
-            console.log("players", players);
+            //console.log("players", players);
         };
 
         socket.emit("request-player-list", { sessionCode });
@@ -61,14 +62,9 @@ export default function HostView({
         };
     }, [sessionCode]);
 
-
-
-
     // getting player answers
     useEffect(() => {
-
         const handleNewPlayerAnswer = ({ playerId, choice, sessionCode, questionId }) => {
-
             //guards
             if (sessionCode && sessionCode !== sessionCodeRef.current) return;
             if (questionId && questionId !== questionIdRef.current) return;
@@ -93,24 +89,62 @@ export default function HostView({
         }
     }, []);
 
-    //--------TO DO!--------
-    //make function to bundle all player answers and send them server? or send them with host to end resoults
-
-
     // clear answers when question changes
     useEffect(() => {
-        setRoundAnswers(prev => ({
-            ...prev,
-            answers
-        }));
+        //saving answers to Round Array to pass onto host for end of round math
+        const prevQ = lastQuestionRef.current;
+        if (prevQ?.id) {
+
+            setRoundAnswers(prev => ({
+                ...prev,
+                [prevQ.id]: {
+                    question: {
+                        id: prevQ.id,
+                        type: prevQ.type,
+                        choices: prevQ.choices ?? [],
+                        correct: prevQ.correct ?? [],
+                        correctText: prevQ.correctText ?? "",
+                        points: prevQ.points?? 1,
+                    },
+                    answerByPlayer: answers,
+                },
+            }));
+
+        }
+
+        //preparing for new question
         setAnswers({});
         setIsLocked(false);
+
+        //updating the ref so its piont to the *current* question for next time
+        lastQuestionRef.current = currentQuestion || null;
+
     }, [questionId]);
+
+    // snapshot the final quesiton of round before ending round
+    const finalizeCurrentQuestionIntoRound = () => {
+        const q = lastQuestionRef.current || currentQuestion;
+        if (!q?.id) return;
+        setRoundAnswers(prev => ({
+            ...prev,
+            [q.id]: {
+                question: {
+                    id: q.id,
+                    type: q.type,
+                    choices: q.choices ?? [],
+                    correct: q.correct ?? [],
+                    correctText: q.correctText ?? "",
+                    points: q.points ?? 1,
+                },
+                answersByPlayer: answers,
+            },
+        }));
+    }
+
 
     //handle next question
     const handleNextQuestion = () => {
         console.log("Host click next question");
-
         //lock question
         setIsLocked(true);
         //compute nextIndex
@@ -124,6 +158,7 @@ export default function HostView({
         // compute previousIndex
         goToPrevQuestion()
     };
+
     // end round btn handler
     const handleEndRound = () => {
         console.log("host has clicked End Round");
@@ -133,14 +168,35 @@ export default function HostView({
 
     const endRound = () => {
         console.log("Host has ended Round");
+        finalizeCurrentQuestionIntoRound();
         setIsEndRoundModalOpen(false);
         socket.emit('end-round', { sessionCode });
+
+        const q = lastQuestionRef.curent || currentQuestion;
+        const merged = q?.id ?
+        {
+            ...roundAnswers,
+            [q.id]: {
+                question: {
+                    id: q.id,
+                    type: q.type,
+                    choices: q.choices ?? [],
+                    correct: q.correct ?? [],
+                    correctText: q.correctText ?? "",
+                    points: q.points ?? 1,
+                },
+                answersByPlayer: answers,
+            },
+
+        } : roundAnswers;
+
 
         //navigate to endRound component 
           navigate(`/session/live/${sessionCodeRef.current}/end`, {
             state: {
                 isHost: true,
-                answers: roundAnswers,
+                roundAnswers: merged,
+                players,
             },
           });
     }

@@ -1,20 +1,17 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useGameSession } from "../../hooks/useGameSession";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import socket from "../../main";
 
 export default function EndRound() {
 
     const { sessionCode } = useParams();
-    const location= useLocation();
-    const state = location.state || {};
-    //states
-    const [resultsReady, setResultsReady] = useState(false);
-    const [isHost, setIsHost] =useState(state.isHost);
+    const { state } = useLocation();
+    const isHost =Boolean(state?.isHost);
+    const roundAnswers = state?.roundAnswers || {};
     const [playersList, setPlayersList] = useState([]);
-    const [answers, setAnswers] = useState(state.answers ||{});
+    const [resultsReady, setResultsReady] = useState(false);
 
-
+    
     //logic for talling up scores
     useEffect( () =>{
         if (!isHost) return;
@@ -22,35 +19,46 @@ export default function EndRound() {
         socket.emit('request-player-list', {sessionCode});
 
         //grab list of players
-        const handlePlayerAnswers = ({ players }) => {
-            console.log("our list of players:", players);
-            setPlayersList(players);
-            console.log("here are the answers", answers);
+        const handlePlayerListUpdate = ({ players }) => {
+            //console.log("our list of players:", players);
+            setPlayersList(players || []);
         }
 
-        socket.on('player-list-update', handlePlayerAnswers);
+        socket.on('player-list-update', handlePlayerListUpdate);
         return () => {
-            socket.off('player-list-updated', handlePlayerAnswers);
+            socket.off('player-list-updated', handlePlayerListUpdate);
         }
-    },[])
+    },[isHost, sessionCode]);
 
-    //finalize round
-    const handleFinalizeResults = () => {
-        console.log("host has finalized results");
+    // scoring logic
+    const scores = useMemo(() => {
+        const tally = {};
+        for (const [qid, payload] of Object.entries(roundAnswers)) {
+            const { question, answersByPlayer } =payload;
+            for (const [pId, {choice}] of Object.entries(roundAnswers)) {
+                if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
-    }
+                let correct = false;
+                if (question.type === "multipleChoice") {
+                    correct = Array.isArray(question.correct) ? question.correct.includes(choice) : choice === question.correct;
+                } else if(question.type === "freeResponse"){
+                    correct = null; // leaves FR as pending to be judged by host later
+                }
 
-    //grade FR question
+                tally[pId].detail.push({qid, type: question.type, choice, correct});
+                if (correct === true) tally[pId].score += question.points ?? 1;
+            }
+        }
+        return tally;
+    },[roundAnswers]);
 
+const handleFinalizeResults = () => setResultsReady(true);
     
     //next round
     const handleNextRound = () => {
         console.log("host has click next round");
-
-
     }
 
-    
 
 
 
@@ -66,27 +74,49 @@ export default function EndRound() {
                         <p>Waiting for Host to Finalize Results</p>
                     </div>
                 )}
-
-
-
             </div>
+
+
+
             {isHost && !resultsReady  && (
-                <div>
+                <div className="space-y-4">
                     <div>
                         <p>You need to go through the results</p>
                     </div>
                     <div className="mt-4"> 
                         <button
-                        onClick={handleNextRound}
-                        >Start Next Round</button>
+                        onClick={handleFinalizeResults}
+                        >Finalize Results</button>
                     </div>               
                 </div>
 
             )}
-            {isHost && resultsReady && (
+            {resultsReady && (
                 <div>
                     <p>These are the results</p>
+
+                    <div>
+                            {playersList.map(player => {
+                                const s = scores[p.id] || { score: 0, detail: [] };
+                                return (
+                                    <div key={p.id} className="border rounded p-3">
+                                        <div>{p.name}</div>
+                                        <div>Total: {s.score} </div>
+                                        <ul className="list-disc ml-6">
+                                            {s.detail.map(d => (
+                                                <li key={`${p.id}-${d.qid}`}>
+                                                    Q {d.qid}: {d.type === "freeResponse" ? "FR (pending)" : d.correct ? "Correct" : "Wrong"}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                );
+                            })}
+                        
+                    </div>
+
                 </div>
+                
             )}
 
 
