@@ -35,22 +35,20 @@ export default function EndRound() {
         const tally = {};
         for (const [qid, payload] of Object.entries(roundAnswers)) {
             const { question, answersByPlayer } = payload;
-            for (const [pId, {choice}] of Object.entries(roundAnswers)) {
+            for (const [pId, {choice}] of Object.entries(answersByPlayer || {})) {
                 if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
                 let correct = false;
+                console.log(`The player ${pId} gave this answer ${choice}`);
+                console.log('roundAnswers:', roundAnswers);
+                console.log("answersByPlayer", answersByPlayer);
                 if (question.type === "multipleChoice") {
                     console.log("correcting MC question", question);
+                    console.log("The correct answer should be:", question.correct);
                     correct = Array.isArray(question.correct) ? question.correct.includes(choice) : choice === question.correct;
-                    console.log("correct:", correct);
-                    console.log("choice?", choice)
-                    console.log("answers by player", answersByPlayer);
-                    console.log("question object:", question);
+                    
                 } else if(question.type === "freeResponse"){
-                    console.log("here's the FR question object", question);
-                    console.log("correctText:", question.correctText);
-                    console.log("answers by player", answersByPlayer);
-                    console.log("question object:", question);
+                    
 
                     correct = null; // leaves FR as pending to be judged by host later
                     
