@@ -172,7 +172,7 @@ export default function HostView({
         setIsEndRoundModalOpen(false);
         socket.emit('end-round', { sessionCode });
 
-        const q = lastQuestionRef.curent || currentQuestion;
+        const q = lastQuestionRef.current || currentQuestion;
         const merged = q?.id ?
         {
             ...roundAnswers,

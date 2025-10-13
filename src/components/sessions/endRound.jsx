@@ -34,15 +34,26 @@ export default function EndRound() {
     const scores = useMemo(() => {
         const tally = {};
         for (const [qid, payload] of Object.entries(roundAnswers)) {
-            const { question, answersByPlayer } =payload;
+            const { question, answersByPlayer } = payload;
             for (const [pId, {choice}] of Object.entries(roundAnswers)) {
                 if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
                 let correct = false;
                 if (question.type === "multipleChoice") {
+                    console.log("correcting MC question", question);
                     correct = Array.isArray(question.correct) ? question.correct.includes(choice) : choice === question.correct;
+                    console.log("correct:", correct);
+                    console.log("choice?", choice)
+                    console.log("answers by player", answersByPlayer);
+                    console.log("question object:", question);
                 } else if(question.type === "freeResponse"){
+                    console.log("here's the FR question object", question);
+                    console.log("correctText:", question.correctText);
+                    console.log("answers by player", answersByPlayer);
+                    console.log("question object:", question);
+
                     correct = null; // leaves FR as pending to be judged by host later
+                    
                 }
 
                 tally[pId].detail.push({qid, type: question.type, choice, correct});
@@ -52,7 +63,10 @@ export default function EndRound() {
         return tally;
     },[roundAnswers]);
 
-const handleFinalizeResults = () => setResultsReady(true);
+    const handleFinalizeResults = () => {
+        console.log(scores);
+        setResultsReady(true);
+    };
     
     //next round
     const handleNextRound = () => {
@@ -97,14 +111,14 @@ const handleFinalizeResults = () => setResultsReady(true);
 
                     <div>
                             {playersList.map(player => {
-                                const s = scores[p.id] || { score: 0, detail: [] };
+                                const s = scores[player.id] || { score: 0, detail: [] };
                                 return (
-                                    <div key={p.id} className="border rounded p-3">
-                                        <div>{p.name}</div>
+                                    <div key={player.id} className="border rounded p-3 mt-4">
+                                        <div>{player.name}</div>
                                         <div>Total: {s.score} </div>
                                         <ul className="list-disc ml-6">
                                             {s.detail.map(d => (
-                                                <li key={`${p.id}-${d.qid}`}>
+                                                <li key={`${d.id}-${d.qid}`}>
                                                     Q {d.qid}: {d.type === "freeResponse" ? "FR (pending)" : d.correct ? "Correct" : "Wrong"}
                                                 </li>
                                             ))}
@@ -117,6 +131,14 @@ const handleFinalizeResults = () => setResultsReady(true);
 
                 </div>
                 
+            )}
+            {resultsReady && isHost && (
+                <div>
+                    <button
+                        className="border border-green-500 rounded">
+                        Start Next Round
+                    </button>
+                </div>
             )}
 
 
