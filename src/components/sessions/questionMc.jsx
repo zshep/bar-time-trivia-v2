@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
-
-export default function QuestionMc({ choices={}, playerChoice = [], setPlayerChoice, isHost = false, correctAnswers = [] }) {
+export default function QuestionMc({ 
+    choices=[], 
+    selectedIndexes = [], 
+    setSelectedIndexes, 
+    isHost = false, 
+    correctAnswers = [] 
+}) {
 
     //console.log("choices", choices);
 
     
 
-    const handleCheckboxChange = (index, isChecked) => {
-        const choice = choices[index];
-        setPlayerChoice(prev =>
-            isChecked
-                ? [...prev, choice]
-                : prev.filter(c => c !== choice)
-        );
-    };
+    const handleCheckboxChange = (idx, isChecked) => {
+    setSelectedIndexes(prev =>
+      isChecked ? [...prev, idx] : prev.filter(i => i !== idx)
+    );
+  };
 
 
     return (
@@ -34,15 +35,13 @@ export default function QuestionMc({ choices={}, playerChoice = [], setPlayerCho
 
                         <p
                             className="border p-2 border-black text-center my-1 w-1/2"
-                            id={idx}
-
                         > {choice || "Some Thing"} </p>
 
                         {!isHost && (
                              <input
                             className="ml-4 "
                             type="checkbox"
-                            checked={playerChoice.includes(choice)}
+                            checked={selectedIndexes.includes(idx)}
                             onChange={(e) => handleCheckboxChange(idx, e.target.checked)}
 
                         />

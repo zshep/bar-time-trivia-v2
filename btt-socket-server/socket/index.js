@@ -89,7 +89,7 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //player sending answer to host
-    socket.on("player-answer", ({ choice, sessionCode, questionId }, ack) => {
+    socket.on("player-answer", ({ sessionCode, questionId }, ack, choiceIndex, choiceText) => {
         const session = getSession(sessionCode);
 
         if (!session) return ack?.({ ok: false, error: "no-session" });
@@ -103,11 +103,12 @@ export function registerSocketHandlers(io, socket) {
             return ack?.({ ok: false, error: "stale-question" });
         }
 
-        //rebroadcasting answer submission
-        console.log(`player ${socket.id} has submitted ${choice} for question ${questionId}`)
+        //rebroadcasting answer submission to Host
+        console.log(`player ${socket.id} has submitted ${choiceText} for question ${questionId}`)
         io.to(session.hostSocketId).emit("submit-answer", {
             playerId: socket.id,
-            choice,
+            choiceIndex,
+            choiceText,
             sessionCode,
             questionId
         });

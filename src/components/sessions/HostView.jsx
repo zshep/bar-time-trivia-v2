@@ -64,19 +64,20 @@ export default function HostView({
 
     // getting player answers
     useEffect(() => {
-        const handleNewPlayerAnswer = ({ playerId, choice, sessionCode, questionId }) => {
+        const handleNewPlayerAnswer = ({ playerId, choiceIndex, choiceText, sessionCode, questionId }) => {
             //guards
             if (sessionCode && sessionCode !== sessionCodeRef.current) return;
             if (questionId && questionId !== questionIdRef.current) return;
             if (isLockedRef.current) return;
 
             //debug
-            console.log(`Answer from ${playerId} for question ${questionId} playerids with this answer ${choice}:`, players.map(p => p.id));
+            console.log(`Answer from ${playerId} for question ${questionId} playerids with this answer ${choiceText}:`, players.map(p => p.id));
 
             setAnswers(prev => ({
                 ...prev,
                 [playerId]: {
-                    choice,
+                    index: choiceIndex,
+                    text: choiceText,
                     updatedAt: Date.now(),
                 },
             }));

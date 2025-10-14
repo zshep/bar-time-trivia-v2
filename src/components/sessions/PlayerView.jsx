@@ -13,9 +13,9 @@ export default function PlayerView({
 }) {
 
   const navigate = useNavigate();
-  const currentChoices = currentQuestion?.choices || [];
+  const labels = (currentQuestion?.choices || []).map(c => c.label);
   const currentQuestionId = currentQuestion?.id || "no-ID";
-  const [playerChoice, setPlayerChoice] = useState([]);
+  const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [playerFrAnswer, setPlayerFrAnswer] = useState("");
 
   // end Round
@@ -40,18 +40,24 @@ export default function PlayerView({
   const handleSubmitAnswer = () => {
 
     if (currentQuestion?.type === "multipleChoice") {
-      if (playerChoice.length < 1) {
+      if (selectedIndexes.length < 1) {
       console.log("Please select at least one answer");
       alert("Please select at least one answer");
       return;
-    } else {
-      console.log("submitAnswer hit");
-      console.log("Submitting these answers:", playerChoice);
-      console.log("questionId:", currentQuestionId)
+    } 
+
+    const choiceIndex = selectedIndexes;
+    const choiceText = selectedIndexes.map(i => labels[i]);
+      
       
       //socket handler emiting player answer
-      socket.emit("player-answer", { choice: playerChoice, sessionCode, questionId: currentQuestionId });
-    }
+      socket.emit("player-answer", { 
+        sessionCode, 
+        questionId: currentQuestionId,
+        choiceIndex, 
+        choiceText 
+      });
+    
 
     }
 
@@ -66,7 +72,11 @@ export default function PlayerView({
       console.log("questionId:", currentQuestionId)
       
       //socket handler emiting player answer
-      socket.emit("player-answer", { choice: playerFrAnswer, sessionCode, questionId: currentQuestionId });
+      socket.emit("player-answer", { 
+        choice: playerFrAnswer, 
+        sessionCode, 
+        questionId: currentQuestionId 
+      });
     }
     }
   };
@@ -81,7 +91,10 @@ export default function PlayerView({
         <div className="flex justify-center mt-4">
 
           {currentQuestion?.type === "multipleChoice" && (
-            <QuestionMc choices={currentQuestion.choices.map(c => c.label)} playerChoice={playerChoice} setPlayerChoice={setPlayerChoice} />
+            <QuestionMc 
+              choices={labels} 
+              selectedIndexes={selectedIndexes} 
+              setSelectedIndexes={setSelectedIndexes} />
           )}
 
           {currentQuestion?.type === "freeResponse" && (
