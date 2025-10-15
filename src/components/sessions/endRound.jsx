@@ -13,12 +13,16 @@ export default function EndRound() {
 
      //normalize indexing:
     function toIndexChoice(rawChoice, question) {
+        //console.log("indexing MC response")
         if (rawChoice == null) return undefined;
         if (typeof rawChoice === "number") return rawChoice;
 
         // Try to map from label/text → index
+        console.log("indexing question choices:", question.choices)
         const choices = question.choices || []; // e.g. [{label:'A'}, {label:'B'}]
         const getLabel = c => (typeof c === 'string' ? c : c?.label ?? c?.value);
+        //console.log("choices:", choices);
+        console.log("choices", choices);
         
         if (Array.isArray(rawChoice)) {
             return rawChoice.map(txt => choices.findIndex(c=> getLabel(c) === txt)).filter(i => i >= 0);
@@ -74,11 +78,16 @@ export default function EndRound() {
                     console.log("choiceIndex:", choiceIndex);
 
                     const correctSet = Array.isArray(question.correct) ? question.correct : [question.correct];
+                    console.log("question.correct", question.correct[0]);
                     console.log("correctSet", correctSet);
-                    console.log("question.correct", question.correct);
-                    const normCorrect = correctSet.map(Number);
-                    console.log("normCorrect", normCorrect);
+                    console.log("typeof Correctset", typeof(correctSet));
 
+                    const correctSetIndex = toIndexChoice(correctSet, question);
+                    console.log("correcSetIndex",correctSetIndex);
+
+                    
+                    //logic if answers are more than one choice
+                    /*
                     if(Array.isArray(choiceIndex)) {
                         const picks = choiceIndex.map(Number).sort();
                         const corr = [...normCorrect].sort();
@@ -87,6 +96,7 @@ export default function EndRound() {
                     } else {
                         correct = normCorrect.includes(Number(choiceIndex));
                     }
+                        */
 
                 } else if (question.type === "freeResponse") {
 
