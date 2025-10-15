@@ -71,7 +71,7 @@ export default function HostView({
             if (isLockedRef.current) return;
 
             //debug
-            console.log(`Answer from ${playerId} for question ${questionId} playerids with this answer ${choiceText}:`, players.map(p => p.id));
+            console.log(`Answer from ${playerId} for question ${questionId} playerids with this answer ${choiceText} and index ${choiceIndex}`);
 
             setAnswers(prev => ({
                 ...prev,
@@ -107,7 +107,7 @@ export default function HostView({
                         correctText: prevQ.correctText ?? "",
                         points: prevQ.points?? 1,
                     },
-                    answerByPlayer: answers,
+                    answersByPlayer: answers,
                 },
             }));
 

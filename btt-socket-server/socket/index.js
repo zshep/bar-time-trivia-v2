@@ -89,9 +89,11 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //player sending answer to host
-    socket.on("player-answer", ({ sessionCode, questionId }, ack, choiceIndex, choiceText) => {
+    socket.on("player-answer", (payload, ack) => {
+        console.log("player-answer payload:", payload);
+        const { sessionCode, questionId, choiceIndex, choiceText, choice } = payload;
+        
         const session = getSession(sessionCode);
-
         if (!session) return ack?.({ ok: false, error: "no-session" });
         if (!session.hostSocketId) return ack?.({ ok: false, error: "no-host" });
 
@@ -108,9 +110,9 @@ export function registerSocketHandlers(io, socket) {
         io.to(session.hostSocketId).emit("submit-answer", {
             playerId: socket.id,
             choiceIndex,
-            choiceText,
+            choiceText: choiceText ?? choice,
             sessionCode,
-            questionId
+            questionId,
         });
 
         ack?.({ ok: true });

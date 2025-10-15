@@ -50,7 +50,7 @@ export default function PlayerView({
     const choiceText = selectedIndexes.map(i => labels[i]);
       
       
-      //socket handler emiting player answer
+      //socket handler emiting player MC answer
       socket.emit("player-answer", { 
         sessionCode, 
         questionId: currentQuestionId,
@@ -71,11 +71,11 @@ export default function PlayerView({
       console.log("Submitting these answers:", playerFrAnswer);
       console.log("questionId:", currentQuestionId)
       
-      //socket handler emiting player answer
+      //socket handler emiting player FR answer
       socket.emit("player-answer", { 
-        choice: playerFrAnswer, 
         sessionCode, 
-        questionId: currentQuestionId 
+        questionId: currentQuestionId,
+        choiceText: playerFrAnswer, 
       });
     }
     }

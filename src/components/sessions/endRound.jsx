@@ -11,6 +11,22 @@ export default function EndRound() {
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
 
+     //normalize indexing:
+    function toIndexChoice(rawChoice, question) {
+        if (rawChoice == null) return undefined;
+        if (typeof rawChoice === "number") return rawChoice;
+
+        // Try to map from label/text → index
+        const choices = question.choices || []; // e.g. [{label:'A'}, {label:'B'}]
+        const getLabel = c => (typeof c === 'string' ? c : c?.label ?? c?.value);
+        
+        if (Array.isArray(rawChoice)) {
+            return rawChoice.map(txt => choices.findIndex(c=> getLabel(c) === txt)).filter(i => i >= 0);
+        }
+        const idx = choices.findIndex(c => getLabel(c) === rawChoice);
+        
+        return idx >= 0 ? idx : undefined;
+    }
 
     //logic for talling up scores
     useEffect(() => {
@@ -26,33 +42,11 @@ export default function EndRound() {
 
         socket.on('player-list-update', handlePlayerListUpdate);
         return () => {
-            socket.off('player-list-updated', handlePlayerListUpdate);
+            socket.off('player-list-update', handlePlayerListUpdate);
         }
     }, [isHost, sessionCode]);
 
-    //normalize indexing:
-    function toIndexChoice(rawChoice, question) {
-        if (typeof rawChoice === "number") return rawChoice;
-
-        // Try to map from label/text → index
-        const choices = question.choices || []; // e.g. [{label:'A'}, {label:'B'}]
-        const idx = choices.findIndex(
-            c =>
-                c?.label === rawChoice ||                // label match
-                c?.value === rawChoice ||                // value match (if you have it)
-                (typeof c === "string" && c === rawChoice) // simple string array
-        );
-        return idx >= 0 ? idx : undefined;
-    }
-
-    function isCorrectIndex(choiceIndex, question) {
-        const correctSet = Array.isArray(question.correct)
-            ? question.correct
-            : [question.correct];
-
-        // normalize all to numbers for comparison
-        return correctSet.some(ci => Number(ci) === Number(choiceIndex));
-    }
+   
 
 
     // scoring logic
@@ -61,27 +55,38 @@ export default function EndRound() {
         for (const [qid, payload] of Object.entries(roundAnswers)) {
             const { question, answersByPlayer } = payload;
 
+
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
-                const rawChoice = ans?.choice;
-                const correctSet = Array.isArray(question.correct) ? question.correct : [question.correct];
-                //console.log("rawchoice", rawChoice);
 
-                const normCorrect = correctSet.map(Number);
-                const playerIndex = ans?.index;
-
+                
                 //console.log('roundAnswers:', JSON.stringify(roundAnswers, null, 2));
                 if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
                 let correct = false;
 
-
-                //console.log("answersByPlayer", answersByPlayer);
                 if (question.type === "multipleChoice") {
                     
-                    const choiceIndex = toIndexChoice(rawChoice, question);
+                    
+                    const choiceIndex = Array.isArray(ans?.index)
+                        ? ans.index
+                        : (ans?.index ?? toIndexChoice(ans?.text, question));
+                    
+                    console.log("choiceIndex:", choiceIndex);
 
+                    const correctSet = Array.isArray(question.correct) ? question.correct : [question.correct];
+                    console.log("correctSet", correctSet);
+                    console.log("question.correct", question.correct);
+                    const normCorrect = correctSet.map(Number);
+                    console.log("normCorrect", normCorrect);
 
-                    correct = choiceIndex !== undefined && isCorrectIndex(choiceIndex, question);
+                    if(Array.isArray(choiceIndex)) {
+                        const picks = choiceIndex.map(Number).sort();
+                        const corr = [...normCorrect].sort();
+                        correct = picks.length === corr.length && picks.every((v,i) => v === corr[i]);
+                        
+                    } else {
+                        correct = normCorrect.includes(Number(choiceIndex));
+                    }
 
                 } else if (question.type === "freeResponse") {
 
@@ -91,7 +96,8 @@ export default function EndRound() {
                 tally[pId].detail.push({
                     qid,
                     type: question.type,
-                    choice: rawChoice,
+                    choiceIndex: ans?.index ?? toIndexChoice(ans?.text, question),
+                    choiceText: ans?.text,
                     correct,
                 });
 
