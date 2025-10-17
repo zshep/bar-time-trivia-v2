@@ -11,25 +11,47 @@ export default function EndRound() {
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
 
-     //normalize indexing:
+    //normalize indexing:
     function toIndexChoice(rawChoice, question) {
         //console.log("indexing MC response")
         if (rawChoice == null) return undefined;
         if (typeof rawChoice === "number") return rawChoice;
 
         // Try to map from label/text → index
-        console.log("indexing question choices:", question.choices)
+        //console.log("indexing question choices:", question.choices)
         const choices = question.choices || []; // e.g. [{label:'A'}, {label:'B'}]
         const getLabel = c => (typeof c === 'string' ? c : c?.label ?? c?.value);
         //console.log("choices:", choices);
-        console.log("choices", choices);
-        
+        //console.log("choices", choices);
+
         if (Array.isArray(rawChoice)) {
-            return rawChoice.map(txt => choices.findIndex(c=> getLabel(c) === txt)).filter(i => i >= 0);
+            return rawChoice.map(txt => choices.findIndex(c => getLabel(c) === txt)).filter(i => i >= 0);
         }
         const idx = choices.findIndex(c => getLabel(c) === rawChoice);
-        
+
         return idx >= 0 ? idx : undefined;
+    }
+
+    //normalizing correct answer to compare stuff
+    function normalizeCorrectToIndexes(question) {
+        const choices = question.choices || []; // ['A','B',...] or [{label:'A'}, ...]
+        console.log("choices from nomralizer helper", choices);
+        const labelOf = c => (typeof c === 'string' ? c : c?.label ?? c?.value ?? c?.text);
+
+        const toIdx = (val) => {
+            if (val == null) return undefined;
+            if (typeof val === 'number') return val;                 // already an index
+            if (!Number.isNaN(Number(val))) return Number(val);      // numeric string like "2"
+            
+            console.log("val", val);
+            // label → index
+            const idx = choices.findIndex(c => labelOf(c) === val);
+            return idx >= 0 ? idx : undefined;
+        };
+
+        const raw = Array.isArray(question.correct) ? question.correct : [question.correct];
+        console.log("raw:", raw);
+        return raw.map(toIdx).filter(i => i !== undefined);        // always array of indexes
     }
 
     //logic for talling up scores
@@ -50,7 +72,7 @@ export default function EndRound() {
         }
     }, [isHost, sessionCode]);
 
-   
+
 
 
     // scoring logic
@@ -62,42 +84,34 @@ export default function EndRound() {
 
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
 
-                
+
                 //console.log('roundAnswers:', JSON.stringify(roundAnswers, null, 2));
                 if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
                 let correct = false;
 
                 if (question.type === "multipleChoice") {
-                    
-                    
-                    const choiceIndex = Array.isArray(ans?.index)
-                        ? ans.index
-                        : (ans?.index ?? toIndexChoice(ans?.text, question));
-                    
-                    console.log("choiceIndex:", choiceIndex);
+                    console.log("grading MC question");
+                    const correctIdx = normalizeCorrectToIndexes(question);
+                    console.log("question:", question);
+                    console.log("question.correct", question.correct);
+                    console.log("correctIDX", correctIdx);
+                    const playerIdx = Array.isArray(ans?.index)
+                        ? ans.index.map(Number)
+                        : (typeof ans?.index === 'number'
+                            ? [Number(ans.index)]
+                            : toIndexArrayFromText(ans?.text, question));             // fallback from labels
 
-                    const correctSet = Array.isArray(question.correct) ? question.correct : [question.correct];
-                    console.log("question.correct", question.correct[0]);
-                    console.log("correctSet", correctSet);
-                    console.log("typeof Correctset", typeof(correctSet));
-
-                    const correctSetIndex = toIndexChoice(correctSet, question);
-                    console.log("correcSetIndex",correctSetIndex);
-
-                    
-                    //logic if answers are more than one choice
-                    /*
-                    if(Array.isArray(choiceIndex)) {
-                        const picks = choiceIndex.map(Number).sort();
-                        const corr = [...normCorrect].sort();
-                        correct = picks.length === corr.length && picks.every((v,i) => v === corr[i]);
-                        
+                    // choose policy: exact match of set (common for multi-select)
+                    const exactSet = true;
+                    if (exactSet) {
+                        const a = [...new Set(playerIdx)].sort((x, y) => x - y);
+                        const b = [...new Set(correctIdx)].sort((x, y) => x - y);
+                        correct = a.length === b.length && a.every((v, i) => v === b[i]);
                     } else {
-                        correct = normCorrect.includes(Number(choiceIndex));
+                        // “any correct selected” policy
+                        correct = playerIdx.some(i => correctIdx.includes(i));
                     }
-                        */
-
                 } else if (question.type === "freeResponse") {
 
                     correct = null; // leaves FR as pending to be judged by host later

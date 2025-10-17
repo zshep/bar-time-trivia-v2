@@ -92,6 +92,7 @@ export default function Lobby() {
       console.log("Received session info:", gameName, hostId, gameStarted);
       setGameName(gameName);
       setHostId(hostId);
+      setGameId(gameId);
       grabHostData(hostId);
       console.log("gameName, HostId", gameName, hostId);
 
@@ -147,10 +148,11 @@ export default function Lobby() {
   // ----- Host check -----
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user && hostId) {
+      setUserId(user.uid || "");
+      
+      if (user?.uid && hostId) {
         setIsHost(user.uid === hostId);
       }
-      setUserId(user.uid);
     });
     return () => unsubscribe();
   }, [hostId]);
@@ -168,9 +170,14 @@ export default function Lobby() {
 
 
   // save data to local store for reconnect issues
-  localStorage.setItem("sessionCode", joinCode);
-  localStorage.setItem("userId", userId);
-  localStorage.setItem("isHost", isHost);
+  useEffect(() => {
+    if (!joinCode || !userId) return;
+    localStorage.setItem("sessionCode", joinCode);
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("isHost", isHost);
+
+  }, [joinCode, userId, isHost]);
+  
 
   return (
     <div className="flex flex-col w-full">
