@@ -12,46 +12,51 @@ export default function EndRound() {
     const [resultsReady, setResultsReady] = useState(false);
 
     //normalize indexing:
-    function toIndexChoice(rawChoice, question) {
-        //console.log("indexing MC response")
-        if (rawChoice == null) return undefined;
-        if (typeof rawChoice === "number") return rawChoice;
+    function buildChoiceIndexMap(choices = []) {
+        const map = new Map();
+        choices.forEach((c, idx) => {
+            const label = typeof c === 'string' ? c : (c?.label ?? c?.calue ?? c?.text);
+            const id = (typeof c === 'object' && c?.id != null) ? String(c.id) : undefined;
 
-        // Try to map from label/text → index
-        //console.log("indexing question choices:", question.choices)
-        const choices = question.choices || []; // e.g. [{label:'A'}, {label:'B'}]
-        const getLabel = c => (typeof c === 'string' ? c : c?.label ?? c?.value);
-        //console.log("choices:", choices);
-        //console.log("choices", choices);
+            if (label) map.set(String(label).trim(), idx);
+            if (id) map.set(String(id).trim(), idx);
 
-        if (Array.isArray(rawChoice)) {
-            return rawChoice.map(txt => choices.findIndex(c => getLabel(c) === txt)).filter(i => i >= 0);
-        }
-        const idx = choices.findIndex(c => getLabel(c) === rawChoice);
-
-        return idx >= 0 ? idx : undefined;
+            //allow numeric string index lookups
+            map.set(String(idx), idx);
+        });
+        return map;
     }
 
-    //normalizing correct answer to compare stuff
+    // normalize correct answers:
     function normalizeCorrectToIndexes(question) {
-        const choices = question.choices || []; // ['A','B',...] or [{label:'A'}, ...]
-        console.log("choices from nomralizer helper", choices);
-        const labelOf = c => (typeof c === 'string' ? c : c?.label ?? c?.value ?? c?.text);
+        const { choices = [], correct } = question || {};
+        const idxMap = buildChoiceIndexMap(choices);
+        const arr = Array.isArray(correct) ? correct : [correct];
 
-        const toIdx = (val) => {
-            if (val == null) return undefined;
-            if (typeof val === 'number') return val;                 // already an index
-            if (!Number.isNaN(Number(val))) return Number(val);      // numeric string like "2"
-            
-            console.log("val", val);
-            // label → index
-            const idx = choices.findIndex(c => labelOf(c) === val);
-            return idx >= 0 ? idx : undefined;
-        };
+        const out = arr.map(v => {
+            if (typeof v === 'number') return v;
+            if (v == null) return undefined;
+            const key = String(v).trim();
+            const hit = idxMap.get(key);
+            return hit !== undefined ? hit : undefined;
+        })
+            .filter(i => i !== undefined);
 
-        const raw = Array.isArray(question.correct) ? question.correct : [question.correct];
-        console.log("raw:", raw);
-        return raw.map(toIdx).filter(i => i !== undefined);        // always array of indexes
+        return out;
+    }
+
+    //fallback when a player's answer came as labels/text
+    function toIndexArrayFromText(raw, question) {
+        if (raw == null) return [];
+        const idxMap = buildChoiceIndexMap(question?.choices || []);
+        const arr = Array.isArray(raw) ? raw : [raw];
+
+        return arr.map(v => {
+            const key = String(v).trim();
+            const hit = idxMap.get(key);
+            return hit !== undefined ? hit : undefined;
+        })
+            .filter(i => i !== undefined);
     }
 
     //logic for talling up scores
@@ -75,6 +80,8 @@ export default function EndRound() {
 
 
 
+
+
     // scoring logic
     const scores = useMemo(() => {
         const tally = {};
@@ -82,8 +89,20 @@ export default function EndRound() {
             const { question, answersByPlayer } = payload;
 
 
+
+
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
 
+                //debugging sanity check
+                console.log({
+                    choices: question.choices,
+                    correctRaw: question.correct,
+                    correctIdx: normalizeCorrectToIndexes(question),
+                    playerRaw: { index: ans?.index, text: ans?.text },
+                    playerIdx: Array.isArray(ans?.index)
+                        ? ans.index
+                        : (typeof ans?.index === 'number' ? [ans.index] : toIndexArrayFromText(ans?.text, question)),
+                });
 
                 //console.log('roundAnswers:', JSON.stringify(roundAnswers, null, 2));
                 if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
@@ -91,27 +110,21 @@ export default function EndRound() {
                 let correct = false;
 
                 if (question.type === "multipleChoice") {
-                    console.log("grading MC question");
                     const correctIdx = normalizeCorrectToIndexes(question);
-                    console.log("question:", question);
-                    console.log("question.correct", question.correct);
-                    console.log("correctIDX", correctIdx);
+
                     const playerIdx = Array.isArray(ans?.index)
                         ? ans.index.map(Number)
                         : (typeof ans?.index === 'number'
                             ? [Number(ans.index)]
-                            : toIndexArrayFromText(ans?.text, question));             // fallback from labels
+                            : toIndexArrayFromText(ans?.text, question)
+                        );
 
-                    // choose policy: exact match of set (common for multi-select)
-                    const exactSet = true;
-                    if (exactSet) {
-                        const a = [...new Set(playerIdx)].sort((x, y) => x - y);
-                        const b = [...new Set(correctIdx)].sort((x, y) => x - y);
-                        correct = a.length === b.length && a.every((v, i) => v === b[i]);
-                    } else {
-                        // “any correct selected” policy
-                        correct = playerIdx.some(i => correctIdx.includes(i));
-                    }
+
+                    //exact set MC policy
+                    const a = [...new Set(playerIdx)].sort((x, y) => x - y);
+                    const b = [...new Set(correctIdx)].sort((x, y) => x - y);
+                    correct = a.length === b.length && a.every((v, i) => v === b[i]);
+
                 } else if (question.type === "freeResponse") {
 
                     correct = null; // leaves FR as pending to be judged by host later
@@ -120,7 +133,7 @@ export default function EndRound() {
                 tally[pId].detail.push({
                     qid,
                     type: question.type,
-                    choiceIndex: ans?.index ?? toIndexChoice(ans?.text, question),
+                    choiceIndex: ans?.index,
                     choiceText: ans?.text,
                     correct,
                 });
@@ -184,16 +197,8 @@ export default function EndRound() {
                         {playersList.map(player => {
                             const s = scores[player.id] || { score: 0, detail: [] };
                             return (
-                                <div key={player.id} className="border rounded p-3 mt-4">
-                                    <div>{player.name}</div>
-                                    <div>Total: {s.score} </div>
-                                    <ul className="list-disc ml-6">
-                                        {s.detail.map(d => (
-                                            <li key={`${d.id}-${d.qid}`}>
-                                                Q {d.qid}: {d.type === "freeResponse" ? "FR (pending)" : d.correct ? "Correct" : "Wrong"}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                <div key={player.id} className="border rounded p-3 mt-4 flex-row">
+                                        <div>{player.name} : {s.score}</div> 
                                 </div>
                             );
                         })}
