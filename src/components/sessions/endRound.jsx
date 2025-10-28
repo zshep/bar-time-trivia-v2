@@ -10,6 +10,10 @@ export default function EndRound() {
     const roundAnswers = state?.roundAnswers || {};
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
+    const [frModalOpen, setFrModalOpen] = useState(false);
+    const [frCorrectAnswer, setFrCorrectAnswer] =useState("");
+    const [frPlayerAnswer, setFrPlayerAnswer] = useState("");
+    const [currentPlayer, setCurrentPlayer] = useState("");
 
     //normalize indexing:
     function buildChoiceIndexMap(choices = []) {
@@ -127,7 +131,25 @@ export default function EndRound() {
 
                 } else if (question.type === "freeResponse") {
 
-                    correct = null; // leaves FR as pending to be judged by host later
+                    console.log("Fr Correct answer", question.correctText);
+                    console.log("player answer", ans.text);
+                    console.log("playerId:", pId);
+                    setFrCorrectAnswer(question.correct);
+                    setFrPlayerAnswer(ans.text);
+                    setCurrentPlayer(pId);
+
+                    if (question.correctText === ans.text) {
+                        console.log("FR correct");
+                        correct = true;
+                    } else {
+                        console.log("FR is incorrect");
+                        //Need to set up logic for host double check FR question:
+                        correct = false;
+                        setFrModalOpen(true);
+
+                    }
+
+                    
                 }
                 // record detail
                 tally[pId].detail.push({
@@ -155,6 +177,17 @@ export default function EndRound() {
     //next round
     const handleNextRound = () => {
         console.log("host has click next round");
+    }
+    //FR correct
+    const handleCorrectFr = () => {
+        console.log("the host thinks this is correct");
+        correct = true;
+        setFrModalOpen(false);
+    }
+    const handleIncorrectFr = () => {
+        console.log("the host thinks this is incorrect");
+        correct = false;
+        setFrModalOpen(false);
     }
 
 
@@ -188,6 +221,21 @@ export default function EndRound() {
                     </div>
                 </div>
 
+            )}
+            {isHost && frModalOpen && (
+                <div> 
+                    <div>
+                        <p>Double Check Free Response for player {currentPlayer}</p>    
+                    </div>
+                    <div className="flex-col"> 
+                        <p>Correct Answer: {frCorrectAnswer}</p>
+                        <p>Player Answer: {frPlayerAnswer}</p>
+                    </div>
+                    <div> 
+                        <button onClick={handleCorrectFr}>Correct</button>
+                        <button onClick={handleIncorrectFr}>Incorrect</button>
+                    </div>
+                </div>
             )}
             {resultsReady && (
                 <div>
