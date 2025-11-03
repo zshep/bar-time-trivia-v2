@@ -234,12 +234,12 @@ export default function EndRound() {
         //console.log(scores);
         setResultsReady(true);
         const finalRoundData = {
-            sessionCode,
+            sessionCode: sessionCode,
             playersList,
             scores
         }
 
-        console.log("emitting round data:", finalRoundData);;
+        console.log("emitting round data:", finalRoundData);
         socket.emit('results-finalized', finalRoundData);
 
     };
