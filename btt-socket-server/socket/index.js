@@ -174,6 +174,13 @@ export function registerSocketHandlers(io, socket) {
         }
     });
 
+    //finalizing results from host
+    socket.on('results-finalized', ({ finalRoundData }) => {
+        console.log("Host has finalized results. Emitting to players");
+        console.log("final Round Data:", finalRoundData);
+        io.to(finalRoundData.sessionCode).emit('round-finalized', finalRoundData);
+    })
+
     //end round
     socket.on('end-round', ({ sessionCode}) =>{
         console.log("user has ended round")

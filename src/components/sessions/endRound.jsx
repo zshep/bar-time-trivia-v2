@@ -10,10 +10,68 @@ export default function EndRound() {
     const roundAnswers = state?.roundAnswers || {};
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
-    const [frModalOpen, setFrModalOpen] = useState(false);
-    const [frCorrectAnswer, setFrCorrectAnswer] =useState("");
     const [frPlayerAnswer, setFrPlayerAnswer] = useState("");
     const [currentPlayer, setCurrentPlayer] = useState("");
+    const [frCorrectAnswer, setFrCorrectAnswer] = useState("");
+    const [frDecisions, setFrDecisions] = useState({}); // {[qid]: {[pid] : true|false} }
+    const [frModalOpen, setFrModalOpen] = useState(false);
+    const [frCursor, setFrCursor] = useState(0);
+
+    // normalize answers for easier comparrison
+    function norm(s) {
+        return String(s ?? "").trim().replace(/\s+/g, "").toLowerCase();
+    }
+
+    
+    // Build a list of FR items that need host review
+    const pendingFR = useMemo(() => {
+        const list = [];
+        for (const [qid, payload] of Object.entries(roundAnswers || {})) {
+            const { question, answersByPlayer } = payload || {};
+            if (!question || question.type !== "freeResponse" || !answersByPlayer) continue;
+
+            const correctText = norm(question.correctText);
+            for (const [pId, ans] of Object.entries(answersByPlayer)) {
+                const playerText = norm(ans?.text);
+                const autoMatch = correctText && playerText && correctText === playerText;
+
+                // if auto correct -> not pending; if we already decided -> not pending
+                const decided = frDecisions[qid]?.[pId];
+                if (!autoMatch && decided == null) {
+                    list.push({
+                        qid,
+                        pId,
+                        correctText: question.correctText ?? "",
+                        playerText: ans?.text ?? "",
+                    });
+                }
+            }
+        }
+        return list;
+    }, [roundAnswers, frDecisions]);
+
+    // Open/close modal when there are items to adjudicate
+    useEffect(() => {
+        if (!isHost || resultsReady) return;
+        if (pendingFR.length > 0) {
+            setFrModalOpen(true);
+            setFrCursor((idx) => Math.min(idx, pendingFR.length - 1)); // keep cursor in range
+        } else {
+            setFrModalOpen(false);
+            setFrCursor(0);
+        }
+    }, [pendingFR, isHost, resultsReady]);
+
+
+    // Host actions for FR decisions
+    function setDecisionFor(qid, pId, value /* true|false */) {
+        setFrDecisions(prev => ({
+            ...prev,
+            [qid]: { ...(prev[qid] || {}), [pId]: value },
+        }));
+        // advance
+        setFrCursor((i) => (i + 1 < pendingFR.length ? i + 1 : 0));
+    }
 
     //normalize indexing:
     function buildChoiceIndexMap(choices = []) {
@@ -81,7 +139,20 @@ export default function EndRound() {
         }
     }, [isHost, sessionCode]);
 
+    //socket listener for players
+    useEffect(() => {
+        if (isHost) return;
+        const handleFinalRoundData = ({ finalRoundData }) => {
+            console.log("finalROundData", finalRoundData);
+            setPlayersList(finalRoundData.playersList);
+            setResultsReady(true);
+        }
+        socket.on('round-finalized', handleFinalRoundData);
+        return () => {
+            socket.off('round-finalized', handleFinalRoundData);
+        }
 
+    },[])
 
 
 
@@ -89,15 +160,18 @@ export default function EndRound() {
     // scoring logic
     const scores = useMemo(() => {
         const tally = {};
-        for (const [qid, payload] of Object.entries(roundAnswers)) {
+        for (const [qid, payload] of Object.entries(roundAnswers || {})) {
             const { question, answersByPlayer } = payload;
 
+            if (!question || !answersByPlayer) continue;
 
+            const ensure = (pid) => (tally[pid] ??= { score: 0, detail: [] });
 
 
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
 
-                //debugging sanity check
+                //debugging question choices/ answers and player answers
+                /*
                 console.log({
                     choices: question.choices,
                     correctRaw: question.correct,
@@ -107,9 +181,8 @@ export default function EndRound() {
                         ? ans.index
                         : (typeof ans?.index === 'number' ? [ans.index] : toIndexArrayFromText(ans?.text, question)),
                 });
+                */
 
-                //console.log('roundAnswers:', JSON.stringify(roundAnswers, null, 2));
-                if (!tally[pId]) tally[pId] = { score: 0, detail: [] };
 
                 let correct = false;
 
@@ -131,28 +204,18 @@ export default function EndRound() {
 
                 } else if (question.type === "freeResponse") {
 
-                    console.log("Fr Correct answer", question.correctText);
-                    console.log("player answer", ans.text);
-                    console.log("playerId:", pId);
-                    setFrCorrectAnswer(question.correct);
-                    setFrPlayerAnswer(ans.text);
-                    setCurrentPlayer(pId);
 
-                    if (question.correctText === ans.text) {
-                        console.log("FR correct");
-                        correct = true;
-                    } else {
-                        console.log("FR is incorrect");
-                        //Need to set up logic for host double check FR question:
-                        correct = false;
-                        setFrModalOpen(true);
+                    const auto = norm(question.correctText) === norm(ans?.text);
+                    const decided = frDecisions[qid]?.[pId];
+                    if (auto) correct = true;
 
-                    }
-
-                    
+                    else if (typeof decided === "boolean") correct = decided;
+                    else correct = null;
                 }
+
+
                 // record detail
-                tally[pId].detail.push({
+                ensure(pId).detail.push({
                     qid,
                     type: question.type,
                     choiceIndex: ans?.index,
@@ -160,36 +223,44 @@ export default function EndRound() {
                     correct,
                 });
 
-                if (correct === true) {
-                    tally[pId].score += question.points ?? 1;
-                }
+                if (correct === true) ensure(pId).score += question.points ?? 1;
             }
         }
 
         return tally;
-    }, [roundAnswers]);
+    }, [roundAnswers, frDecisions]);
 
     const handleFinalizeResults = () => {
-        console.log(scores);
+        //console.log(scores);
         setResultsReady(true);
+        const finalRoundData = {
+            sessionCode,
+            playersList,
+            scores
+        }
+
+        console.log("emitting round data:", finalRoundData);;
+        socket.emit('results-finalized', finalRoundData);
+
     };
 
     //next round
     const handleNextRound = () => {
         console.log("host has click next round");
     }
-    //FR correct
-    const handleCorrectFr = () => {
-        console.log("the host thinks this is correct");
-        correct = true;
-        setFrModalOpen(false);
-    }
-    const handleIncorrectFr = () => {
-        console.log("the host thinks this is incorrect");
-        correct = false;
-        setFrModalOpen(false);
-    }
 
+
+    const handleCorrectFr = () => {
+        const item = pendingFR[frCursor];
+        if (!item) return;
+        setDecisionFor(item.qid, item.pId, true);
+    };
+
+    const handleIncorrectFr = () => {
+        const item = pendingFR[frCursor];
+        if (!item) return;
+        setDecisionFor(item.qid, item.pId, false);
+    };
 
 
 
@@ -217,23 +288,28 @@ export default function EndRound() {
                     <div className="mt-4">
                         <button
                             onClick={handleFinalizeResults}
-                        >Finalize Results</button>
+                            className={`mt-4 px-4 py-2 rounded ${pendingFR.length>0 ? 'bg-gray-300' : 'bg-blue-600 text-white'}`}
+                        > {pendingFR.length > 0 ? `Review ${pendingFR.length}` : 'Finalize Results'}</button>
                     </div>
                 </div>
 
             )}
-            {isHost && frModalOpen && (
-                <div> 
-                    <div>
-                        <p>Double Check Free Response for player {currentPlayer}</p>    
-                    </div>
-                    <div className="flex-col"> 
-                        <p>Correct Answer: {frCorrectAnswer}</p>
-                        <p>Player Answer: {frPlayerAnswer}</p>
-                    </div>
-                    <div> 
-                        <button onClick={handleCorrectFr}>Correct</button>
-                        <button onClick={handleIncorrectFr}>Incorrect</button>
+            {isHost && frModalOpen && pendingFR.length > 0 && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <h3 className="text-lg font-bold mb-2">
+                            Review Free Response ({frCursor + 1} of {pendingFR.length})
+                        </h3>
+                        <div className="space-y-2">
+                            <div><span className="font-semibold">Player:</span> {pendingFR[frCursor].pId}</div>
+                            <div><span className="font-semibold">Correct Answer:</span> {pendingFR[frCursor].correctText}</div>
+                            <div><span className="font-semibold">Player Answer:</span> {pendingFR[frCursor].playerText}</div>
+                        </div>
+                        <div className="flex gap-3 mt-4">
+                            <button onClick={handleCorrectFr} className="px-4 py-2 rounded bg-green-600 text-white">Correct</button>
+                            <button onClick={handleIncorrectFr} className="px-4 py-2 rounded bg-red-500 text-white">Incorrect</button>
+                            <button onClick={() => setFrModalOpen(false)} className="ml-auto px-4 py-2 rounded bg-gray-200">Close</button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -246,7 +322,7 @@ export default function EndRound() {
                             const s = scores[player.id] || { score: 0, detail: [] };
                             return (
                                 <div key={player.id} className="border rounded p-3 mt-4 flex-row">
-                                        <div>{player.name} : {s.score}</div> 
+                                    <div>{player.name} : {s.score}</div>
                                 </div>
                             );
                         })}
