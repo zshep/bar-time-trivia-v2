@@ -16,6 +16,8 @@ export default function EndRound() {
     const [frDecisions, setFrDecisions] = useState({}); // {[qid]: {[pid] : true|false} }
     const [frModalOpen, setFrModalOpen] = useState(false);
     const [frCursor, setFrCursor] = useState(0);
+    const [finalScores, setFinalScores] = useState(null);
+    const [frozenHostScores, setFrozenHostScores] = useState(null);
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -139,12 +141,13 @@ export default function EndRound() {
         }
     }, [isHost, sessionCode]);
 
-    //socket listener for players
+    //socket listener for players endround final results
     useEffect(() => {
         if (isHost) return;
         const handleFinalRoundData = ({ finalRoundData }) => {
             console.log("finalROundData", finalRoundData);
             setPlayersList(finalRoundData.playersList);
+            setFinalScores(finalRoundData.scores || {});
             setResultsReady(true);
         }
         socket.on('round-finalized', handleFinalRoundData);
@@ -152,7 +155,7 @@ export default function EndRound() {
             socket.off('round-finalized', handleFinalRoundData);
         }
 
-    },[])
+    },[isHost]);
 
 
 
@@ -169,20 +172,6 @@ export default function EndRound() {
 
 
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
-
-                //debugging question choices/ answers and player answers
-                /*
-                console.log({
-                    choices: question.choices,
-                    correctRaw: question.correct,
-                    correctIdx: normalizeCorrectToIndexes(question),
-                    playerRaw: { index: ans?.index, text: ans?.text },
-                    playerIdx: Array.isArray(ans?.index)
-                        ? ans.index
-                        : (typeof ans?.index === 'number' ? [ans.index] : toIndexArrayFromText(ans?.text, question)),
-                });
-                */
-
 
                 let correct = false;
 
@@ -230,17 +219,31 @@ export default function EndRound() {
         return tally;
     }, [roundAnswers, frDecisions]);
 
+    //setting display scores for all
+    const displayScores = useMemo(() => {
+        if (resultsReady){
+            return isHost ? (frozenHostScores || {}) : (finalScores || {});
+        }
+
+        return isHost ? (scores || {}) : {};
+    }, [isHost, resultsReady, scores, frozenHostScores, finalScores]);
+
     const handleFinalizeResults = () => {
+
+        //freezing current computed scoers to host UI stops being derived
+        const frozen = JSON.parse(JSON.stringify(scores));
+        setFrozenHostScores(frozen);
+
         //console.log(scores);
-        setResultsReady(true);
         const finalRoundData = {
             sessionCode: sessionCode,
             playersList,
-            scores
+            scores: frozen,
         }
-
-        console.log("emitting round data:", finalRoundData);
-        socket.emit('results-finalized', finalRoundData);
+        
+        //console.log("emitting round data:", finalRoundData);
+        socket.emit('results-finalized', {finalRoundData});
+        setResultsReady(true);
 
     };
 
@@ -319,7 +322,7 @@ export default function EndRound() {
 
                     <div>
                         {playersList.map(player => {
-                            const s = scores[player.id] || { score: 0, detail: [] };
+                            const s = displayScores[player.id] || { score: 0, detail: [] };
                             return (
                                 <div key={player.id} className="border rounded p-3 mt-4 flex-row">
                                     <div>{player.name} : {s.score}</div>
@@ -335,7 +338,7 @@ export default function EndRound() {
             {resultsReady && isHost && (
                 <div>
                     <button
-                        className="border border-green-500 rounded">
+                        className="border border-green-500 rounded mt-4">
                         Start Next Round
                     </button>
                 </div>

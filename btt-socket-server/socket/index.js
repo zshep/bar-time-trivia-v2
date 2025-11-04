@@ -14,7 +14,6 @@ export function registerSocketHandlers(io, socket) {
 
         // sending initial state to host
         socket.emit('player-list-update', { players: [] });
-
     });
 
     // Player joins a session
@@ -177,10 +176,9 @@ export function registerSocketHandlers(io, socket) {
     //finalizing results from host
     socket.on('results-finalized', ({ finalRoundData }) => {
         
-   
         console.log("final Round Data:", finalRoundData);
-        io.to(sessionCode).emit('round-finalized', finalRoundData);
-    })
+        io.to(finalRoundData.sessionCode).emit('round-finalized', {finalRoundData});
+    });
 
     //end round
     socket.on('end-round', ({ sessionCode}) =>{
