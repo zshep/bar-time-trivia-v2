@@ -73,7 +73,7 @@ export function registerSocketHandlers(io, socket) {
         const session = getSession(sessionCode);
 
         if (session) {
-            console.log("session found for", sessionCode, ":", session);
+            //console.log("session found for", sessionCode, ":", session);
             socket.emit('session-info', {
                 sessionCode,
                 gameName: session.gameName,
@@ -89,7 +89,7 @@ export function registerSocketHandlers(io, socket) {
 
     //player sending answer to host
     socket.on("player-answer", (payload, ack) => {
-        console.log("player-answer payload:", payload);
+        //console.log("player-answer payload:", payload);
         const { sessionCode, questionId, choiceIndex, choiceText, choice } = payload;
         
         const session = getSession(sessionCode);
@@ -140,7 +140,7 @@ export function registerSocketHandlers(io, socket) {
         if (session.hostSocketId !== socket.id) return;
 
         //setting current question
-        console.log("server storing question", question);
+        //console.log("server storing question", question);
         setCurrentQuestion(sessionCode, question);
         io.to(sessionCode).emit('new-question', question);
     });
@@ -176,7 +176,7 @@ export function registerSocketHandlers(io, socket) {
     //finalizing results from host
     socket.on('results-finalized', ({ finalRoundData }) => {
         
-        console.log("final Round Data:", finalRoundData);
+        //console.log("final Round Data:", finalRoundData);
         io.to(finalRoundData.sessionCode).emit('round-finalized', {finalRoundData});
     });
 
@@ -185,6 +185,12 @@ export function registerSocketHandlers(io, socket) {
         console.log("user has ended round")
         io.to(sessionCode).emit('round-ended', { sessionCode });
     });
+
+    //next round
+    socket.on('next-round', ({finalScores}) => {
+        console.log("host is starting next round");
+        //console.log("previous round data:", finalScores );
+    } );
 
     //end game
     socket.on('end-game', async ({ sessionCode }) => {

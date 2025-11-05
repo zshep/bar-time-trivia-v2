@@ -247,25 +247,30 @@ export default function EndRound() {
 
     };
 
-    //next round
-    const handleNextRound = () => {
-        console.log("host has click next round");
-    }
-
-
+    
+    
     const handleCorrectFr = () => {
         const item = pendingFR[frCursor];
         if (!item) return;
         setDecisionFor(item.qid, item.pId, true);
     };
-
+    
     const handleIncorrectFr = () => {
         const item = pendingFR[frCursor];
         if (!item) return;
         setDecisionFor(item.qid, item.pId, false);
     };
+    
+    //next round
+    const handleNextRound = () => {
+        console.log("host has click next round");
+     
+        //send results/people to next round
+        socket.emit('next-round', {finalScores});
 
+        //navigate to LiveMainPage
 
+    }
 
     return (
         <div>
@@ -338,7 +343,8 @@ export default function EndRound() {
             {resultsReady && isHost && (
                 <div>
                     <button
-                        className="border border-green-500 rounded mt-4">
+                        className="border border-green-500 rounded mt-4"
+                        onClick={handleNextRound}>
                         Start Next Round
                     </button>
                 </div>
