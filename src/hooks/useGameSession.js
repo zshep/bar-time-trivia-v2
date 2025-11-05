@@ -12,6 +12,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const userId = user?.uid;
   const navigate = useNavigate();
   const [roundData, setRoundData] = useState([]);
+  const [currentRoundNumber, setCurrentRoundNumber] =useState(0);
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null);
@@ -19,8 +20,6 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const [gameName, setGameName] = useState("");
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("");
-  
-
   const [loading, setLoading] = useState(true);
 
   // ---- Fetch Rounds ----

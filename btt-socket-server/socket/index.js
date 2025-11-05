@@ -79,7 +79,11 @@ export function registerSocketHandlers(io, socket) {
                 gameName: session.gameName,
                 hostId: session.hostId,
                 gameId: session.gameId,
-                gameStarted: session.gameStarted
+                gameStarted: session.gameStarted,
+                currentRound: session.currentRound,
+                totalRounds: session.roundIds?.length ?? null,
+                currentRoundId: session.roundIds?.[session.currentRound] ?? null,
+                currentQuestionIndex: session.currentQuestionIndex ?? 0,
             });
         } else {
             console.log("session does not exist for sessionCode", sessionCode);
@@ -187,9 +191,24 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //next round
-    socket.on('next-round', ({finalScores}) => {
+    socket.on('next-round', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
+        if (!session) return;
+
+        if (session.hostSocketId !== socket.id) return;
+
+        session.currentRound += 1;
+        session.currentQuestion = null;
+        session.currentQuestionIndex = 0;
+
         console.log("host is starting next round");
-        //console.log("previous round data:", finalScores );
+        
+        io.to(sessionCode).emit('round-changed', {
+            sessionCode,
+            roundNumber: session.currentRound,
+            roundId:session.roundIds?.[session.currentRound] ?? null,
+            totalRounds: session.roundIds?.length ?? null,
+        });
     } );
 
     //end game

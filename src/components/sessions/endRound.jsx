@@ -266,7 +266,7 @@ export default function EndRound() {
         console.log("host has click next round");
      
         //send results/people to next round
-        socket.emit('next-round', {finalScores});
+        socket.emit('next-round', { sessionCode });
 
         //navigate to LiveMainPage
 

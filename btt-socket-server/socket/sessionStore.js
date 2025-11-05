@@ -8,6 +8,7 @@ export function createSession(sessionCode, hostId, gameName, gameId, hostSocketI
         gameId,
         players: [],
         currentRound: null,
+        roundsIds:null,
         currentQuestion: null,
         currentQuestionIndex: null,
         gameStarted: false,
@@ -119,6 +120,7 @@ export function startGame(sessionCode) {
   const session = sessions.get(sessionCode);
   if (!session) return;
   session.gameStarted = true;
+  session.currentRound = 0;
   if (session.currentQuestionIndex == null) session.currentQuestionIndex = -1; // before first question
 }
 
