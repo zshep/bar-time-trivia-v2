@@ -22,6 +22,22 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   const [questionType, setQuestionType] = useState("");
   const [loading, setLoading] = useState(true);
 
+  
+  // ---- Get initial round meta data from server for first load/reconnect -----
+  useEffect(() => {
+    const handleSessionInfo = payload => {
+      if (payload?.currentRound != null) {
+        setCurrentRoundNumber(payload.currentRound);
+      }
+      if (payload?.gameId) setGameId(payload.gameId);
+      if (payload?.gameName) setGameName(payload.gameName);
+    };
+    socket.on('session-info', handleSessionInfo);
+    socket.emit('request-session-info', {sessionCode});
+    return () => socket.off('session-info', handleSessionInfo);
+  }, [sessionCode]);
+
+  
   // ---- Fetch Rounds ----
   useEffect(() => {
     if (!gameId) return;
@@ -44,7 +60,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   // ---- Fetch Questions for host only ----
   useEffect(() => {
     if (!roundData.length || userId !== hostId) return;
-    const roundId = roundData[0]?.id;
+    const idx = currentRoundNumber;
+    const roundId = roundData[idx]?.id;
     if (!roundId) return;
 
     const fetchQuestions = async () => {
@@ -63,7 +80,23 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     };
 
     fetchQuestions();
-  }, [roundData, userId, hostId]);
+  }, [roundData, userId, hostId, currentRoundNumber]);
+
+  //listen for round change from server
+  useEffect(() => {
+    const onRoundChanged = ({ roundNumber }) => {
+      console.log("Host is going to the next round")
+      setCurrentRoundNumber(roundNumber);
+      setQuestionData([]);
+      setCurrentIndex(null);
+      setCurrentQuestion(null);
+      setQuestionText("");
+      setQuestionType("");
+      setLoading(true);
+    };
+    socket.on('round-changed', onRoundChanged);
+    return () => socket.off('round-changed', onRoundChanged);
+  }, []);
 
   // ---- Set Current Question ----
   useEffect(() => {
@@ -128,9 +161,9 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
     console.log("Host emitting question to players...", currentQuestion);
     socket.emit("send-question", {
       sessionCode,
-      question: currentQuestion,
+      question: {...currentQuestion, roundNumber: currentRoundNumber },
     });
-  }, [currentQuestion, userId, hostId, sessionCode]);
+  }, [currentQuestion, userId, hostId, sessionCode, currentRoundNumber]);
 
   // Client player recieving question
   useEffect(() => {
@@ -163,11 +196,11 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   useEffect(() => {
     
     const endRoundHandler = ({ sessionCode }) => {
-      navigate(`/session/live/${sessionCode}/end`);
+      navigate(`/session/live/${sessionCode}`);
     };
     socket.on('end-round', endRoundHandler);
     return () => {
-      socket.off('round-ended', endRoundHandler);
+      socket.off('round-end', endRoundHandler);
     }
 
   }, [navigate]);
@@ -177,6 +210,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
   return {
     sessionCode,
     loading,
+    currentRoundNumber,
     questionData,
     currentQuestion,
     questionText,

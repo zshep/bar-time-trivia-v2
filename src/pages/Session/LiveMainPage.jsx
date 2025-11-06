@@ -8,9 +8,6 @@ import { useGameSession } from "../../hooks/useGameSession";
 import PlayerView from "../../components/sessions/PlayerView";
 import HostView from "../../components/sessions/HostView";
 
-
-
-
 export default function LiveMainPage() {
 
   const { state } = useLocation();
@@ -18,7 +15,7 @@ export default function LiveMainPage() {
   
 
   const session = useGameSession({ gameId, sessionCode, hostId });
-  const currentRound = session.roundData?.[0]?.roundNumber || 1;
+  const currentRound = (session.currentRoundNumber ?? 0) + 1;
   
 
 

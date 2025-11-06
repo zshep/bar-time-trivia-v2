@@ -1,9 +1,11 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import socket from "../../main";
+import { io } from "socket.io-client";
 
 export default function EndRound() {
 
+    const navigate = useNavigate();
     const { sessionCode } = useParams();
     const { state } = useLocation();
     const isHost = Boolean(state?.isHost);
@@ -269,8 +271,18 @@ export default function EndRound() {
         socket.emit('next-round', { sessionCode });
 
         //navigate to LiveMainPage
-
+        navigate(`/session/live/${sessionCode}`);
     }
+
+    //next round socket listener 
+    useEffect(() => {
+        socket.on('round-changed',({sessionCode, roundNumber, roundId, totalRounds }) =>{
+            navigate(`/session/live/${sessionCode}`)
+        })
+    })
+
+
+   
 
     return (
         <div>
