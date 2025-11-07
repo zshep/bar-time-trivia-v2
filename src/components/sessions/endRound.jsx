@@ -9,6 +9,8 @@ export default function EndRound() {
     const { sessionCode } = useParams();
     const { state } = useLocation();
     const isHost = Boolean(state?.isHost);
+    const [hostId, setHostId] =useState(null);
+    const [gameId, setGameId] = useState("");
     const roundAnswers = state?.roundAnswers || {};
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
@@ -20,6 +22,18 @@ export default function EndRound() {
     const [frCursor, setFrCursor] = useState(0);
     const [finalScores, setFinalScores] = useState(null);
     const [frozenHostScores, setFrozenHostScores] = useState(null);
+
+    // grabbing session info to navigate to next round
+    useEffect(() => {
+        
+        const handleSessionInfo = ({ gameId, hostId }) => {
+            console.log("grabbing session Info from server")
+            setGameId(gameId);
+            setHostId(hostId);
+        };
+
+        socket.on('session-info', handleSessionInfo);
+    })
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -265,19 +279,34 @@ export default function EndRound() {
     
     //next round
     const handleNextRound = () => {
+        
+       
+
         console.log("host has click next round");
-     
-        //send results/people to next round
+    
+        //send socket to next round
         socket.emit('next-round', { sessionCode });
 
         //navigate to LiveMainPage
-        navigate(`/session/live/${sessionCode}`);
+        navigate(`/session/live/${sessionCode}`, {
+            state: {
+                gameId,
+                sessionCode,
+                hostId,
+            }
+        });
+         
     }
 
     //next round socket listener 
     useEffect(() => {
         socket.on('round-changed',({sessionCode, roundNumber, roundId, totalRounds }) =>{
-            navigate(`/session/live/${sessionCode}`)
+            navigate(`/session/live/${sessionCode}`, {
+                state: {
+                    gameName,
+
+                }
+            })
         })
     })
 
