@@ -72,23 +72,20 @@ export function registerSocketHandlers(io, socket) {
 
         const session = getSession(sessionCode);
 
-        if (session) {
+        if (!session) return;
             //console.log("session found for", sessionCode, ":", session);
-            socket.emit('session-info', {
-                sessionCode,
-                gameName: session.gameName,
-                hostId: session.hostId,
-                gameId: session.gameId,
-                gameStarted: session.gameStarted,
-                currentRound: session.currentRound,
-                totalRounds: session.roundIds?.length ?? null,
-                currentRoundId: session.roundIds?.[session.currentRound] ?? null,
-                currentQuestionIndex: session.currentQuestionIndex ?? 0,
-            });
-        } else {
-            console.log("session does not exist for sessionCode", sessionCode);
-            console.log("current session store keys:", Array.from(session.keys()));
-        }
+        socket.emit('session-info', {
+            sessionCode,
+            gameName: session.gameName,
+            hostId: session.hostId,
+            gameId: session.gameId,
+            gameStarted: session.gameStarted,
+            currentRound: session.currentRound,
+            totalRounds: session.roundIds?.length ?? null,
+            currentRoundId: session.roundIds?.[session.currentRound] ?? null,
+            currentQuestionIndex: session.currentQuestionIndex ?? 0,
+        });
+        
     });
 
     //player sending answer to host

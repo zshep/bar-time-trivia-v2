@@ -11,6 +11,7 @@ export default function EndRound() {
     const isHost = Boolean(state?.isHost);
     const [hostId, setHostId] =useState(null);
     const [gameId, setGameId] = useState("");
+    const [gameName, setGameName] = useState("");
     const roundAnswers = state?.roundAnswers || {};
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
@@ -26,14 +27,19 @@ export default function EndRound() {
     // grabbing session info to navigate to next round
     useEffect(() => {
         
-        const handleSessionInfo = ({ gameId, hostId }) => {
+        if(!gameId || !gameName || !hostId) {
+            socket.emit('request-session-info', { sessionCode } );
+        }
+
+        const handleSessionInfo = ({ gameName, gameId, hostId }) => {
             console.log("grabbing session Info from server")
+            setGameName(gameName);
             setGameId(gameId);
             setHostId(hostId);
         };
 
         socket.on('session-info', handleSessionInfo);
-    })
+    }, [])
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -280,9 +286,8 @@ export default function EndRound() {
     //next round
     const handleNextRound = () => {
         
-       
-
         console.log("host has click next round");
+        console.log(`hostId: ${hostId}, gameName: ${gameName}, gameId:${gameId}, sessionCode: ${sessionCode}`);
     
         //send socket to next round
         socket.emit('next-round', { sessionCode });
@@ -290,9 +295,10 @@ export default function EndRound() {
         //navigate to LiveMainPage
         navigate(`/session/live/${sessionCode}`, {
             state: {
-                gameId,
-                sessionCode,
-                hostId,
+                gameName: gameName,
+                gameId: gameId,
+                sessionCode: sessionCode,
+                hostId: hostId,
             }
         });
          
