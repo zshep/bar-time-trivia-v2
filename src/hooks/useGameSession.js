@@ -7,11 +7,12 @@ import { useAuth } from "./useAuth";
 import { toWireQuestion } from "../utils/toWireQuestion";
 
 
-export function useGameSession({ gameId: initialGameId, sessionCode, hostId }) {
+export function useGameSession({ gameId: initialGameId, sessionCode, hostId, currentRoundIndex, currentRoundId }) {
   const user = useAuth();
   const userId = user?.uid;
   const navigate = useNavigate();
   const [roundData, setRoundData] = useState([]);
+  const [activeRoundId, setActiveRoundId] = useState(currentRoundId || null);
   const [currentRoundNumber, setCurrentRoundNumber] =useState(0);
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);

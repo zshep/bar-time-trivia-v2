@@ -194,17 +194,25 @@ export function registerSocketHandlers(io, socket) {
 
         if (session.hostSocketId !== socket.id) return;
 
+        //ensure defaults
+        session.currentRound = session.currentRound ?? 0;
+        session.roundIds = session.roundIds ?? [];
+
+        //advance round info
         session.currentRound += 1;
         session.currentQuestion = null;
         session.currentQuestionIndex = 0;
+
+        const currentRoundId = session.roundIds[session.currentRound] ?? null;
+        const totalRounds = session.roundIds.length ?? null;
 
         console.log("host is starting next round");
         
         io.to(sessionCode).emit('round-changed', {
             sessionCode,
             roundNumber: session.currentRound,
-            roundId:session.roundIds?.[session.currentRound] ?? null,
-            totalRounds: session.roundIds?.length ?? null,
+            roundId: currentRoundId,
+            totalRounds: totalRounds,
         });
     } );
 

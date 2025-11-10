@@ -12,33 +12,40 @@ import HostView from "../../components/sessions/HostView";
 export default function LiveMainPage() {
 
   const { state } = useLocation();
+  const sessionCode = state?.sessionCode;
+  
   //grabing game info if there
   const [meta, setMeta] = useState({
     gameName: state?.gameName,
     gameId: state?.gameId,
     hostId: state?.hostId,
+    sessionCode
   });
-  const sessionCode = state?.sessionCode;
 
   //grab game info if not there
   useEffect(() => {
-    if (!meta.gameId || !meta.hostId || !meta.sessionCode) {
-      socket.emit('request-session-info', { sessionCode: sessionCode});
-      //safeEmit("request-session-info", {sessionCode});
+    let requested = false;
+    function onInfo(p) {
+      setMeta(m => ({
+        ...m,
+        gameName: p.gameName ?? m.gameName,
+        gameId: p.gameId ?? m.gameId,
+        host: p.hostId ?? m.hostId,
+        sessionCode: p.sessionCode ?? m.sessionCode,
+        //optional: currentRoundIndex, totalRounds, currentRoundID
+      }))
     }
 
-    const onInfo = (p) => setMeta(m => ({
-      ...m,
-      gameName: p.gameName ?? m.gameName,
-      gameId: p.gameId ?? m.gameId,
-      hostId: p.hostId ?? m.hostId,
-      sessionCode: p.sessionCode ?? m.sessionCode
-    }));
-
+    if (sessionCode && (!meta.gameId || !meta.hostId)) {
+      if (!requested) {
+        requested = true;
+        socket.emit('request-session-info', { sessionCode });
+      }
+    }
     socket.on('session-info', onInfo);
     return () => socket.off('session-info', onInfo);
 
-  }, [meta, sessionCode]);
+  }, [sessionCode]);
   
 
   const session = useGameSession(meta);

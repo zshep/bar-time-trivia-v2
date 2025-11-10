@@ -40,7 +40,7 @@ export default function EndRound() {
         socket.on('session-info', handleSessionInfo);
 
         return () => socket.off('session-info', handleSessionInfo);
-    }, [sessionCode, gameId, gameName, hostId])
+    }, [sessionCode])
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -302,11 +302,14 @@ export default function EndRound() {
             console.log(`session ${sessionCode}, id: ${roundId}, round: ${roundNumber} out of ${totalRounds}`);
             navigate(`/session/live/${sessionCode}`, {
                 state: {
+                    sessionCode,
+                    gameId,
                     gameName,
+                    hostId,
                     roundNumber,
                     roundId,
                     totalRounds,
-                    isHost,
+                    
                 }
             });
 
