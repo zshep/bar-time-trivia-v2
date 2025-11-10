@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import {useLocation, useParams } from "react-router-dom";
 import socket from "../../main";
+import { safeEmit } from "../../utils/safeEmit";
 import { useReconnect } from "../../hooks/useReconnect";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
@@ -11,10 +12,36 @@ import HostView from "../../components/sessions/HostView";
 export default function LiveMainPage() {
 
   const { state } = useLocation();
-  const { gameName, gameId, sessionCode, hostId } = state;
+  //grabing game info if there
+  const [meta, setMeta] = useState({
+    gameName: state?.gameName,
+    gameId: state?.gameId,
+    hostId: state?.hostId,
+  });
+  const sessionCode = state?.sessionCode;
+
+  //grab game info if not there
+  useEffect(() => {
+    if (!meta.gameId || !meta.hostId || !meta.sessionCode) {
+      socket.emit('request-session-info', { sessionCode: sessionCode});
+      //safeEmit("request-session-info", {sessionCode});
+    }
+
+    const onInfo = (p) => setMeta(m => ({
+      ...m,
+      gameName: p.gameName ?? m.gameName,
+      gameId: p.gameId ?? m.gameId,
+      hostId: p.hostId ?? m.hostId,
+      sessionCode: p.sessionCode ?? m.sessionCode
+    }));
+
+    socket.on('session-info', onInfo);
+    return () => socket.off('session-info', onInfo);
+
+  }, [meta, sessionCode]);
   
 
-  const session = useGameSession({ gameId, sessionCode, hostId });
+  const session = useGameSession(meta);
   const currentRound = (session.currentRoundNumber ?? 0) + 1;
   
 
@@ -45,16 +72,16 @@ export default function LiveMainPage() {
   );
 
   // protecting with conditional rendering
-  if (!sessionCode || !hostId || session.loading) {
+  if (!sessionCode || !meta.hostId || session.loading) {
 
-    console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId} session.loading: ${session.loading}`)
+    console.log(`gameId: ${meta.gameId} sessionCode: ${sessionCode} hostId: ${meta.hostId} session.loading: ${session.loading}`)
     
 
     return (
       <div>
         <p>Loading session...</p>
         <p>SessionCode: {sessionCode}</p>
-        <p>HostId: {hostId}</p>
+        <p>HostId: {meta.hostId}</p>
         <p>Loading status: {session.loading ? "true" : "false"}</p>
       </div>
     );
@@ -65,7 +92,7 @@ export default function LiveMainPage() {
     <div className="flex flex-col w-full items-center">
       <div className="flex border border-black justify-around w-1/3">
         <div>
-          <p>Game: {gameName}</p>
+          <p>Game: {meta.gameName}</p>
         </div>
         <div>
           <p>Round: {currentRound}</p>

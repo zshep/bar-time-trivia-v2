@@ -1,7 +1,6 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import socket from "../../main";
-import { io } from "socket.io-client";
 
 export default function EndRound() {
 
@@ -27,7 +26,7 @@ export default function EndRound() {
     // grabbing session info to navigate to next round
     useEffect(() => {
         
-        if(!gameId || !gameName || !hostId) {
+        if (!gameId || !gameName || !hostId) {
             socket.emit('request-session-info', { sessionCode } );
         }
 
@@ -39,7 +38,9 @@ export default function EndRound() {
         };
 
         socket.on('session-info', handleSessionInfo);
-    }, [])
+
+        return () => socket.off('session-info', handleSessionInfo);
+    }, [sessionCode, gameId, gameName, hostId])
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -291,30 +292,29 @@ export default function EndRound() {
     
         //send socket to next round
         socket.emit('next-round', { sessionCode });
-
-        //navigate to LiveMainPage
-        navigate(`/session/live/${sessionCode}`, {
-            state: {
-                gameName: gameName,
-                gameId: gameId,
-                sessionCode: sessionCode,
-                hostId: hostId,
-            }
-        });
          
     }
 
     //next round socket listener 
     useEffect(() => {
-        socket.on('round-changed',({sessionCode, roundNumber, roundId, totalRounds }) =>{
+        const onRoundChanged = ({sessionCode, roundNumber, roundId, totalRounds}) => {
+            
+            console.log(`session ${sessionCode}, id: ${roundId}, round: ${roundNumber} out of ${totalRounds}`);
             navigate(`/session/live/${sessionCode}`, {
                 state: {
                     gameName,
-
+                    roundNumber,
+                    roundId,
+                    totalRounds,
+                    isHost,
                 }
-            })
-        })
-    })
+            });
+
+        }
+        socket.on('round-changed', onRoundChanged);
+
+        return () => socket.off('round-changed', onRoundChanged);
+    }, [navigate, gameName, gameId, hostId, isHost]);
 
 
    
