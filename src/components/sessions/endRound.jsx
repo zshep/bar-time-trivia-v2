@@ -8,7 +8,7 @@ export default function EndRound() {
     const { sessionCode } = useParams();
     const { state } = useLocation();
     const isHost = Boolean(state?.isHost);
-    const [hostId, setHostId] =useState(null);
+    const [hostId, setHostId] = useState(null);
     const [gameId, setGameId] = useState("");
     const [gameName, setGameName] = useState("");
     const roundAnswers = state?.roundAnswers || {};
@@ -26,9 +26,9 @@ export default function EndRound() {
 
     // grabbing session info to navigate to next round
     useEffect(() => {
-        
+
         if (!gameId || !gameName || !hostId) {
-            socket.emit('request-session-info', { sessionCode } );
+            socket.emit('request-session-info', { sessionCode });
         }
 
         const handleSessionInfo = ({ gameName, gameId, hostId }) => {
@@ -48,7 +48,7 @@ export default function EndRound() {
         return String(s ?? "").trim().replace(/\s+/g, "").toLowerCase();
     }
 
-    
+
     // Build a list of FR items that need host review
     const pendingFR = useMemo(() => {
         const list = [];
@@ -168,18 +168,17 @@ export default function EndRound() {
     //socket listener for players endround final results
     useEffect(() => {
         if (isHost) return;
-        const handleFinalRoundData = ({ finalRoundData }) => {
-            console.log("finalROundData", finalRoundData);
-            setPlayersList(finalRoundData.playersList);
-            setFinalScores(finalRoundData.scores || {});
+        const handleFinal = ({ sessionCode: sc, roundIndex, roundScores, leaderboard }) => {
+
+            setFinalScores({ roundIndex, roundScores, leaderboard });
             setResultsReady(true);
         }
-        socket.on('round-finalized', handleFinalRoundData);
+        socket.on('round-finalized', handleFinal);
         return () => {
-            socket.off('round-finalized', handleFinalRoundData);
+            socket.off('round-finalized', handleFinal);
         }
 
-    },[isHost]);
+    }, []);
 
 
 
@@ -245,7 +244,7 @@ export default function EndRound() {
 
     //setting display scores for all
     const displayScores = useMemo(() => {
-        if (resultsReady){
+        if (resultsReady) {
             return isHost ? (frozenHostScores || {}) : (finalScores || {});
         }
 
@@ -258,48 +257,62 @@ export default function EndRound() {
         const frozen = JSON.parse(JSON.stringify(scores));
         setFrozenHostScores(frozen);
 
+        // determine roundInex
+        const roundIdx =
+            ((state?.roundNumber ?? roundNumber ?? 1) - 1);
+
+        // set up data to be sent to server
+        const roundScores = Object.entries(frozen).map(([pId, v]) => {
+            const p = playersList.find(pl => pl.id === pId) || {};
+            const playerId = p.userId ?? p.id ?? pId;
+            const name = p.name ?? "";
+            const roundScore = Number(v?.score ?? 0);
+
+            return { playerId, name, roundScore }
+
+        })
+
         //console.log(scores);
         const finalRoundData = {
             sessionCode: sessionCode,
-            playersList,
-            scores: frozen,
+            roundIndex: roundIdx,
+            scores: roundScores,
         }
-        
+
         console.log("emitting round data:", finalRoundData);
-        socket.emit('results-finalized', {finalRoundData});
+        socket.emit('results-finalized', { finalRoundData });
         setResultsReady(true);
 
     };
 
-    
-    
+    //getting host input for correct FR    
     const handleCorrectFr = () => {
         const item = pendingFR[frCursor];
         if (!item) return;
         setDecisionFor(item.qid, item.pId, true);
     };
-    
+
+    //getting host input for incorrect FR
     const handleIncorrectFr = () => {
         const item = pendingFR[frCursor];
         if (!item) return;
         setDecisionFor(item.qid, item.pId, false);
     };
-    
+
     //next round
     const handleNextRound = () => {
-        
+
         console.log("host has click next round");
         console.log(`hostId: ${hostId}, gameName: ${gameName}, gameId:${gameId}, sessionCode: ${sessionCode}`);
-    
+
         //send socket to next round
         socket.emit('next-round', { sessionCode });
-         
     }
 
     //next round socket listener 
     useEffect(() => {
-        const onRoundChanged = ({sessionCode, roundNumber, roundId, totalRounds}) => {
-            
+        const onRoundChanged = ({ sessionCode, roundNumber, roundId, totalRounds }) => {
+
             console.log(`session ${sessionCode}, id: ${roundId}, round: ${roundNumber} out of ${totalRounds}`);
             navigate(`/session/live/${sessionCode}`, {
                 state: {
@@ -310,7 +323,6 @@ export default function EndRound() {
                     roundNumber,
                     roundId,
                     totalRounds,
-                    
                 }
             });
 
@@ -321,7 +333,7 @@ export default function EndRound() {
     }, [navigate, gameName, gameId, hostId, isHost]);
 
 
-   
+
 
     return (
         <div>
@@ -347,7 +359,7 @@ export default function EndRound() {
                     <div className="mt-4">
                         <button
                             onClick={handleFinalizeResults}
-                            className={`mt-4 px-4 py-2 rounded ${pendingFR.length>0 ? 'bg-gray-300' : 'bg-blue-600 text-white'}`}
+                            className={`mt-4 px-4 py-2 rounded ${pendingFR.length > 0 ? 'bg-gray-300' : 'bg-blue-600 text-white'}`}
                         > {pendingFR.length > 0 ? `Review ${pendingFR.length}` : 'Finalize Results'}</button>
                     </div>
                 </div>
@@ -372,24 +384,27 @@ export default function EndRound() {
                     </div>
                 </div>
             )}
-            {resultsReady && (
-                <div>
-                    <p>These are the results</p>
-
+            {resultsReady && finalScores && (
+                <div className="mt-4 space-y-4">
+                    <h2 className="text-xl font-bold">Round {finalScores.roundIndex + 1} Results</h2>
                     <div>
-                        {playersList.map(player => {
-                            const s = displayScores[player.id] || { score: 0, detail: [] };
-                            return (
-                                <div key={player.id} className="border rounded p-3 mt-4 flex-row">
-                                    <div>{player.name} : {s.score}</div>
-                                </div>
-                            );
-                        })}
-
+                        {finalScores.roundScores.map(r => (
+                            <div key={r.playerId} className="border rounded p-2">
+                                {r.name || r.playerId}: +{r.roundScore}
+                            </div>
+                        ))}
                     </div>
 
+                    <h2 className="text-xl font-bold mt-6">Game Totals</h2>
+                    <div>
+                        {finalScores.leaderboard.map(p => (
+                            <div key={p.playerId} className="border rounded p-2 flex justify-between">
+                                <span>{p.name || p.playerId}</span>
+                                <span>{p.total}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-
             )}
             {resultsReady && isHost && (
                 <div>

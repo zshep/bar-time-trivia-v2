@@ -176,10 +176,68 @@ export function registerSocketHandlers(io, socket) {
 
     //finalizing results from host
     socket.on('results-finalized', ({ finalRoundData }) => {
-        
+        const { sessionCode, roundIndex, scores } = finalRoundData || {};
+        const session = getSession(sessionCode);
+        if (!session) return;
         //console.log("final Round Data:", finalRoundData);
-        io.to(finalRoundData.sessionCode).emit('round-finalized', {finalRoundData});
+        if (socket.id !== session.hostSocketId) return;
+
+        //merge round scores
+        upsertRoundTotals(session, roundIndex, scores || []);
+
+        //prepare a compact broadcast for everyone
+        const leaderboard = Object.entries(session.currentPlayerScores)
+            .map(([playerId, rec]) => ({
+                playerId,
+                name: rec.name,
+                total: rec.total,
+                rounds: rec.byRound,
+            }))
+            .sort((a,b) => b.total - a.total);
+
+        //emit finalized data to all to display
+        io.to(sessionCode).emit('round-finalized', {
+            sessionCode,
+            roundIndex,
+            roundScores: scores,
+            leaderboard,
+        });
     });
+
+    //--------helpers to manage round data ---------
+    function playerKeyFrom(p) {
+        return p?.userId ?? p?.id;
+    }
+
+    function upsertRoundTotals(session, roundIndex, entries) {
+        if (!session.finalizedRounds) session.finalizedRounds = new Set();
+        if (session.finalizedRounds.has(roundIndex)) {
+            recomputeTotals(session);
+            return;
+        }
+
+        for (const { playerId, name, roundScore } of entries ) {
+            if (!session.currentPlayerScores[playerId]) {
+                session.currentPlayersScores[playerId] = {
+                    name: name ?? "",
+                    total: 0,
+                    byRound: {},
+                };
+            }
+            //writing the round score
+            session.currentPlayerScores[playerId].byRound[roundIndex] = Number(roundScore) || 0;
+        }
+        recomputeTotals(session);
+        session.finalizedRounds.add(roundIndex);
+    }
+
+    function recomputeTotals(session) {
+        for (const [pid, rec] of Object.entries(session.currentPlayerScores)) {
+            const sum = Object.values(rec.byRound || {}).reduce((a,b) => a + (Number(b) || 0), 0);
+            rec.total = sum
+        }
+    }
+
 
     //end round
     socket.on('end-round', ({ sessionCode}) =>{
