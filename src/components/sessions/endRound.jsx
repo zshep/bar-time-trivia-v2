@@ -12,6 +12,7 @@ export default function EndRound() {
     const [gameId, setGameId] = useState("");
     const [gameName, setGameName] = useState("");
     const roundAnswers = state?.roundAnswers || {};
+    const [roundNumber, setRoundNumber] = useState(1);
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
     const [frPlayerAnswer, setFrPlayerAnswer] = useState("");
@@ -264,7 +265,7 @@ export default function EndRound() {
             scores: frozen,
         }
         
-        //console.log("emitting round data:", finalRoundData);
+        console.log("emitting round data:", finalRoundData);
         socket.emit('results-finalized', {finalRoundData});
         setResultsReady(true);
 

@@ -29,8 +29,9 @@ export default function HostView({
     const questionId = currentQuestion?.id || "no-ID";
    
     console.log("current Question:", currentQuestion);
+    console.log("roundData", roundData.length);
   
-    const frAnswer = currentQuestion?.answer || "";
+    
 
     // latest references 
     const sessionCodeRef = useRef(sessionCode);
@@ -230,14 +231,19 @@ export default function HostView({
                     ))}
                 </div>
                 <div className="flex justify-between mt-4">
-                    <button
+                    {roundData.length > currentQuestion?.number ? (
+                        <button
                         onClick={handleNextQuestion}
-                        className="">
-                        Next Question</button>
-                    <button
-                        onClick={handlePreviousQuestion}>Previous Question</button>
+                        className="m-2"
+                        > Next Question </button>) : ( <p> </p>) }
+                    {currentQuestion?.number > 1 ? (<button
+                        onClick={handlePreviousQuestion}
+                        className="m-2"
+                        > Previous Question</button>) : ( <p> </p>)  }
+                    
                     <button
                         onClick={handleEndRound}
+                        className="m-2"
                         >End Round</button>
 
                 </div>
