@@ -17,7 +17,7 @@ export default function PlayerView({
   const currentQuestionId = currentQuestion?.id || "no-ID";
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [playerFrAnswer, setPlayerFrAnswer] = useState("");
-
+  const [answered, setAnswered] =useState(false);
   // end Round
     useEffect(() => {
       
@@ -57,8 +57,7 @@ export default function PlayerView({
         choiceIndex, 
         choiceText 
       });
-    
-
+      setAnswered(true);
     }
 
     if (currentQuestion?.type === "freeResponse") {
@@ -77,6 +76,7 @@ export default function PlayerView({
         questionId: currentQuestionId,
         choiceText: playerFrAnswer, 
       });
+      setAnswered(true);
     }
     }
   };
@@ -85,10 +85,10 @@ export default function PlayerView({
 
   return (
 
-    <div className="flex flex-col w-full items-center mt-5">
+    <div className="flex flex-col w-full  mt-5">
       <div className="">
 
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center">
 
           {currentQuestion?.type === "multipleChoice" && (
             <QuestionMc 
@@ -109,6 +109,11 @@ export default function PlayerView({
             <QuestionSort />
           )}
         </div>
+        {answered && (
+          <div className="text-green-600 text-lg items-center flex justify-center"> 
+            <p>Answered</p>
+          </div>
+        )}
 
         <div className="flex justify-center mt-10 ">
 
