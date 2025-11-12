@@ -205,10 +205,7 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //--------helpers to manage round data ---------
-    function playerKeyFrom(p) {
-        return p?.userId ?? p?.id;
-    }
-
+  
     function upsertRoundTotals(session, roundIndex, entries) {
         if (!session.finalizedRounds) session.finalizedRounds = new Set();
         if (session.finalizedRounds.has(roundIndex)) {
@@ -218,7 +215,7 @@ export function registerSocketHandlers(io, socket) {
 
         for (const { playerId, name, roundScore } of entries ) {
             if (!session.currentPlayerScores[playerId]) {
-                session.currentPlayersScores[playerId] = {
+                session.currentPlayerScores[playerId] = {
                     name: name ?? "",
                     total: 0,
                     byRound: {},
