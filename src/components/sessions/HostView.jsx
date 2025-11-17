@@ -28,8 +28,8 @@ export default function HostView({
 
     const questionId = currentQuestion?.id || "no-ID";
    
-    console.log("current Question:", currentQuestion);
-    console.log("roundData", roundData.length);
+    //console.log("current Question:", currentQuestion);
+    //console.log("total round amount", roundData.length);
   
     
 

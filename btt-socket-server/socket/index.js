@@ -177,6 +177,7 @@ export function registerSocketHandlers(io, socket) {
     //finalizing results from host
     socket.on('results-finalized', ({ finalRoundData }) => {
         const { sessionCode, roundIndex, scores } = finalRoundData || {};
+        console.log("finalizing round data:", finalRoundData)
         const session = getSession(sessionCode);
         if (!session) return;
         //console.log("final Round Data:", finalRoundData);
@@ -205,10 +206,15 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //--------helpers to manage round data ---------
-  
+    
+    //updating total scores from new round data
     function upsertRoundTotals(session, roundIndex, entries) {
+        if(!session.currentPlayerScores) session.currentPlayerScores = {};
         if (!session.finalizedRounds) session.finalizedRounds = new Set();
+
+        //idempotency
         if (session.finalizedRounds.has(roundIndex)) {
+            console.log("recomputing totals");
             recomputeTotals(session);
             return;
         }
@@ -224,6 +230,7 @@ export function registerSocketHandlers(io, socket) {
             //writing the round score
             session.currentPlayerScores[playerId].byRound[roundIndex] = Number(roundScore) || 0;
         }
+        
         recomputeTotals(session);
         session.finalizedRounds.add(roundIndex);
     }

@@ -15,9 +15,6 @@ export default function EndRound() {
     const [roundNumber, setRoundNumber] = useState(1);
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
-    const [frPlayerAnswer, setFrPlayerAnswer] = useState("");
-    const [currentPlayer, setCurrentPlayer] = useState("");
-    const [frCorrectAnswer, setFrCorrectAnswer] = useState("");
     const [frDecisions, setFrDecisions] = useState({}); // {[qid]: {[pid] : true|false} }
     const [frModalOpen, setFrModalOpen] = useState(false);
     const [frCursor, setFrCursor] = useState(0);
@@ -147,7 +144,7 @@ export default function EndRound() {
             .filter(i => i !== undefined);
     }
 
-    //logic for talling up scores
+    //grabbing round data
     useEffect(() => {
         if (!isHost) return;
         //send socket to grab player list
@@ -167,9 +164,10 @@ export default function EndRound() {
 
     //socket listener for players endround final results
     useEffect(() => {
-        if (isHost) return;
+        //if (isHost) return;
         const handleFinal = ({ sessionCode: sc, roundIndex, roundScores, leaderboard }) => {
-
+            console.log("final results roundSCores:", roundScores);
+            console.log("final results leaderboard", leaderboard);
             setFinalScores({ roundIndex, roundScores, leaderboard });
             setResultsReady(true);
         }
@@ -260,6 +258,7 @@ export default function EndRound() {
         // determine roundInex
         const roundIdx =
             ((state?.roundNumber ?? roundNumber ?? 1) - 1);
+        console.log("roundIdx:", roundIdx);
 
         // set up data to be sent to server
         const roundScores = Object.entries(frozen).map(([pId, v]) => {
