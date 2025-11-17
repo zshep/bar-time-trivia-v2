@@ -176,18 +176,25 @@ export function registerSocketHandlers(io, socket) {
 
     //finalizing results from host
     socket.on('results-finalized', ({ finalRoundData }) => {
-        const { sessionCode, roundIndex, scores } = finalRoundData || {};
-        console.log("finalizing round data:", finalRoundData)
+        const { sessionCode } = finalRoundData || {};
+        //console.log("finalizing round data:", finalRoundData)
         const session = getSession(sessionCode);
         if (!session) return;
         //console.log("final Round Data:", finalRoundData);
         if (socket.id !== session.hostSocketId) return;
 
+        const roundIndex = Number(finalRoundData?.roundIndex);
+        if (!Number.isInteger(roundIndex) || roundIndex < 0) {
+            console.warn('results-finalized: invalid roundindex', finalRoundData?.roundIndex);
+            return;
+        }
+
+        const scores = Array.isArray(finalRoundData?.scores) ? finalRoundData.scores : [];
         //merge round scores
         upsertRoundTotals(session, roundIndex, scores || []);
 
         //prepare a compact broadcast for everyone
-        const leaderboard = Object.entries(session.currentPlayerScores)
+        const leaderboard = Object.entries(session.currentPlayerScores || {})
             .map(([playerId, rec]) => ({
                 playerId,
                 name: rec.name,
@@ -214,14 +221,17 @@ export function registerSocketHandlers(io, socket) {
 
         //idempotency
         if (session.finalizedRounds.has(roundIndex)) {
-            console.log("recomputing totals");
+            console.log('upsertRoundTotals: round already finalized, recomputing only. roundIndex=', roundIndex);
             recomputeTotals(session);
             return;
         }
 
         for (const { playerId, name, roundScore } of entries ) {
-            if (!session.currentPlayerScores[playerId]) {
-                session.currentPlayerScores[playerId] = {
+            if (!playerId) continue;
+            const pid = String(playerId);
+
+            if (!session.currentPlayerScores[pid]) {
+                session.currentPlayerScores[pid] = {
                     name: name ?? "",
                     total: 0,
                     byRound: {},
@@ -236,7 +246,12 @@ export function registerSocketHandlers(io, socket) {
     }
 
     function recomputeTotals(session) {
+        if (!session.currentPlayerScores) return;
+
         for (const [pid, rec] of Object.entries(session.currentPlayerScores)) {
+            
+            console.log('recomputeTotals pid=', pid, 'byRound=', JSON.stringify(rec.byRound));
+
             const sum = Object.values(rec.byRound || {}).reduce((a,b) => a + (Number(b) || 0), 0);
             rec.total = sum
         }

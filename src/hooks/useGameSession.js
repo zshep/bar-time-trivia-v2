@@ -201,7 +201,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
     };
     socket.on('end-round', endRoundHandler);
     return () => {
-      socket.off('round-end', endRoundHandler);
+      socket.off('end-round', endRoundHandler);
     }
 
   }, [navigate]);

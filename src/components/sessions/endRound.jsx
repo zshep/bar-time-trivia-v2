@@ -28,11 +28,15 @@ export default function EndRound() {
             socket.emit('request-session-info', { sessionCode });
         }
 
-        const handleSessionInfo = ({ gameName, gameId, hostId }) => {
+        const handleSessionInfo = ({ gameName, gameId, hostId, currentRound }) => {
             console.log("grabbing session Info from server")
             setGameName(gameName);
             setGameId(gameId);
             setHostId(hostId);
+
+            if (typeof currentRound === "number") {
+                setRoundNumber(currentRound);
+            }
         };
 
         socket.on('session-info', handleSessionInfo);
@@ -255,10 +259,18 @@ export default function EndRound() {
         const frozen = JSON.parse(JSON.stringify(scores));
         setFrozenHostScores(frozen);
 
-        // determine roundInex
-        const roundIdx =
-            ((state?.roundNumber ?? roundNumber ?? 1) - 1);
-        console.log("roundIdx:", roundIdx);
+        // determine roundIndex
+        const roundIdx = (() => {
+            // if wanting to send roundIndex
+            if (typeof state?.roundIndex === "number") return state.roundIndex;
+
+            if(typeof roundNumber === "number") return roundNumber;
+
+            //fallback
+            return 0;
+
+        })();
+        console.log("roundIdx going to server:", roundIdx);
 
         // set up data to be sent to server
         const roundScores = Object.entries(frozen).map(([pId, v]) => {
