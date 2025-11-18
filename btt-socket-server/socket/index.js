@@ -23,36 +23,45 @@ export function registerSocketHandlers(io, socket) {
         //console.log("session", session);
         //console.log("Player joining: ", playerName)
 
-        if (session) {
-            socket.join(sessionCode);
-            console.log(`${playerName} with userId: ${userId} joined session ${sessionCode}`);
-
-            //updating in-memory session
-            const player = addOrAttachPlayer(sessionCode, {
-                socketId: socket.id,
-                userId,
-                name: playerName,
-            });
-
-            //sync for late joiner
-            if (session.currentQuestion) {
-                socket.emit("new-question", session.currentQuestion);
-            }
-
-            io.to(sessionCode).emit('player-list-update', { players: session.players });
-
-            socket.emit('joined-successfully', {
-                sessionCode,
-                gameName: session.gameName,
-                hostId: session.hostId
-            });
-
-        } else {
-            //session doesn't exist
-            socket.emit('join-error', { message: "Session not found" });
+        if (!session) {
+            socket.emit("join-error", { message: "Session not found" });
             return;
         }
+        
+        const player = addOrAttachPlayer(sessionCode, {
+            socketId: socket.id,
+            userId,
+            name: playerName,
+        });
 
+        if (!player) {
+            socket.emit("join-error", { message: "Could not add player" });
+            return;
+        }
+        
+        socket.join(sessionCode);
+        console.log(`${playerName} with userId: ${userId} joined session ${sessionCode}`);
+
+
+        //sync for late joiner
+        if (session.currentQuestion) {
+            socket.emit("new-question", session.currentQuestion);
+        }
+
+        const safePlayers = session.players.map(p => ({
+            id: p.id,
+            userId: p.userId,
+            name: p.name,
+            connected: p.connected,
+        }));
+
+        io.to(sessionCode).emit('player-list-update', { players: safePlayers});      
+        io.to(sessionCode).emit('joined-successfully', {
+            sessionCode,
+            gameName: session.gameName,
+            hostId: session.hostId,
+            players: safePlayers,
+        });
 
     });
 
@@ -72,7 +81,10 @@ export function registerSocketHandlers(io, socket) {
 
         const session = getSession(sessionCode);
 
-        if (!session) return;
+        if (!session){
+            socket.emit("join-error", { message: 'Session not found'});
+            return;
+        }
             //console.log("session found for", sessionCode, ":", session);
         socket.emit('session-info', {
             sessionCode,
@@ -147,31 +159,79 @@ export function registerSocketHandlers(io, socket) {
     });
 
     // reconnecting player
-    socket.on("reconnect-player", ({ sessionCode, userId, playerName }) => {
+    socket.on("reconnect-player", ({ sessionCode, userId }) => {
+        console.log(`reconnect-player from ${socket.id} for userId: ${userId} to session: ${sessionCode}`)
+        
         const session = getSession(sessionCode);
-        if (!session) return;
+        if (!session) {
+            socket.emit('reconnect-failed', {reason: "session-not-found"});
+            return;
+        } 
+
+        //console.log("Players BEFORE reconnect:", JSON.stringify(session.players, null, 2));
+
+        const player = addOrAttachPlayer(sessionCode, {
+            socketId: socket.id,
+            userId,
+        });
+
+        //console.log("Players AFTER reconnect:", JSON.stringify(session.players, null, 2));
+
+        if (!player) {
+            socket.emit('reconnect-failed', {reason: "player-not-found"});
+            return;
+        }
 
         socket.join(sessionCode);
-        addOrAttachPlayer(sessionCode, { socketId: socket.id, userId, name: playerName });
-        socket.emit("player-list-update", { players: session.players });
+
+        const safePlayers = session.players.map(p => ({
+            id: p.id,
+            userId: p.userId,
+            name: p.name,
+            connected: p.connected,
+        }))
+        
+        io.to(sessionCode).emit("player-list-update", { players: safePlayers });
         if (session.currentQuestion) socket.emit("new-question", session.currentQuestion);
     });
 
     //reconnect host
     socket.on("reconnect-host", ({ sessionCode, userId }) => {
         const session = getSession(sessionCode);
-        if (session) {
-            setHostSocket(sessionCode, socket.id);
-            socket.join(sessionCode);
+        if (!session) {
+            socket.emit('reconnect-failed', { reason: "Cannot find Session"} );
+            return;
+        } 
 
-            //push current state to host
-            socket.emit("player-list-update", { players: session.players });
-
-            if (session.currentQuestion) {
-                socket.emit("new-question", session.currentQuestion);
-            }
-            io.to(sessionCode).emit("host-status", { connected: true });
+        if (session.hostId !== userId) {
+            socket.emit("reconnect-failed", { reason: "not-host"});
+            return;
         }
+
+        setHostSocket(sessionCode, socket.id);
+        socket.join(sessionCode);
+
+        //building safe player object
+        const safePlayers = session.players.map(p => ({
+            id: p.id,
+            userId: p.userId,
+            name: p.name,
+            connected: p.connected,
+            currentPlayerScores: currentPlayerScores,
+            roundHistory: roundHistory,
+            finalizedRounds: finalizedRounds,
+        }));
+
+
+
+        //push current state to host
+        socket.emit("player-list-update", { players: safePlayers });
+
+        if (session.currentQuestion) {
+            socket.emit("new-question", session.currentQuestion);
+        }
+        io.to(sessionCode).emit("host-status", { connected: true });
+       
     });
 
     //finalizing results from host

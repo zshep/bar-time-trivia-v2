@@ -40,6 +40,12 @@ export default function JoinTriviaSession() {
 
         const handleJoinedSuccessfully = ({ sessionCode, gameName, hostId }) => {
             console.log("Joined Successful, navigating to lobby");
+
+            //local storage for reconnect helper
+            localStorage.setItem("sessionCode", sessionCode);
+            if (userId) localStorage.setItem("userId", userId);
+            localStorage.setItem("isHost", "false");
+
             navigate(`/session/lobby/${sessionCode}`, {
                 state: {
                     sessionCode,

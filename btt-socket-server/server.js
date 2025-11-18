@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
     const { sessionCode, session, isHost } = res;
 
     if (isHost) {
-      io.to(sessionCode).emit("host-status", { connected: fasle });
+      io.to(sessionCode).emit("host-status", { connected: false });
     } else {
       //building Safe/ non-circular payload
       const safePlayers = session.players.map((p) => ({
