@@ -20,16 +20,32 @@ io.on('connection', (socket) => {
 
  socket.on("disconnect", () => {
     console.log("disconnected:", socket.id);
-    const res = markDisconnected(socket.id, { graceMs: 120_000 });
+    
+    let res;
+    try {
+      res = markDisconnected(socket.id, { graceMs: 120_000});
+    } catch (err) {
+      console.error("Error in Markdisonnected:", err);
+      return;
+    }  
+    
     if (!res) return;
 
     const { sessionCode, session, isHost } = res;
+
     if (isHost) {
-      // Optional: notify room host is reconnecting
-      io.to(sessionCode).emit("host-status", { connected: false });
+      io.to(sessionCode).emit("host-status", { connected: fasle });
     } else {
-      io.to(sessionCode).emit("player-list-update", { players: session.players });
+      //building Safe/ non-circular payload
+      const safePlayers = session.players.map((p) => ({
+        id: p.id,
+        name: p.name,
+        score: p.score,
+        isConnected: p.isConnected,
+      }));
+      io.to(sessionCode).emit("player-list-update", { players: safePlayers });
     }
+    
   });
 });
 
