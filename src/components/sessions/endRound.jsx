@@ -13,6 +13,7 @@ export default function EndRound() {
     const [gameName, setGameName] = useState("");
     const roundAnswers = state?.roundAnswers || {};
     const [roundNumber, setRoundNumber] = useState(1);
+    const [totalNumberRounds, setTotalNumberRounds] =useState(1);
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
     const [frDecisions, setFrDecisions] = useState({}); // {[qid]: {[pid] : true|false} }
@@ -28,15 +29,18 @@ export default function EndRound() {
             socket.emit('request-session-info', { sessionCode });
         }
 
-        const handleSessionInfo = ({ gameName, gameId, hostId, currentRound }) => {
+        const handleSessionInfo = ({ gameName, gameId, hostId, currentRound, totalRounds }) => {
             console.log("grabbing session Info from server")
             setGameName(gameName);
             setGameId(gameId);
             setHostId(hostId);
+            setTotalNumberRounds(totalRounds);
+
 
             if (typeof currentRound === "number") {
                 setRoundNumber(currentRound);
             }
+            console.log(`Round: ${currentRound} out of ${totalRounds}`);
         };
 
         socket.on('session-info', handleSessionInfo);
@@ -169,7 +173,7 @@ export default function EndRound() {
     //socket listener for players endround final results
     useEffect(() => {
         //if (isHost) return;
-        const handleFinal = ({ sessionCode: sc, roundIndex, roundScores, leaderboard }) => {
+        const handleFinal = ({ sessionCode, roundIndex, roundScores, leaderboard }) => {
             console.log("final results roundSCores:", roundScores);
             console.log("final results leaderboard", leaderboard);
             setFinalScores({ roundIndex, roundScores, leaderboard });

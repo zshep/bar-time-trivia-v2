@@ -86,6 +86,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
             //console.log("session found for", sessionCode, ":", session);
+            console.log(`current round: ${session.currentRound} out of ${session.roundIds?.length}`)
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
@@ -217,7 +218,7 @@ export function registerSocketHandlers(io, socket) {
             userId: p.userId,
             name: p.name,
             connected: p.connected,
-            currentPlayerScores: currentPlayerScores,
+            currentPlayerScores: p.currentPlayerScores,
             roundHistory: roundHistory,
             finalizedRounds: finalizedRounds,
         }));
