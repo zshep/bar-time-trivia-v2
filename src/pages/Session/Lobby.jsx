@@ -14,17 +14,20 @@ export default function Lobby() {
   const [gameName, setGameName] = useState(state.gameName);
   const [gameId, setGameId] = useState(state.gameId);
   const [joinCode, setJoinCode] = useState(state.sessionCode);
-  const [hostId, setHostId] = useState(state.hostId);
-  const [hostName, setHostName] = useState("");
+  const [hostId, setHostId] = useState(state.hostId ?? null);
+  const [hostName, setHostName] = useState(state.hostName ?? "Unkown Host");
   const [players, setPlayers] = useState([]);
   const [isHost, setIsHost] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountDown] = useState(3);
   const [userId, setUserId] = useState("");
 
+  
+
   // ----- Ref to prevent session spam -----
   const sessionInfoRequestedRef = useRef(false);
   useReconnect();
+  
   // ----- Firestore lookup -----
   const grabHostData = async (hostId) => {
     try {
@@ -40,6 +43,15 @@ export default function Lobby() {
       console.error("Error fetching host data:", err);
     }
   };
+
+
+  //grab host id if host
+  useEffect(() => {
+    if (hostId && !hostName) {
+      console.log("lookingfor host info");
+      grabHostData(hostId);
+    }
+  }, [hostName, hostId]);
 
   // ----- Host starts game -----
   const handleStartGame = () => {
@@ -88,7 +100,7 @@ export default function Lobby() {
 
   // ----- Get session info if needed -----
   useEffect(() => {
-    const handleSessionInfo = ({ gameName, hostId, gameStarted }) => {
+    const handleSessionInfo = ({ gameName, hostId, gameStarted, hostName }) => {
       console.log("Received session info:", gameName, hostId, gameStarted);
       setGameName(gameName);
       setHostId(hostId);
@@ -197,7 +209,7 @@ export default function Lobby() {
       </div>
 
       <div className="mt-3 text-xl space-y-5">
-        <p>Host: {hostName || "YoMamma"}</p>
+        <p>Host: {hostName || "Unknown"}</p>
         <p>Game: {gameName || "Unknown"}</p>
         <p className="text-3xl">Join Code: {joinCode}</p>
       </div>

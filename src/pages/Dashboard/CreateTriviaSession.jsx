@@ -9,6 +9,7 @@ export default function CreateTriviaSession() {
 
     const [userId, setUserId] = useState(null);
     const [userData, setUserData] = useState({})
+    const [userName, setUserName] = useState("Unknown");
     const [games, setGames] = useState([]);
     const [selectedGameId, setSelectedGameId] = useState("");
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function CreateTriviaSession() {
                 //console.log("user: ", user);
                 setUserId(user.uid);
                 setUserData(user);
+                setUserName(user.displayName);
                 grabUserData(user.uid);
             } else {
                 console.log("there is no user");
@@ -94,8 +96,10 @@ export default function CreateTriviaSession() {
         socket.emit("create-session", {
             sessionCode: joinCode,
             hostId: userId,
+            hostName: userName,
             gameId: game.id,
             gameName: game.name,
+
         });
 
         // Redirect user to lobby screen (assuming you have routing set up)
@@ -104,7 +108,8 @@ export default function CreateTriviaSession() {
                 gameName: game.name,
                 gameId: game.id,
                 sessionCode: joinCode,
-                hostId: userData.uid
+                hostId: userData.uid,
+                hostName: userName,
             }
         });
 

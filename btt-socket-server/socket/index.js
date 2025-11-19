@@ -5,9 +5,9 @@ import { saveGameResult } from '../firestore/saveGameResult.js';
 export function registerSocketHandlers(io, socket) {
 
     // Host creates a session
-    socket.on('create-session', ({ sessionCode, hostId, gameId, gameName }) => {
-        console.log(`Session created: ${sessionCode} by host ${hostId} for game ${gameName}`);
-        createSession(sessionCode, hostId, gameName, gameId, socket.id);
+    socket.on('create-session', ({ sessionCode, hostId, hostName, gameId, gameName }) => {
+        console.log(`Session created: ${sessionCode} by host ${hostName} with id: ${hostId} for game ${gameName}`);
+        createSession(sessionCode, hostId, gameName, gameId, socket.id, hostName);
 
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });
@@ -60,6 +60,7 @@ export function registerSocketHandlers(io, socket) {
             sessionCode,
             gameName: session.gameName,
             hostId: session.hostId,
+            hostName: session.hostName,
             players: safePlayers,
         });
 
@@ -91,6 +92,7 @@ export function registerSocketHandlers(io, socket) {
             sessionCode,
             gameName: session.gameName,
             hostId: session.hostId,
+            hostName: session.hostName,
             gameId: session.gameId,
             gameStarted: session.gameStarted,
             currentRound: session.currentRound,
@@ -219,8 +221,7 @@ export function registerSocketHandlers(io, socket) {
             name: p.name,
             connected: p.connected,
             currentPlayerScores: p.currentPlayerScores,
-            roundHistory: roundHistory,
-            finalizedRounds: finalizedRounds,
+            
         }));
 
 

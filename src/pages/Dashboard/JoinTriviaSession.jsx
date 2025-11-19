@@ -11,13 +11,14 @@ export default function JoinTriviaSession() {
     const [userName, setUserName] = useState("NOUSER");
     const [gameName, setGameName] = useState("Unknown Game");
     const [hostId, setHostId] = useState("uknown host");
+    const [hostName, setHostName] = useState("Unknown")
     const navigate = useNavigate();
 
     //grabbing users data
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                console.log("user: ", user);
+                //console.log("user: ", user);
                 setUserId(user.uid);
                 setUserName(user.displayName);
 
@@ -32,13 +33,14 @@ export default function JoinTriviaSession() {
 
     // handling socket calls for entering Join Code
     useEffect(() => {
-        const handleSessionInfo = ({ gameName, hostId }) => {
+        const handleSessionInfo = ({ gameName, hostId, hostName }) => {
             console.log('Received session info:', gameName, hostId);
             setGameName(gameName);
             setHostId(hostId);
+            setHostName(hostName);
         };
 
-        const handleJoinedSuccessfully = ({ sessionCode, gameName, hostId }) => {
+        const handleJoinedSuccessfully = ({ sessionCode, gameName, hostId, hostName }) => {
             console.log("Joined Successful, navigating to lobby");
 
             //local storage for reconnect helper
@@ -50,10 +52,8 @@ export default function JoinTriviaSession() {
                 state: {
                     sessionCode,
                     gameName,
-                    hostData: {
-                        uid: hostId,
-                        displayName: userName
-                    }
+                    hostId,
+                    hostName: hostName,
                 }
             });
 
