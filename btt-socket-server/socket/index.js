@@ -5,9 +5,9 @@ import { saveGameResult } from '../firestore/saveGameResult.js';
 export function registerSocketHandlers(io, socket) {
 
     // Host creates a session
-    socket.on('create-session', ({ sessionCode, hostId, hostName, gameId, gameName }) => {
+    socket.on('create-session', ({ sessionCode, hostId, hostName, gameName, gameId  }) => {
         console.log(`Session created: ${sessionCode} by host ${hostName} with id: ${hostId} for game ${gameName}`);
-        createSession(sessionCode, hostId, gameName, gameId, socket.id, hostName);
+        createSession(sessionCode, hostId, hostName, gameName, gameId, socket.id );
 
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });

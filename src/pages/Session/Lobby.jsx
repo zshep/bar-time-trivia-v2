@@ -15,7 +15,7 @@ export default function Lobby() {
   const [gameId, setGameId] = useState(state.gameId);
   const [joinCode, setJoinCode] = useState(state.sessionCode);
   const [hostId, setHostId] = useState(state.hostId ?? null);
-  const [hostName, setHostName] = useState(state.hostName ?? "Unkown Host");
+  const [hostName, setHostName] = useState(state.hostName ?? "");
   const [players, setPlayers] = useState([]);
   const [isHost, setIsHost] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
@@ -100,12 +100,12 @@ export default function Lobby() {
 
   // ----- Get session info if needed -----
   useEffect(() => {
-    const handleSessionInfo = ({ gameName, hostId, gameStarted, hostName }) => {
+    const handleSessionInfo = ({ gameName, hostId, hostName, gameId, gameStarted }) => {
       console.log("Received session info:", gameName, hostId, gameStarted);
       setGameName(gameName);
       setHostId(hostId);
       setGameId(gameId);
-      grabHostData(hostId);
+      setHostName(hostName);
       console.log("gameName, HostId", gameName, hostId);
 
       //deteremining if host or player
@@ -133,14 +133,12 @@ export default function Lobby() {
       console.log("Requesting session info from server...");
       socket.emit("request-session-info", { sessionCode: joinCode });
     }
-    /* else {
-     grabHostData(hostId);
-   } */
+    
 
     return () => {
       socket.off("session-info", handleSessionInfo);
     };
-  }, [gameName, hostId, joinCode]);
+  }, [gameName, hostId, joinCode, navigate]);
 
   // ----- Player list sync -----
   useEffect(() => {
