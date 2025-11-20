@@ -1,13 +1,13 @@
-import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion, addOrAttachPlayer, setHostSocket, setCurrentQuestion } from './sessionStore.js';
+import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion, addOrAttachPlayer, setHostSocket, setCurrentQuestion, getCurrentQuestionIndex } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
 export function registerSocketHandlers(io, socket) {
 
     // Host creates a session
-    socket.on('create-session', ({ sessionCode, hostId, hostName, gameName, gameId  }) => {
+    socket.on('create-session', ({ sessionCode, hostId, hostName, gameName, gameId }) => {
         console.log(`Session created: ${sessionCode} by host ${hostName} with id: ${hostId} for game ${gameName}`);
-        createSession(sessionCode, hostId, hostName, gameName, gameId, socket.id );
+        createSession(sessionCode, hostId, hostName, gameName, gameId, socket.id);
 
         socket.join(sessionCode);
         io.to(socket.id).emit('session-created', { sessionCode });
@@ -27,7 +27,7 @@ export function registerSocketHandlers(io, socket) {
             socket.emit("join-error", { message: "Session not found" });
             return;
         }
-        
+
         const player = addOrAttachPlayer(sessionCode, {
             socketId: socket.id,
             userId,
@@ -38,7 +38,7 @@ export function registerSocketHandlers(io, socket) {
             socket.emit("join-error", { message: "Could not add player" });
             return;
         }
-        
+
         socket.join(sessionCode);
         console.log(`${playerName} with userId: ${userId} joined session ${sessionCode}`);
 
@@ -55,7 +55,7 @@ export function registerSocketHandlers(io, socket) {
             connected: p.connected,
         }));
 
-        io.to(sessionCode).emit('player-list-update', { players: safePlayers});      
+        io.to(sessionCode).emit('player-list-update', { players: safePlayers });
         io.to(sessionCode).emit('joined-successfully', {
             sessionCode,
             gameName: session.gameName,
@@ -82,12 +82,12 @@ export function registerSocketHandlers(io, socket) {
 
         const session = getSession(sessionCode);
 
-        if (!session){
-            socket.emit("join-error", { message: 'Session not found'});
+        if (!session) {
+            socket.emit("join-error", { message: 'Session not found' });
             return;
         }
-            //console.log("session found for", sessionCode, ":", session);
-            console.log(`current round: ${session.currentRound} out of ${session.roundIds?.length}`)
+        //console.log("session found for", sessionCode, ":", session);
+        console.log(`current round: ${session.currentRoundIndex} out of ${session.roundIds?.length}`)
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
@@ -100,14 +100,34 @@ export function registerSocketHandlers(io, socket) {
             currentRoundId: session.roundIds?.[session.currentRound] ?? null,
             currentQuestionIndex: session.currentQuestionIndex ?? 0,
         });
-        
+
     });
+
+    // Start game
+    socket.on('start-game', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
+        if (!session) return;
+
+        // host-only guard 
+        if (session.hostSocketId !== socket.id) return;
+
+        console.log("Game is starting for session:", sessionCode)
+        startGame(sessionCode);
+
+        const idx = getCurrentQuestionIndex(sessionCode);
+        console.log("current Question index:", idx);
+        console.log("current round index:", session.currentRoundIndex);
+
+        io.to(sessionCode).emit('game-started');
+        nextQuestion(sessionCode);
+    });
+
 
     //player sending answer to host
     socket.on("player-answer", (payload, ack) => {
         //console.log("player-answer payload:", payload);
         const { sessionCode, questionId, choiceIndex, choiceText, choice } = payload;
-        
+
         const session = getSession(sessionCode);
         if (!session) return ack?.({ ok: false, error: "no-session" });
         if (!session.hostSocketId) return ack?.({ ok: false, error: "no-host" });
@@ -134,18 +154,6 @@ export function registerSocketHandlers(io, socket) {
     });
 
 
-    // Start game
-    socket.on('start-game', ({ sessionCode }) => {
-        const session = getSession(sessionCode);
-        if (!session) return;
-
-        // host-only guard 
-        if (session.hostSocketId !== socket.id) return;
-
-        startGame(sessionCode);
-        io.to(sessionCode).emit('game-started');
-        nextQuestion(sessionCode);
-    });
 
     // Recieve and forward question from Host
     socket.on('send-question', ({ sessionCode, question }) => {
@@ -164,12 +172,12 @@ export function registerSocketHandlers(io, socket) {
     // reconnecting player
     socket.on("reconnect-player", ({ sessionCode, userId }) => {
         console.log(`reconnect-player from ${socket.id} for userId: ${userId} to session: ${sessionCode}`)
-        
+
         const session = getSession(sessionCode);
         if (!session) {
-            socket.emit('reconnect-failed', {reason: "session-not-found"});
+            socket.emit('reconnect-failed', { reason: "session-not-found" });
             return;
-        } 
+        }
 
         //console.log("Players BEFORE reconnect:", JSON.stringify(session.players, null, 2));
 
@@ -181,7 +189,7 @@ export function registerSocketHandlers(io, socket) {
         //console.log("Players AFTER reconnect:", JSON.stringify(session.players, null, 2));
 
         if (!player) {
-            socket.emit('reconnect-failed', {reason: "player-not-found"});
+            socket.emit('reconnect-failed', { reason: "player-not-found" });
             return;
         }
 
@@ -193,7 +201,7 @@ export function registerSocketHandlers(io, socket) {
             name: p.name,
             connected: p.connected,
         }))
-        
+
         io.to(sessionCode).emit("player-list-update", { players: safePlayers });
         if (session.currentQuestion) socket.emit("new-question", session.currentQuestion);
     });
@@ -202,12 +210,12 @@ export function registerSocketHandlers(io, socket) {
     socket.on("reconnect-host", ({ sessionCode, userId }) => {
         const session = getSession(sessionCode);
         if (!session) {
-            socket.emit('reconnect-failed', { reason: "Cannot find Session"} );
+            socket.emit('reconnect-failed', { reason: "Cannot find Session" });
             return;
-        } 
+        }
 
         if (session.hostId !== userId) {
-            socket.emit("reconnect-failed", { reason: "not-host"});
+            socket.emit("reconnect-failed", { reason: "not-host" });
             return;
         }
 
@@ -221,7 +229,7 @@ export function registerSocketHandlers(io, socket) {
             name: p.name,
             connected: p.connected,
             currentPlayerScores: p.currentPlayerScores,
-            
+
         }));
 
 
@@ -233,7 +241,7 @@ export function registerSocketHandlers(io, socket) {
             socket.emit("new-question", session.currentQuestion);
         }
         io.to(sessionCode).emit("host-status", { connected: true });
-       
+
     });
 
     //finalizing results from host
@@ -263,7 +271,7 @@ export function registerSocketHandlers(io, socket) {
                 total: rec.total,
                 rounds: rec.byRound,
             }))
-            .sort((a,b) => b.total - a.total);
+            .sort((a, b) => b.total - a.total);
 
         //emit finalized data to all to display
         io.to(sessionCode).emit('round-finalized', {
@@ -275,10 +283,10 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //--------helpers to manage round data ---------
-    
+
     //updating total scores from new round data
     function upsertRoundTotals(session, roundIndex, entries) {
-        if(!session.currentPlayerScores) session.currentPlayerScores = {};
+        if (!session.currentPlayerScores) session.currentPlayerScores = {};
         if (!session.finalizedRounds) session.finalizedRounds = new Set();
 
         //idempotency
@@ -288,7 +296,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
 
-        for (const { playerId, name, roundScore } of entries ) {
+        for (const { playerId, name, roundScore } of entries) {
             if (!playerId) continue;
             const pid = String(playerId);
 
@@ -302,7 +310,7 @@ export function registerSocketHandlers(io, socket) {
             //writing the round score
             session.currentPlayerScores[playerId].byRound[roundIndex] = Number(roundScore) || 0;
         }
-        
+
         recomputeTotals(session);
         session.finalizedRounds.add(roundIndex);
     }
@@ -311,17 +319,17 @@ export function registerSocketHandlers(io, socket) {
         if (!session.currentPlayerScores) return;
 
         for (const [pid, rec] of Object.entries(session.currentPlayerScores)) {
-            
+
             console.log('recomputeTotals pid=', pid, 'byRound=', JSON.stringify(rec.byRound));
 
-            const sum = Object.values(rec.byRound || {}).reduce((a,b) => a + (Number(b) || 0), 0);
+            const sum = Object.values(rec.byRound || {}).reduce((a, b) => a + (Number(b) || 0), 0);
             rec.total = sum
         }
     }
 
 
     //end round
-    socket.on('end-round', ({ sessionCode}) =>{
+    socket.on('end-round', ({ sessionCode }) => {
         console.log("user has ended round")
         io.to(sessionCode).emit('round-ended', { sessionCode });
     });
@@ -346,14 +354,14 @@ export function registerSocketHandlers(io, socket) {
         const totalRounds = session.roundIds.length ?? null;
 
         console.log("host is starting next round");
-        
+
         io.to(sessionCode).emit('round-changed', {
             sessionCode,
             roundNumber: session.currentRound,
             roundId: currentRoundId,
             totalRounds: totalRounds,
         });
-    } );
+    });
 
     //end game
     socket.on('end-game', async ({ sessionCode }) => {
