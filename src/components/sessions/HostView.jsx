@@ -10,9 +10,10 @@ import socket from "../../main";
 export default function HostView({
     currentQuestion,
     sessionCode,
-    roundData,
     goToNextQuestion,
     goToPrevQuestion,
+    hasNextQuestion,
+    hasPreviousQuestion,
 }) {
 
     const navigate =useNavigate();
@@ -231,15 +232,15 @@ export default function HostView({
                     ))}
                 </div>
                 <div className="flex justify-between mt-4">
-                    {roundData.length > currentQuestion?.number ? (
+                    {hasNextQuestion && (
                         <button
                         onClick={handleNextQuestion}
                         className="m-2"
-                        > Next Question </button>) : ( <p> </p>) }
-                    {currentQuestion?.number > 1 ? (<button
+                        > Next Question </button>) }
+                    {hasPreviousQuestion && (<button
                         onClick={handlePreviousQuestion}
                         className="m-2"
-                        > Previous Question</button>) : ( <p> </p>)  }
+                        > Previous Question</button>) }
                     
                     <button
                         onClick={handleEndRound}

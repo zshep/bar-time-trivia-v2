@@ -23,6 +23,10 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
   const [questionType, setQuestionType] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const totalQuestions = questionData.length
+  const hasNextQuestion = currentIndex != null && totalQuestions > 0 && currentIndex < totalQuestions -1;
+  const hasPreviousQuestion = currentIndex != null && totalQuestions > 0 && currentIndex > 0;
+
   
   // ---- Get initial round meta data from server for first load/reconnect -----
   useEffect(() => {
@@ -32,6 +36,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
       }
       if (payload?.gameId) setGameId(payload.gameId);
       if (payload?.gameName) setGameName(payload.gameName);
+      if (payload?.currentRound) setCurrentRoundNumber(payload.currentRound);
+      if (payload?.currentRoundId) setActiveRoundId(payload.currentRoundId); 
     };
     
     socket.on('session-info', handleSessionInfo);
@@ -41,6 +47,10 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
 
   
   // ---- Fetch Rounds ----
+  //------------ TO DO! make session call to server to grab round ID --------------
+
+
+  /*
   useEffect(() => {
     if (!gameId) return;
 
@@ -58,12 +68,14 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
 
     fetchRounds();
   }, [gameId]);
+  */
 
   // ---- Fetch Questions for host only ----
   useEffect(() => {
-    if (!roundData.length || userId !== hostId) return;
-    const idx = currentRoundNumber;
-    const roundId = roundData[idx]?.id;
+    //if (!roundData.length || userId !== hostId) return;
+    //const idx = currentRoundNumber;
+    const roundId = activeRoundId;
+    console.log("current round Id", roundId);
     if (!roundId) return;
 
     const fetchQuestions = async () => {
@@ -75,20 +87,24 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
         const wireQuestions = questions.map(toWireQuestion);
         setQuestionData(wireQuestions);
         setLoading(false);
-        console.log("Wired Questions",wireQuestions);
+        console.log("activeRoundId:", activeRoundId);
+        //console.log("Wired Questions",wireQuestions);
       } catch (err) {
         console.error("Error fetching questions:", err);
       }
     };
 
     fetchQuestions();
-  }, [roundData, userId, hostId, currentRoundNumber]);
+  }, [activeRoundId, userId, hostId, currentRoundNumber]);
 
   //listen for round change from server
   useEffect(() => {
     const onRoundChanged = ({ roundNumber }) => {
       console.log("Host is going to the next round")
       setCurrentRoundNumber(roundNumber);
+      if (roundId) setActiveRoundId(roundId);
+
+      //reset local question State
       setQuestionData([]);
       setCurrentIndex(null);
       setCurrentQuestion(null);
@@ -225,5 +241,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
     goToQuestionIndex,
     goToNextQuestion,
     goToPrevQuestion,
+    hasNextQuestion,
+    hasPreviousQuestion,
   };
 }

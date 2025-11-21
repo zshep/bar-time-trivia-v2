@@ -9,7 +9,7 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameId,
     players: [],
     currentRound: null, //round number
-    currendRoundIndex: null,
+    currentRoundIndex: null,
     currentRoundId: null,
     currentRoundName: null,
     roundIds: null,
@@ -136,8 +136,8 @@ export function setRoundData(sessionCode, roundData) {
   if (!session) return;
 
   //ensure defaults
-  session.currentRound = 0;
-  session.currentRoundIndex = - 1;
+  session.currentRound = 0; // before 1st round
+  session.currentRoundIndex = - 1; // before 1st round
   session.roundIds = [];
 
   //push all roundIds to session.roundIds 
@@ -155,7 +155,7 @@ export function nextRound(sessionCode) {
   //advance round info
   session.currentRound += 1;
   session.currentQuestion = null;
-  session.currentQuestionIndex = 0;
+  session.currentQuestionIndex = -1;
 
 }
 

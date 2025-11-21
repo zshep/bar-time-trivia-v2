@@ -11,7 +11,7 @@ export function toWireQuestion(doc) {
     mcChoices: mcChoicesTop,
     mcAnswers: mcAnswersTop,
   } = doc;
-  console.log("normalizing data:", doc);
+  //console.log("normalizing data:", doc);
 
   const isArray = (v) => Array.isArray ? Array.isArray(v) : Object.prototype.toString.call(v) === "[object Array]";
 
@@ -31,7 +31,7 @@ export function toWireQuestion(doc) {
       id: String.fromCharCode(65 + i), // "A","B","C","D",...
       label,
     }));
-    console.log("choices after normalized", choices);
+    //console.log("choices after normalized", choices);
 
     const correct = rawCorrect
       .map((ans) => {

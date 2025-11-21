@@ -135,7 +135,7 @@ export function registerSocketHandlers(io, socket) {
 
         console.log("Game is starting for session:", sessionCode)
         startGame(sessionCode);
-        nextRound(sessionCode);
+        //nextRound(sessionCode);
 
         const idx = getCurrentQuestionIndex(sessionCode);
         console.log("current Question index:", idx);

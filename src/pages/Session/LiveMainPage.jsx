@@ -30,8 +30,11 @@ export default function LiveMainPage() {
         ...m,
         gameName: p.gameName ?? m.gameName,
         gameId: p.gameId ?? m.gameId,
-        host: p.hostId ?? m.hostId,
+        hostId: p.hostId ?? m.hostId,
         sessionCode: p.sessionCode ?? m.sessionCode,
+        currentRoundIndex: p.currentRoundIndex ?? m.currentRoundIndex,
+        currentRoundId: p.currentRoundId ?? m.currentRoundId,
+
         //optional: currentRoundIndex, totalRounds, currentRoundID
       }))
     }
@@ -49,7 +52,7 @@ export default function LiveMainPage() {
   
 
   const session = useGameSession(meta);
-  const currentRound = (session.currentRoundNumber ?? 0) + 1;
+  const currentRound = (session.currentRoundNumber ?? 0);
   
 
 
@@ -114,7 +117,7 @@ export default function LiveMainPage() {
       <div>
 
         {isHost && (
-          <HostView {...session} goToNextQuestion={session.goToNextQuestion} goToPreviousQuestion={session.goToPrevQuestion} />
+          <HostView {...session}  />
         )}
         {!isHost && (
           <PlayerView {...session} />
