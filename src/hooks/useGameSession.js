@@ -33,6 +33,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
       if (payload?.gameId) setGameId(payload.gameId);
       if (payload?.gameName) setGameName(payload.gameName);
     };
+    
     socket.on('session-info', handleSessionInfo);
     socket.emit('request-session-info', {sessionCode});
     return () => socket.off('session-info', handleSessionInfo);

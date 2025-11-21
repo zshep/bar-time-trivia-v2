@@ -1,4 +1,16 @@
-import { getSession, deleteSession, createSession, addPlayerToSession, startGame, nextQuestion, addOrAttachPlayer, setHostSocket, setCurrentQuestion, getCurrentQuestionIndex } from './sessionStore.js';
+import { getSession, 
+         deleteSession, 
+         createSession, 
+         addPlayerToSession, 
+         startGame, 
+         nextQuestion, 
+         addOrAttachPlayer, 
+         setHostSocket, 
+         setCurrentQuestion, 
+         getCurrentQuestionIndex, 
+         setRoundData,
+        nextRound
+        } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -87,7 +99,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
         //console.log("session found for", sessionCode, ":", session);
-        console.log(`current round: ${session.currentRoundIndex} out of ${session.roundIds?.length}`)
+        console.log(`current round: ${session.currentRound} out of ${session.roundIds?.length}`)
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
@@ -103,6 +115,16 @@ export function registerSocketHandlers(io, socket) {
 
     });
 
+    //saving round data to sever
+    socket.on('store-roundData', ({sessionCode, roundData}) => {
+        const session = getSession(sessionCode);
+
+        if (!session) return;
+        console.log("recieved roundData from host:", roundData);
+        setRoundData(sessionCode, roundData);
+
+    })
+
     // Start game
     socket.on('start-game', ({ sessionCode }) => {
         const session = getSession(sessionCode);
@@ -113,6 +135,7 @@ export function registerSocketHandlers(io, socket) {
 
         console.log("Game is starting for session:", sessionCode)
         startGame(sessionCode);
+        nextRound(sessionCode);
 
         const idx = getCurrentQuestionIndex(sessionCode);
         console.log("current Question index:", idx);
@@ -341,14 +364,7 @@ export function registerSocketHandlers(io, socket) {
 
         if (session.hostSocketId !== socket.id) return;
 
-        //ensure defaults
-        session.currentRound = session.currentRound ?? 0;
-        session.roundIds = session.roundIds ?? [];
-
-        //advance round info
-        session.currentRound += 1;
-        session.currentQuestion = null;
-        session.currentQuestionIndex = 0;
+        nextRound(sessionCode);
 
         const currentRoundId = session.roundIds[session.currentRound] ?? null;
         const totalRounds = session.roundIds.length ?? null;

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../../main";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, getDocs, doc, collection, query, where, orderBy } from "firebase/firestore";
 import { useReconnect } from "../../hooks/useReconnect";
 
 export default function Lobby() {
@@ -16,6 +16,7 @@ export default function Lobby() {
   const [joinCode, setJoinCode] = useState(state.sessionCode);
   const [hostId, setHostId] = useState(state.hostId ?? null);
   const [hostName, setHostName] = useState(state.hostName ?? "");
+  const [roundData, setRoundData] =useState([])
   const [players, setPlayers] = useState([]);
   const [isHost, setIsHost] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
@@ -28,7 +29,7 @@ export default function Lobby() {
   const sessionInfoRequestedRef = useRef(false);
   useReconnect();
   
-  // ----- Firestore lookup -----
+  // ----- Firestore lookup for host -----
   const grabHostData = async (hostId) => {
     try {
       const hostRef = doc(db, "users", hostId);
@@ -44,6 +45,37 @@ export default function Lobby() {
     }
   };
 
+  //-----------firestore look up for round data-----------
+  
+  useEffect(() => {
+    if (!gameId || !isHost) {
+      console.log("gameId and host", gameId, isHost);
+      return;
+    };
+    console.log("am I the host?", isHost);
+    
+    const fetchRounds = async () => {
+      try {
+        const col = collection(db, "rounds");
+        const q = query(col, where("gameId", "==", gameId), orderBy("roundNumber", "asc"));
+        const snap = await getDocs(q);
+        const rounds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setRoundData(rounds);
+        //set round specific data???
+        console.log("emitting round data:", rounds);
+        socket.emit('store-roundData', { sessionCode : joinCode, roundData : rounds });
+
+        
+      } catch (err) {
+        console.error("Error fetching rounds:", err);
+      }
+    };
+
+    fetchRounds();
+
+
+
+  }, [gameId, isHost]);
 
   //grab host id if host
   useEffect(() => {
