@@ -365,9 +365,10 @@ export default function EndRound() {
 
     //end Round as Host
     const handleEndGame = () => {
-        console.log("host is ending the game");
+        console.log("host is finalizing the game");
 
-        socket.emit('end-game', { sessionCode } );
+        //send message to go to game results page
+        socket.emit('finalize-game', { sessionCode } );
 
     }
 
@@ -375,14 +376,14 @@ export default function EndRound() {
     useEffect(() => {
 
         const handleGameEnded = () => {
-            console.log("game has ended");
+            console.log("game has ended, go see final results");
             
-            //nagivigate to final end page
+            //navigate to EndGamePage
             navigate('');
 
         }
 
-        socket.on('game-ended', handleGameEnded);
+        socket.on('game-finalized', handleGameEnded);
     }, [])
 
 
@@ -446,9 +447,10 @@ export default function EndRound() {
                             </div>
                         ))}
                     </div>
-
-                    <h2 className="text-xl font-bold mt-6">Game Totals</h2>
+                    {!isLast ? (
+                    
                     <div>
+                        <h2 className="text-xl font-bold mt-6">Game Totals</h2>
                         {finalScores.leaderboard.map(p => (
                             <div key={p.playerId} className="border rounded p-2 flex justify-between">
                                 <span>{p.name || p.playerId}</span>
@@ -456,6 +458,7 @@ export default function EndRound() {
                             </div>
                         ))}
                     </div>
+                    ) : ( <div> </div>   )}
                 </div>
             )}
             {resultsReady && isHost && (

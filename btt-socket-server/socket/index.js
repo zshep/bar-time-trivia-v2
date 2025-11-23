@@ -380,6 +380,19 @@ export function registerSocketHandlers(io, socket) {
         });
     });
 
+    //finalize game - show final results
+    socket.on('finalize-game', ({ sessionCode }) => {
+        const session = getSession(sessionCode);
+        if (!session) return;
+
+        //Notify players
+            io.to(sessionCode).emit('game-finalized', { message: 'Game Finalized' })
+
+
+    })
+
+
+
     //end game
     socket.on('end-game', async ({ sessionCode }) => {
         const session = getSession(sessionCode);
