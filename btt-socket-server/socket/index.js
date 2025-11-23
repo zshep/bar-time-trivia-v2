@@ -1,16 +1,17 @@
-import { getSession, 
-         deleteSession, 
-         createSession, 
-         addPlayerToSession, 
-         startGame, 
-         nextQuestion, 
-         addOrAttachPlayer, 
-         setHostSocket, 
-         setCurrentQuestion, 
-         getCurrentQuestionIndex, 
-         setRoundData,
-        nextRound
-        } from './sessionStore.js';
+import {
+    getSession,
+    deleteSession,
+    createSession,
+    addPlayerToSession,
+    startGame,
+    nextQuestion,
+    addOrAttachPlayer,
+    setHostSocket,
+    setCurrentQuestion,
+    getCurrentQuestionIndex,
+    setRoundData,
+    nextRound
+} from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
 
 
@@ -88,7 +89,7 @@ export function registerSocketHandlers(io, socket) {
 
     });
 
-    // grab missing data for lobby
+    // grabbing session data/info
     socket.on('request-session-info', ({ sessionCode }) => {
         console.log("Session Info request for session:", sessionCode);
 
@@ -99,7 +100,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
         //console.log("session found for", sessionCode, ":", session);
-        console.log(`current round: ${session.currentRound} out of ${session.roundIds?.length}`)
+        console.log(` Server currentRound: ${session.currentRound} of ${session.roundIds?.length}`)
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
@@ -116,7 +117,7 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //saving round data to sever
-    socket.on('store-roundData', ({sessionCode, roundData}) => {
+    socket.on('store-roundData', ({ sessionCode, roundData }) => {
         const session = getSession(sessionCode);
 
         if (!session) return;
@@ -139,7 +140,7 @@ export function registerSocketHandlers(io, socket) {
 
         const idx = getCurrentQuestionIndex(sessionCode);
         console.log("current Question index:", idx);
-        console.log("current round index:", session.currentRoundIndex);
+        
 
         io.to(sessionCode).emit('game-started');
         nextQuestion(sessionCode);
@@ -366,16 +367,16 @@ export function registerSocketHandlers(io, socket) {
 
         nextRound(sessionCode);
 
+        const totalRounds = session.roundIds.length ?? 0;
         const currentRoundId = session.roundIds[session.currentRound] ?? null;
-        const totalRounds = session.roundIds.length ?? null;
 
-        console.log("host is starting next round");
+        console.log(`host is starting round index ${session.currentRound} of ${totalRounds}`);
 
         io.to(sessionCode).emit('round-changed', {
             sessionCode,
             roundNumber: session.currentRound,
             roundId: currentRoundId,
-            totalRounds: totalRounds,
+            totalRounds,
         });
     });
 
@@ -387,7 +388,7 @@ export function registerSocketHandlers(io, socket) {
             // sumary of data to save
             const finalData = {
                 players: session.players,
-                totalRounds: session.currentRound,
+                totalRounds: session.roundIds?.length ?? 0,
                 gameStartedAt: session.startedAt || null,
                 hostId: session.hostId,
                 sessionCode

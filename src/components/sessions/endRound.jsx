@@ -21,6 +21,7 @@ export default function EndRound() {
     const [frCursor, setFrCursor] = useState(0);
     const [finalScores, setFinalScores] = useState(null);
     const [frozenHostScores, setFrozenHostScores] = useState(null);
+    const [lastRound, setLastRound] = useState(false);
 
     // grabbing session info to navigate to next round
     useEffect(() => {
@@ -38,15 +39,30 @@ export default function EndRound() {
 
 
             if (typeof currentRound === "number") {
-                setRoundNumber(currentRound);
+                setRoundNumber((currentRound + 1));
             }
-            console.log(`Round: ${currentRound} out of ${totalRounds}`);
+            
         };
 
         socket.on('session-info', handleSessionInfo);
 
         return () => socket.off('session-info', handleSessionInfo);
     }, [sessionCode])
+
+    //checking if this is the last round
+    useEffect(() => {
+        if (!isHost) return;
+        console.log("roundNumber: ", roundNumber)
+        console.log("totalNumberRounds", totalNumberRounds);
+
+        const isLast = roundNumber === totalNumberRounds && totalNumberRounds > 0;
+        setLastRound(isLast);
+        console.log(`EndRound display: ${roundNumber} of ${totalNumberRounds}, last? ${isLast}`);
+
+        if (isLast) {
+            console.log("this is last round");
+        }
+    }, [isHost, roundNumber, totalNumberRounds]);
 
     // normalize answers for easier comparrison
     function norm(s) {
@@ -347,7 +363,27 @@ export default function EndRound() {
         return () => socket.off('round-changed', onRoundChanged);
     }, [navigate, gameName, gameId, hostId, isHost]);
 
+    //end Round as Host
+    const handleEndGame = () => {
+        console.log("host is ending the game");
 
+        socket.emit('end-game', { sessionCode } );
+
+    }
+
+    //game ended
+    useEffect(() => {
+
+        const handleGameEnded = () => {
+            console.log("game has ended");
+            
+            //nagivigate to final end page
+            navigate('');
+
+        }
+
+        socket.on('game-ended', handleGameEnded);
+    }, [])
 
 
     return (
@@ -369,12 +405,13 @@ export default function EndRound() {
             {isHost && !resultsReady && (
                 <div className="space-y-4">
                     <div>
-                        <p>You need to go through the results</p>
+                        <p>{pendingFR.length > 0 ? `There are pending free response Questions` 
+                        : `No pending free response questions`}</p>
                     </div>
                     <div className="mt-4">
                         <button
                             onClick={handleFinalizeResults}
-                            className={`mt-4 px-4 py-2 rounded ${pendingFR.length > 0 ? 'bg-gray-300' : 'bg-blue-600 text-white'}`}
+                            className={`mt-4 px-4 py-2 rounded ${pendingFR.length > 0 ? 'bg-gray-300' : 'bg-green-900 text-white'}`}
                         > {pendingFR.length > 0 ? `Review ${pendingFR.length}` : 'Finalize Results'}</button>
                     </div>
                 </div>
@@ -401,7 +438,7 @@ export default function EndRound() {
             )}
             {resultsReady && finalScores && (
                 <div className="mt-4 space-y-4">
-                    <h2 className="text-xl font-bold">Round {finalScores.roundIndex + 1} Results</h2>
+                    <h2 className="text-xl font-bold">Round {roundNumber} Results</h2>
                     <div>
                         {finalScores.roundScores.map(r => (
                             <div key={r.playerId} className="border rounded p-2">
@@ -422,13 +459,20 @@ export default function EndRound() {
                 </div>
             )}
             {resultsReady && isHost && (
-                <div>
-                    <button
-                        className="border border-green-500 rounded mt-4"
-                        onClick={handleNextRound}>
-                        Start Next Round
-                    </button>
-                </div>
+                <div className="mt-4">
+                    {!lastRound ? (
+                        <button
+                            className="border border-green-500 rounded"
+                            onClick={handleNextRound}>
+                            Start Next Round 
+                        </button> ) : (
+                        <button 
+                            className="border border-red rounded"
+                            onClick={handleEndGame}>   
+                                End Game
+                        </button>) } 
+                </div> 
+                        
             )}
 
 

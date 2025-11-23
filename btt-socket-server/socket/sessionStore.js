@@ -9,12 +9,10 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameId,
     players: [],
     currentRound: null, //round number
-    currentRoundIndex: null,
     currentRoundId: null,
     currentRoundName: null,
     roundIds: null,
     currentQuestion: null,
-    currentQuestionIndex: null,
     gameStarted: false,
     hostSocketId,
     currentPlayerScores: {}, // [playerKey] : { name, total, by Round: { [roundIndex]: number}}
@@ -126,8 +124,9 @@ export function markDisconnected(socketId, { graceMs = 120_000 } = {}) {
 export function startGame(sessionCode) {
   const session = sessions.get(sessionCode);
   if (!session) return;
+
   session.gameStarted = true;
-  session.currentRound = 0;
+   if (session.currentRound == null) session.currentRound = 0;
   if (session.currentQuestionIndex == null) session.currentQuestionIndex = -1; // before first question
 }
 
@@ -135,16 +134,14 @@ export function setRoundData(sessionCode, roundData) {
   const session = sessions.get(sessionCode);
   if (!session) return;
 
-  //ensure defaults
-  session.currentRound = 0; // before 1st round
-  session.currentRoundIndex = - 1; // before 1st round
-  session.roundIds = [];
-
   //push all roundIds to session.roundIds 
-  roundData.forEach(round => {
-    session.roundIds.push(round.id);
-  });
-  
+  session.roundIds = roundData.map(r => r.id);
+
+  if (session.currentRound == null) {
+    session.currentRound = 0;
+  }
+
+  session.currentQuestionIndex = -1;  
 
 }
 

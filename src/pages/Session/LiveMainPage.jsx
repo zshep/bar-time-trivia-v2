@@ -32,7 +32,7 @@ export default function LiveMainPage() {
         gameId: p.gameId ?? m.gameId,
         hostId: p.hostId ?? m.hostId,
         sessionCode: p.sessionCode ?? m.sessionCode,
-        currentRoundIndex: p.currentRoundIndex ?? m.currentRoundIndex,
+        
         currentRoundId: p.currentRoundId ?? m.currentRoundId,
 
         //optional: currentRoundIndex, totalRounds, currentRoundID
@@ -52,7 +52,7 @@ export default function LiveMainPage() {
   
 
   const session = useGameSession(meta);
-  const currentRound = (session.currentRoundNumber ?? 0);
+  const currentRoundDisplay = (session.currentRoundNumber ?? 0) + 1;
   
 
 
@@ -105,7 +105,7 @@ export default function LiveMainPage() {
           <p>Game: {meta.gameName}</p>
         </div>
         <div>
-          <p>Round: {currentRound}</p>
+          <p>Round: {currentRoundDisplay}</p>
         </div>
       </div>
 

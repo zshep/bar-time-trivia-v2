@@ -14,6 +14,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
   const [roundData, setRoundData] = useState([]);
   const [activeRoundId, setActiveRoundId] = useState(currentRoundId || null);
   const [currentRoundNumber, setCurrentRoundNumber] =useState(0);
+  
   const [questionData, setQuestionData] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null);
@@ -37,7 +38,9 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
       if (payload?.gameId) setGameId(payload.gameId);
       if (payload?.gameName) setGameName(payload.gameName);
       if (payload?.currentRound) setCurrentRoundNumber(payload.currentRound);
-      if (payload?.currentRoundId) setActiveRoundId(payload.currentRoundId); 
+      if (payload?.currentRoundId) setActiveRoundId(payload.currentRoundId);
+      console.log("Client got currentRound:", payload.currentRound);
+
     };
     
     socket.on('session-info', handleSessionInfo);
@@ -46,30 +49,6 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
   }, [sessionCode]);
 
   
-  // ---- Fetch Rounds ----
-  //------------ TO DO! make session call to server to grab round ID --------------
-
-
-  /*
-  useEffect(() => {
-    if (!gameId) return;
-
-    const fetchRounds = async () => {
-      try {
-        const col = collection(db, "rounds");
-        const q = query(col, where("gameId", "==", gameId), orderBy("roundNumber", "asc"));
-        const snap = await getDocs(q);
-        const rounds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setRoundData(rounds);
-      } catch (err) {
-        console.error("Error fetching rounds:", err);
-      }
-    };
-
-    fetchRounds();
-  }, [gameId]);
-  */
-
   // ---- Fetch Questions for host only ----
   useEffect(() => {
     //if (!roundData.length || userId !== hostId) return;
@@ -99,8 +78,8 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
 
   //listen for round change from server
   useEffect(() => {
-    const onRoundChanged = ({ roundNumber }) => {
-      console.log("Host is going to the next round")
+    const onRoundChanged = ({ roundNumber, roundId }) => {
+      console.log("Host is going to the next round, round: ", roundNumber);
       setCurrentRoundNumber(roundNumber);
       if (roundId) setActiveRoundId(roundId);
 
@@ -229,6 +208,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
     sessionCode,
     loading,
     currentRoundNumber,
+    currentRoundIndex,
     questionData,
     currentQuestion,
     questionText,
