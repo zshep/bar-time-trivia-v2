@@ -19,6 +19,7 @@ import EditQuestion from '../pages/Dashboard/EditQuestionPage';
 import Lobby from '../pages/Session/Lobby';
 import LiveMainPage from '../pages/Session/LiveMainPage';
 import EndRound from './sessions/EndRound';
+import EndGame from '../pages/Session/EndGamePage';
 
 
 
@@ -55,6 +56,7 @@ function AppRouter() {
             <Route path="lobby/:sessionCode" element={<Lobby/>}/>
             <Route path="live/:sessionCode" element={<LiveMainPage/>}/>
             <Route path="live/:sessionCode/end" element={<EndRound/>} />
+            <Route path="live/:sessionCode/endGame" element={<EndGame/>} />
 
 
 

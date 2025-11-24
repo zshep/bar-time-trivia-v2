@@ -84,6 +84,7 @@ export default function PlayerView({
   //reset answered marker
   useEffect(() => {
     setAnswered(false);
+    setPlayerFrAnswer("");
   }, [currentQuestion]);
 
 

@@ -51,7 +51,7 @@ export default function EndRound() {
 
     //checking if this is the last round
     useEffect(() => {
-        if (!isHost) return;
+        
         console.log("roundNumber: ", roundNumber)
         console.log("totalNumberRounds", totalNumberRounds);
 
@@ -379,8 +379,8 @@ export default function EndRound() {
             console.log("game has ended, go see final results");
             
             //navigate to EndGamePage
-            navigate('');
-
+            navigate(`/session/live/${sessionCode}/endGame`);
+            
         }
 
         socket.on('game-finalized', handleGameEnded);
@@ -447,7 +447,7 @@ export default function EndRound() {
                             </div>
                         ))}
                     </div>
-                    {!isLast ? (
+                    {!lastRound ? (
                     
                     <div>
                         <h2 className="text-xl font-bold mt-6">Game Totals</h2>
@@ -458,7 +458,9 @@ export default function EndRound() {
                             </div>
                         ))}
                     </div>
-                    ) : ( <div> </div>   )}
+                    ) : ( <div> Game Results Next!! </div> 
+
+                    )}
                 </div>
             )}
             {resultsReady && isHost && (
