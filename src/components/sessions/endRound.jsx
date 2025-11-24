@@ -290,7 +290,7 @@ export default function EndRound() {
             return 0;
 
         })();
-        console.log("roundIdx going to server:", roundIdx);
+        //console.log("roundIdx going to server:", roundIdx);
 
         // set up data to be sent to server
         const roundScores = Object.entries(frozen).map(([pId, v]) => {
@@ -379,8 +379,12 @@ export default function EndRound() {
             console.log("game has ended, go see final results");
             
             //navigate to EndGamePage
-            navigate(`/session/live/${sessionCode}/endGame`);
-            
+            navigate(`/session/live/${sessionCode}/endGame`, {
+                state: {
+                    isHost,
+                    finalScores
+
+                }});
         }
 
         socket.on('game-finalized', handleGameEnded);
