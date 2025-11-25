@@ -121,7 +121,7 @@ export function registerSocketHandlers(io, socket) {
         const session = getSession(sessionCode);
 
         if (!session) return;
-        console.log("recieved roundData from host:", roundData);
+        //console.log("recieved roundData from host:", roundData);
         setRoundData(sessionCode, roundData);
 
     })

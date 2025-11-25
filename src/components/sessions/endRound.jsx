@@ -20,6 +20,7 @@ export default function EndRound() {
     const [frModalOpen, setFrModalOpen] = useState(false);
     const [frCursor, setFrCursor] = useState(0);
     const [finalScores, setFinalScores] = useState(null);
+    const [gameScores, setGameScores] = useState(null);
     const [frozenHostScores, setFrozenHostScores] = useState(null);
     const [lastRound, setLastRound] = useState(false);
 
@@ -190,9 +191,10 @@ export default function EndRound() {
     useEffect(() => {
         //if (isHost) return;
         const handleFinal = ({ sessionCode, roundIndex, roundScores, leaderboard }) => {
-            console.log("final results roundSCores:", roundScores);
+            //console.log("final results roundSCores:", roundScores);
             console.log("final results leaderboard", leaderboard);
             setFinalScores({ roundIndex, roundScores, leaderboard });
+            setGameScores({ leaderboard });
             setResultsReady(true);
         }
         socket.on('round-finalized', handleFinal);
@@ -366,6 +368,7 @@ export default function EndRound() {
     //end Round as Host
     const handleEndGame = () => {
         console.log("host is finalizing the game");
+        console.log("Final Results:", finalScores);
 
         //send message to go to game results page
         socket.emit('finalize-game', { sessionCode } );
@@ -377,6 +380,8 @@ export default function EndRound() {
 
         const handleGameEnded = () => {
             console.log("game has ended, go see final results");
+            console.log("finalScores:", finalScores);
+            console.log("GameScores:", gameScores);
             
             //navigate to EndGamePage
             navigate(`/session/live/${sessionCode}/endGame`, {
