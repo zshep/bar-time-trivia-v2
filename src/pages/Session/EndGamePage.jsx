@@ -13,6 +13,7 @@ export default function EndGame() {
     //debugging finalscores
     useEffect(() => {
         console.log("finalScores", finalScores);
+        console.log("leaderboard", finalScores.leaderboard);
     }, [])
 
     //socket listener for everyone to exist session -> dashboard
@@ -50,18 +51,18 @@ export default function EndGame() {
             </div>
             <div>
                 {/* Winner: {leaderboard[0]} */}
-                <h1>Winner: {/*finalScores.leaderboard[0].name*/}</h1>
+                <h1>Winner: {finalScores.leaderboard[0].name}</h1>
             </div>
             <div>
                 {/* LeaderBoard: Grid */}
                 <div>
                         <h2 className="text-xl font-bold mt-6">Game Totals</h2>
-                        {/*finalScores.leaderboard.map(p => (
+                        {finalScores.leaderboard.map(p => (
                             <div key={p.playerId} className="border rounded p-2 flex justify-between">
                                 <span>{p.name || p.playerId}</span>
                                 <span>{p.total}</span>
                             </div>
-                        )) */}
+                        )) } 
                     </div>
 
             </div>

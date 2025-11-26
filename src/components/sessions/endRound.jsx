@@ -202,7 +202,7 @@ export default function EndRound() {
             socket.off('round-finalized', handleFinal);
         }
 
-    }, []);
+    }, [sessionCode]);
 
 
 
@@ -393,7 +393,7 @@ export default function EndRound() {
         }
 
         socket.on('game-finalized', handleGameEnded);
-    }, [])
+    }, [finalScores, gameScores]);
 
 
     return (
