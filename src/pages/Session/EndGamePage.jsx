@@ -7,8 +7,26 @@ export default function EndGame() {
     const navigate = useNavigate();
     const { state } = useLocation();
     const { sessionCode } = useParams();
-    const isHost = Boolean(state?.isHost)
+    const isHost = Boolean(state?.isHost);
+    const [gameName, setGameName] = useState("");
     const [finalScores, setFinalScores] = useState(state?.finalScores || null);
+
+    //grabbing session info
+    useEffect(() => {
+        const handleSessionInfo = (payload) => {
+            if (!payload) {
+                console.log("no payload for session info")
+                return;
+            }  
+
+            console.log("we have the payload", payload);
+            setGameName(payload?.gameName);    
+            }
+        socket.emit('request-session-info', { sessionCode });
+        socket.on('session-info', handleSessionInfo);
+        socket.off('session-info', handleSessionInfo);
+
+    },[])
 
     //debugging finalscores
     useEffect(() => {
@@ -51,14 +69,14 @@ export default function EndGame() {
             </div>
             <div>
                 {/* Winner: {leaderboard[0]} */}
-                <h1>Winner: {finalScores.leaderboard[0].name}</h1>
+                <h4 className="text-3xl mt-4">Winner: {finalScores.leaderboard[0].name}</h4>
             </div>
             <div>
                 {/* LeaderBoard: Grid */}
                 <div>
                         <h2 className="text-xl font-bold mt-6">Game Totals</h2>
                         {finalScores.leaderboard.map(p => (
-                            <div key={p.playerId} className="border rounded p-2 flex justify-between">
+                            <div key={p.playerId} className="border rounded border-black p-2 flex justify-between mt-3">
                                 <span>{p.name || p.playerId}</span>
                                 <span>{p.total}</span>
                             </div>
@@ -70,7 +88,7 @@ export default function EndGame() {
             <div>
                 {/* Host Button: Close Session return everyone to dashboard*/}
                 <button onClick={handleEndSession}
-                        className="border border-black rounded-sm">
+                        className="border border-black rounded-md mt-5">
                     End Session
                 </button>
             </div>

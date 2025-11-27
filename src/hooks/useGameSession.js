@@ -39,7 +39,7 @@ export function useGameSession({ gameId: initialGameId, sessionCode, hostId, cur
       if (payload?.gameName) setGameName(payload.gameName);
       if (payload?.currentRound) setCurrentRoundNumber(payload.currentRound);
       if (payload?.currentRoundId) setActiveRoundId(payload.currentRoundId);
-      console.log("Client got currentRound:", payload.currentRound);
+      //console.log("Client got currentRound:", payload.currentRound);
 
     };
     
