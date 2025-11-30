@@ -96,11 +96,12 @@ export function registerSocketHandlers(io, socket) {
         const session = getSession(sessionCode);
 
         if (!session) {
+            console.log("missing Session");
             socket.emit("join-error", { message: 'Session not found' });
             return;
         }
         //console.log("session found for", sessionCode, ":", session);
-        console.log(` Server currentRound: ${session.currentRound} of ${session.roundIds?.length}`)
+      
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
