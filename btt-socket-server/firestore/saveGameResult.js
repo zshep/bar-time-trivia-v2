@@ -1,6 +1,5 @@
 import { db } from "../socket/firebaseAdmin.js"; 
-import { doc, setDoc } from 'firebase/firestore';
-import { Timestamp } from "firebase/firestore";
+
 
 /**
  * Save final game session result to Firestore
@@ -9,10 +8,7 @@ import { Timestamp } from "firebase/firestore";
  */
 export async function saveGameResult(sessionCode, finalData) {
     try {
-        await db.collection('completedSessions').doc(sessionCode).set({
-          ...finalData,
-          endedAt: Timestamp.now()
-        });
+        await db.collection('sessions').doc(sessionCode).set({finalData});
         console.log(`✅ Game session ${sessionCode} saved to Firestore`);
       } catch (error) {
         console.error('❌ Failed to save game result:', error);
