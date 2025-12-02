@@ -401,16 +401,27 @@ export function registerSocketHandlers(io, socket) {
         if (session) {
             // sumary of data to save
             const finalData = {
+                sessionCode,
+                gameId: session.gameId ?? null,
+                gameName: session.gameName ?? null,
+                hostId: session.hostId,
+                hostName: session.hostName ?? null,
+                
+                totalRounds: session.roundIds?.length ?? 0,
+                roundIds: session.roundIds ?? [],
+
+                //sanitized players
                 players: (session.players || []).map(p => ({
                     id: p.id,
                     userId: p.userId ?? null,
                     name: p.name ?? null,
                     connected: !!p.connected,
                 })),
-                totalRounds: session.roundIds?.length ?? 0,
+                playerScores: session.currentPlayerScores || {},
+                finalizedRounds: Array.from(session.finalizedRounds || []),
+
                 gameStartedAt: session.startedAt || null,
-                hostId: session.hostId,
-                sessionCode
+                
             };
             await saveGameResult(sessionCode, finalData);
 
