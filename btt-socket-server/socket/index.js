@@ -401,7 +401,12 @@ export function registerSocketHandlers(io, socket) {
         if (session) {
             // sumary of data to save
             const finalData = {
-                players: session.players,
+                players: (session.players || []).map(p => ({
+                    id: p.id,
+                    userId: p.userId ?? null,
+                    name: p.name ?? null,
+                    connected: !!p.connected,
+                })),
                 totalRounds: session.roundIds?.length ?? 0,
                 gameStartedAt: session.startedAt || null,
                 hostId: session.hostId,

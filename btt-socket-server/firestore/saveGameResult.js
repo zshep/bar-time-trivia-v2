@@ -1,4 +1,4 @@
-import { db } from "../socket/firebaseAdmin.js"; 
+import { adminDb } from "../socket/firebaseAdmin.js"; 
 
 
 /**
@@ -8,7 +8,7 @@ import { db } from "../socket/firebaseAdmin.js";
  */
 export async function saveGameResult(sessionCode, finalData) {
     try {
-        await db.collection('sessions').doc(sessionCode).set({finalData});
+        await adminDb.collection('sessions').doc(sessionCode).set(finalData);
         console.log(`✅ Game session ${sessionCode} saved to Firestore`);
       } catch (error) {
         console.error('❌ Failed to save game result:', error);
