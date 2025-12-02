@@ -333,7 +333,7 @@ export function registerSocketHandlers(io, socket) {
                 };
             }
             //writing the round score
-            session.currentPlayerScores[playerId].byRound[roundIndex] = Number(roundScore) || 0;
+            session.currentPlayerScores[pid].byRound[roundIndex] = Number(roundScore) || 0;
         }
 
         recomputeTotals(session);

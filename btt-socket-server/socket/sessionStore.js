@@ -16,7 +16,6 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameStarted: false,
     hostSocketId,
     currentPlayerScores: {}, // [playerKey] : { name, total, by Round: { [roundIndex]: number}}
-    roundHistory: [],
     finalizedRounds: new Set(),
     startedAt: Date.now(),
   });
