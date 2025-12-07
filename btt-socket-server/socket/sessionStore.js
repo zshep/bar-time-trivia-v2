@@ -16,6 +16,9 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameStarted: false,
     hostSocketId,
     currentPlayerScores: {}, // [playerKey] : { name, total, by Round: { [roundIndex]: number}}
+    questionsAnsweredByPlayer: {}, //[playerKey]: int
+    questionsCorrectByPlayer: {}, //[playerKey]: int
+    roundsPlayedByPlayer: {},
     finalizedRounds: new Set(),
     startedAt: Date.now(),
   });
@@ -80,8 +83,21 @@ export function addOrAttachPlayer(sessionCode, { socketId, userId, name }) {
     player.connected = true;
   } else {
     // first time joining for this userId
-    player = { id: socketId, userId, name, connected: true };
-    session.players.push(player);
+    const playerKey = userId || socketId; 
+    player = { 
+        id: socketId, 
+        userId, 
+        name,
+        playerKey, 
+        connected: true 
+      };
+    
+      session.players.push(player);
+
+  }
+
+  if (!player.playerKey) {
+    player.playerKey = player.userId || player.id;
   }
   return player;
 }
@@ -184,6 +200,37 @@ export function nextQuestion(sessionCode) {
   if (!session) return;
   if (session.currentQuestionIndex == null) session.currentQuestionIndex = 0;
   else session.currentQuestionIndex += 1;
+}
+
+export function recordPlayerAnswer( sessionCode, playerKey, { isCorrect, points}) {
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+
+  //-------scores -------
+  if (!session.currentPlayerScores[playerKey]) {
+    session.currentPlayerScores[playerKey] = {
+      name: null,
+      total: 0,
+      byRound: {}, // roundIndex -> points
+    };
+  }
+
+  const scoreObj = session.currentPlayerScores[playerKey];
+  const roundIndex = session.currentRound ?? 0;
+
+  //update total points
+  if (typeof points === 'number') {
+    scoreObj.total += points;
+    scoreObj.byRound[roundIndex] = (scoreObj.byRound[roundIndex] || 0) + points;
+  } 
+
+  session.questionsAnsweredByPlayer[playerKey] =
+    (session.questionsAnsweredByPlayer[playerKey] || 0) + 1;
+
+    if (isCorrect) {
+      session.questionsCorrectByPlayer[playerKey] =
+        (session.questionsCorrectByPlayer[playerKey] || 0 ) + 1;
+    }
 }
 
 export function setHostSocket(sessionCode, hostSocketId) {
