@@ -21,6 +21,7 @@ export default function DashboardInfo() {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const data = userDoc.data();
+                        console.log("user data:", data);
                         setUsername(data.username || user.displayName || "User");
                     } else {
                         setUsername(user.displayName || "User");
