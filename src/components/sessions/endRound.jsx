@@ -13,7 +13,7 @@ export default function EndRound() {
     const [gameName, setGameName] = useState("");
     const roundAnswers = state?.roundAnswers || {};
     const [roundNumber, setRoundNumber] = useState(1);
-    const [totalNumberRounds, setTotalNumberRounds] =useState(1);
+    const [totalNumberRounds, setTotalNumberRounds] = useState(1);
     const [playersList, setPlayersList] = useState([]);
     const [resultsReady, setResultsReady] = useState(false);
     const [frDecisions, setFrDecisions] = useState({}); // {[qid]: {[pid] : true|false} }
@@ -42,7 +42,7 @@ export default function EndRound() {
             if (typeof currentRound === "number") {
                 setRoundNumber((currentRound + 1));
             }
-            
+
         };
 
         socket.on('session-info', handleSessionInfo);
@@ -52,7 +52,7 @@ export default function EndRound() {
 
     //checking if this is the last round
     useEffect(() => {
-        
+
         console.log("roundNumber: ", roundNumber)
         console.log("totalNumberRounds", totalNumberRounds);
 
@@ -204,6 +204,38 @@ export default function EndRound() {
 
     }, [sessionCode]);
 
+    //helper to record per- player stats for this round
+    function recordPlayerAnswer(tally, pId, { question, ans, correct }) {
+        if (!tally[pId]) {
+            tally[pId] = {
+                score: 0,
+                questionsAnswered: 0,
+                questionsCorrect: 0,
+                detail: [],
+            };
+        }
+
+        const entry = tally[pId];
+
+        //logging detial for debugging/ future UI
+        entry.detail.push({
+            qid: question.id || question.qid || undefined,
+            type: question.type,
+            choiceIndex: ans?.index,
+            choiceText: ans?.text,
+            correct,
+
+        });
+
+        // always increment  "answered" if they submitted *anything*
+        entry.questionsAnswered += 1;
+
+        if (correct === true) {
+            entry.questionsCorrect += 1;
+            entry.score += question.points ?? 1;
+
+        }
+    }
 
 
 
@@ -215,7 +247,7 @@ export default function EndRound() {
 
             if (!question || !answersByPlayer) continue;
 
-            const ensure = (pid) => (tally[pid] ??= { score: 0, detail: [] });
+
 
 
             for (const [pId, ans] of Object.entries(answersByPlayer || {})) {
@@ -250,30 +282,15 @@ export default function EndRound() {
                 }
 
 
-                // record detail
-                ensure(pId).detail.push({
-                    qid,
-                    type: question.type,
-                    choiceIndex: ans?.index,
-                    choiceText: ans?.text,
-                    correct,
-                });
+                recordPlayerAnswer(tally, pId, { question, ans, correct });
 
-                if (correct === true) ensure(pId).score += question.points ?? 1;
+
             }
         }
 
         return tally;
     }, [roundAnswers, frDecisions]);
 
-    //setting display scores for all
-    const displayScores = useMemo(() => {
-        if (resultsReady) {
-            return isHost ? (frozenHostScores || {}) : (finalScores || {});
-        }
-
-        return isHost ? (scores || {}) : {};
-    }, [isHost, resultsReady, scores, frozenHostScores, finalScores]);
 
     const handleFinalizeResults = () => {
 
@@ -286,7 +303,7 @@ export default function EndRound() {
             // if wanting to send roundIndex
             if (typeof state?.roundIndex === "number") return state.roundIndex;
 
-            if(typeof roundNumber === "number") return roundNumber;
+            if (typeof roundNumber === "number") return roundNumber;
 
             //fallback
             return 0;
@@ -299,9 +316,18 @@ export default function EndRound() {
             const p = playersList.find(pl => pl.id === pId) || {};
             const playerId = p.userId ?? p.id ?? pId;
             const name = p.name ?? "";
-            const roundScore = Number(v?.score ?? 0);
 
-            return { playerId, name, roundScore }
+            const roundScore = Number(v?.score ?? 0);
+            const questionsAnswered = v.questionsAnswered ?? 0;
+            const questionsCorrect = v.questionsCorrect ?? 0;
+
+            return {
+                playerId,
+                name,
+                roundScore,
+                questionsAnswered,
+                questionsCorrect
+            };
 
         })
 
@@ -371,7 +397,7 @@ export default function EndRound() {
         console.log("Final Results:", finalScores);
 
         //send message to go to game results page
-        socket.emit('finalize-game', { sessionCode } );
+        socket.emit('finalize-game', { sessionCode });
 
     }
 
@@ -382,14 +408,15 @@ export default function EndRound() {
             console.log("game has ended, go see final results");
             console.log("finalScores:", finalScores);
             console.log("GameScores:", gameScores);
-            
+
             //navigate to EndGamePage
             navigate(`/session/live/${sessionCode}/endGame`, {
                 state: {
                     isHost,
                     finalScores
 
-                }});
+                }
+            });
         }
 
         socket.on('game-finalized', handleGameEnded);
@@ -415,8 +442,8 @@ export default function EndRound() {
             {isHost && !resultsReady && (
                 <div className="space-y-4">
                     <div>
-                        <p>{pendingFR.length > 0 ? `There are pending free response Questions` 
-                        : `No pending free response questions`}</p>
+                        <p>{pendingFR.length > 0 ? `There are pending free response Questions`
+                            : `No pending free response questions`}</p>
                     </div>
                     <div className="mt-4">
                         <button
@@ -457,17 +484,17 @@ export default function EndRound() {
                         ))}
                     </div>
                     {!lastRound ? (
-                    
-                    <div>
-                        <h2 className="text-xl font-bold mt-6">Game Totals</h2>
-                        {finalScores.leaderboard.map(p => (
-                            <div key={p.playerId} className="border rounded p-2 flex justify-between">
-                                <span>{p.name || p.playerId}</span>
-                                <span>{p.total}</span>
-                            </div>
-                        ))}
-                    </div>
-                    ) : ( <div> Game Results Next!! </div> 
+
+                        <div>
+                            <h2 className="text-xl font-bold mt-6">Game Totals</h2>
+                            {finalScores.leaderboard.map(p => (
+                                <div key={p.playerId} className="border rounded p-2 flex justify-between">
+                                    <span>{p.name || p.playerId}</span>
+                                    <span>{p.total}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (<div> Game Results Next!! </div>
 
                     )}
                 </div>
@@ -478,15 +505,15 @@ export default function EndRound() {
                         <button
                             className="border border-green-500 rounded"
                             onClick={handleNextRound}>
-                            Start Next Round 
-                        </button> ) : (
-                        <button 
+                            Start Next Round
+                        </button>) : (
+                        <button
                             className="border border-red rounded"
-                            onClick={handleEndGame}>   
-                                End Game
-                        </button>) } 
-                </div> 
-                        
+                            onClick={handleEndGame}>
+                            End Game
+                        </button>)}
+                </div>
+
             )}
 
 

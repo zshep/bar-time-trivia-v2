@@ -13,6 +13,8 @@ import {
     nextRound
 } from './sessionStore.js';
 import { saveGameResult } from '../firestore/saveGameResult.js';
+import { adminDb } from './firebaseAdmin.js';
+import { FieldValue } from 'firebase-admin/firestore';
 
 
 export function registerSocketHandlers(io, socket) {
@@ -101,7 +103,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
         //console.log("session found for", sessionCode, ":", session);
-      
+
         socket.emit('session-info', {
             sessionCode,
             gameName: session.gameName,
@@ -141,7 +143,7 @@ export function registerSocketHandlers(io, socket) {
 
         const idx = getCurrentQuestionIndex(sessionCode);
         console.log("current Question index:", idx);
-        
+
 
         io.to(sessionCode).emit('game-started');
         nextQuestion(sessionCode);
@@ -313,6 +315,8 @@ export function registerSocketHandlers(io, socket) {
     function upsertRoundTotals(session, roundIndex, entries) {
         if (!session.currentPlayerScores) session.currentPlayerScores = {};
         if (!session.finalizedRounds) session.finalizedRounds = new Set();
+        if (!session.questionsAnsweredByPlayer) session.questionsAnsweredByPlayer = {};
+        if (!session.questionsCorrectByPlayer) session.questionsCorrectByPlayer = {};
 
         //idempotency
         if (session.finalizedRounds.has(roundIndex)) {
@@ -334,6 +338,16 @@ export function registerSocketHandlers(io, socket) {
             }
             //writing the round score
             session.currentPlayerScores[pid].byRound[roundIndex] = Number(roundScore) || 0;
+
+            //accumulate questions answered / correct across the whole game
+            const answered = Number(questionsAnswered) || 0;
+            const correct = Number(questionsCorrect) || 0;
+
+            session.questionsAnsweredByPlayer[pid] =
+                (session.questionsAnsweredByPlayer[pid] || 0) + answered;
+
+            session.questionsCorrectByPlayer[pid] =
+                (session.questionsCorrectByPlayer[pid] || 0) + correct;
         }
 
         recomputeTotals(session);
@@ -382,15 +396,93 @@ export function registerSocketHandlers(io, socket) {
     });
 
     //finalize game - show final results
-    socket.on('finalize-game', ({ sessionCode }) => {
+    socket.on('finalize-game', async ({ sessionCode }) => {
         const session = getSession(sessionCode);
         if (!session) return;
+        if (socket.id !== session.hostSocketId) return;
+
+        // safey defualts
+        const currentScores = session.currentPlayerScores || {};
+        const answeredMap = session.questionsAnsweredByPlayer || {};
+        const correctMap = session.questionsCorrectByPlayer || {};
+        const roundsPlayed = session.finalizedRounds
+            ? session.finalizedRounds.size
+            : 0;
+
+
+
+        // build per-player game stats for logged in users only
+        const perPlayerStats = [];
+
+        for (const [pid, rec] of Object.entries(currentScores)) {
+
+            const userMatch = session.players.find(p => p.userId === pid);
+
+            if (!userMatch || !userMatch.userId){
+                console.log("player not found, skipping");
+                continue;
+            }
+
+            const userId = userMatch.userId;
+            const totalPoints = Number(rec.total) || 0;
+            const questionsAnswered = Number(answeredMap[pid] || 0);
+            const questionsCorrect = Number(correctMap[pid] || 0);
+
+            perPlayerStats.push({
+                userId,
+                name: userMatch.name || rec.name || "",
+                points: totalPoints,
+                questionsAnswered,
+                questionsCorrect,
+                roundsPlayed,
+            });
+        }
+
+        //updating firestore user stats
+        if (perPlayerStats.length > 0) {
+            try {
+                await updateUserStatsForFinishedGame(perPlayerStats);
+            } catch(err) {
+                console.error('Error updating user stats for finished game:', err);
+            }
+        }
 
         //Notify players
-            io.to(sessionCode).emit('game-finalized', { message: 'Game Finalized' })
-
-
+        io.to(sessionCode).emit('game-finalized', { message: 'Game Finalized' })
     })
+
+    //firestore updater helper
+    async function updateUserStatsForFinishedGame(perPlayerStats) {
+        const batch = adminDb.batch();
+
+        perPlayerStats.forEach(p => {
+            const {
+                userId,
+                points,
+                questionsAnswered,
+                questionsCorrect,
+                roundsPlayed,
+            } = p;
+
+            const userRef = adminDb.collection('users').doc(userId);
+
+            batch.set(
+                userRef,
+                {
+                    stats: {
+                        gamesPlayed: FieldValue.increment(1),
+                        totalPoints: FieldValue.increment(points),
+                        questionsAnswered: FieldValue.increment(questionsAnswered),
+                        questionsCorrect: FieldValue.increment(questionsCorrect),
+                        lastPlayedAt: FieldValue.serverTimestamp(),
+                    },
+                },
+                { merge: true }
+            );
+        });
+
+        await batch.commit();
+    }
 
 
 
@@ -406,7 +498,7 @@ export function registerSocketHandlers(io, socket) {
                 gameName: session.gameName ?? null,
                 hostId: session.hostId,
                 hostName: session.hostName ?? null,
-                
+
                 totalRounds: session.roundIds?.length ?? 0,
                 roundIds: session.roundIds ?? [],
 
@@ -421,7 +513,7 @@ export function registerSocketHandlers(io, socket) {
                 finalizedRounds: Array.from(session.finalizedRounds || []),
 
                 gameStartedAt: session.startedAt || null,
-                
+
             };
             await saveGameResult(sessionCode, finalData);
 
