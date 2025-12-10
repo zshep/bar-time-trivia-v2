@@ -340,9 +340,8 @@ export function registerSocketHandlers(io, socket) {
             session.currentPlayerScores[pid].byRound[roundIndex] = Number(roundScore) || 0;
 
             //accumulate questions answered / correct across the whole game
-            const answered = Number(questionsAnswered) || 0;
-            const correct = Number(questionsCorrect) || 0;
-
+            const answered = Number(session.questionsAnsweredByPlayer[pid]) || 0;
+            const correct = Number(session.questionsCorrectByPlayer[pid]) || 0;
             session.questionsAnsweredByPlayer[pid] =
                 (session.questionsAnsweredByPlayer[pid] || 0) + answered;
 
