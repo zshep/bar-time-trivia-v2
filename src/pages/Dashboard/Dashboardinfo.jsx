@@ -10,11 +10,13 @@ import Playerstats from "../../components/dashboard/playerstats";
 export default function DashboardInfo() {
 
     const [username, setUsername] = useState(null);
+    const [user, setUser] = useState(null);
     const db = getFirestore();
 
     useEffect(() => {
         const fetchUserData = async () => {
             const user = auth.currentUser;
+            setUser(user);
             
             if (user) {
                 try {
@@ -53,7 +55,7 @@ export default function DashboardInfo() {
                     <div className=" border border-black p-2 rounded">
                         <p className="text-center">User Stats</p>
                     </div>
-                    <Playerstats></Playerstats>
+                    <Playerstats userId={user?.uid}></Playerstats>
                 </div>
             </div>
         </div>
