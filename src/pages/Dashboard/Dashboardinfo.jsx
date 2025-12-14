@@ -41,21 +41,14 @@ export default function DashboardInfo() {
     }, []);
 
     return (
-        <div className="flex w-full justify-around mt-20" >
-            <div className="flex flex-row">
-                <div className="flex flex-col  mx-4">
-                    <div className="border border-black p-2 text-center rounded mt-3">
-                        <p>Welcome, {username}</p>
-                    </div>
-                    <Playericon></Playericon>
-                </div>
+        <div className="flex w-full justify-around mt-4" >
+            <div className="flex flex-col">
+            
+                
+                <div className="d-flex flex-column mx-2 mt-3">
 
-                <div className="d-flex flex-column mx-4 mt-3">
-
-                    <div className=" border border-black p-2 rounded">
-                        <p className="text-center">User Stats</p>
-                    </div>
-                    <Playerstats userId={user?.uid}></Playerstats>
+    
+                    <Playerstats userId={user?.uid} userName={username}></Playerstats>
                 </div>
             </div>
         </div>

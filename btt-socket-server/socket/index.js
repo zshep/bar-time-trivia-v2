@@ -287,6 +287,8 @@ export function registerSocketHandlers(io, socket) {
         }
 
         const scores = Array.isArray(finalRoundData?.scores) ? finalRoundData.scores : [];
+        
+        console.log("results-finalized incoming scores sample:", scores?.[0]);
         //merge round scores
         upsertRoundTotals(session, roundIndex, scores || []);
 
@@ -325,7 +327,7 @@ export function registerSocketHandlers(io, socket) {
             return;
         }
 
-        for (const { playerId, name, roundScore } of entries) {
+        for (const { playerId, name, roundScore, questionsAnswered, questionsCorrect } of entries) {
             if (!playerId) continue;
             const pid = String(playerId);
 
@@ -340,8 +342,8 @@ export function registerSocketHandlers(io, socket) {
             session.currentPlayerScores[pid].byRound[roundIndex] = Number(roundScore) || 0;
 
             //accumulate questions answered / correct across the whole game
-            const answered = Number(session.questionsAnsweredByPlayer[pid]) || 0;
-            const correct = Number(session.questionsCorrectByPlayer[pid]) || 0;
+            const answered = Number(questionsAnswered) || 0;
+            const correct = Number(questionsCorrect) || 0;
             session.questionsAnsweredByPlayer[pid] =
                 (session.questionsAnsweredByPlayer[pid] || 0) + answered;
 

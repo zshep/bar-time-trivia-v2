@@ -326,7 +326,7 @@ export default function EndRound() {
                 name,
                 roundScore,
                 questionsAnswered,
-                questionsCorrect
+                questionsCorrect,
             };
 
         })
