@@ -1,4 +1,4 @@
-function toCSV(headers, rows) {
+export function toCSV(headers, rows) {
   const escape = (v) =>
     `"${String(v ?? "").replace(/"/g, '""')}"`;
 

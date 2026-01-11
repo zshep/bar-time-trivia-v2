@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import socket from "../../main";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { toCSV } from "../utils/csv";
+import { toCSV } from "../../utils/csv";
 
 export default function EndGame() {
 
