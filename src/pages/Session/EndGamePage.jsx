@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import socket from "../../main";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toCSV } from "../utils/csv";
 
 export default function EndGame() {
 
@@ -32,9 +33,10 @@ export default function EndGame() {
 
     //debugging finalscores
     useEffect(() => {
+        if (!finalScores) return;
         console.log("finalScores", finalScores);
         console.log("leaderboard", finalScores.leaderboard);
-    }, [])
+    }, [finalScores])
 
     //host handle end session button
     const handleEndSession = () => {
@@ -56,6 +58,55 @@ export default function EndGame() {
 
     }, [])
 
+    //leaderboard headers for csv download
+    const headers = [
+        "group_name",
+        "game_name",
+        "player_name",
+        "total_points",
+        "accuracy_percent",
+        "questions_answered",
+        "questions_correct",
+        "rounds_played",
+    ];
+
+    const rows = (finalScores?.leaderboard || []).map(p => {
+        const questionsAnswered = p.questionsAnswered ?? 0;
+        const questionsCorrect = p.questionsCorrect ?? 0;
+
+        const accuracy =
+            questionsAnswered > 0
+                ? Math.round((questionsCorrect / questionsAnswered) * 1000) / 10
+                : 0;
+
+        return {
+            group_name: "",                 // field to fill in later
+            game_name: gameName || "",
+            player_name: p.name || "",
+            total_points: p.total ?? 0,
+            accuracy_percent: accuracy,
+            questions_answered: questionsAnswered,
+            questions_correct: questionsCorrect,
+            rounds_played: p.roundsPlayed ?? "", // optional / safe default
+        };
+    });
+
+    //downloading csv
+    function downloadLeaderboardCSV() {
+        if(!finalScores?.leaderboard?.length) return;
+
+        const csv = toCSV(headers, rows);
+        const blob = new Blob([csv], { type: "text/csv"});
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `btt-leaderboard_${gameName || "game"}.csv`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+    }
+
 
 
 
@@ -63,7 +114,7 @@ export default function EndGame() {
     return (
         <div className="justify-center">
             <div className="flex justify-center text-2xl mt-1">
-                    <p>Game: {gameName}</p>
+                <p>Game: {gameName}</p>
             </div>
             <div>
                 {/* Winner: {leaderboard[0]} */}
@@ -90,6 +141,14 @@ export default function EndGame() {
                         End Session
                     </button>
                 </div>
+            )}
+            {isHost && (
+                <button
+                    onClick={downloadLeaderboardCSV}
+                    className="mt-4 px-4 py-2 bg-green-700 text-white rounded"
+                >
+                    DownLoad LeaderBoard CSV
+                </button>
             )}
         </div>
     )
