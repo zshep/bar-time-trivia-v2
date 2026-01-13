@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
@@ -18,7 +18,7 @@ import SessionPage from '../pages/Session/SessionPage';
 import EditQuestion from '../pages/Dashboard/EditQuestionPage';
 import Lobby from '../pages/Session/Lobby';
 import LiveMainPage from '../pages/Session/LiveMainPage';
-import EndRound from './sessions/EndRound';
+import EndRound from './sessions/endRound';
 import EndGame from '../pages/Session/EndGamePage';
 
 
