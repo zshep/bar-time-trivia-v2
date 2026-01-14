@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth } from "../api/firebase/firebaseConfig";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import React from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from "../../../src/components/PasswordInput";
 
@@ -28,49 +28,57 @@ function Auth() {
     }
   };
 
+return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <form
+      onSubmit={handleSignin}
+      className="w-full max-w-sm bg-white border border-gray-300 rounded-lg p-6 shadow"
+    >
+      <h1 className="text-2xl font-semibold text-center mb-6">
+        Log In
+      </h1>
 
-  return (
+      <div className="space-y-4">
+        <input
+          className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-    <div className="flex-col">
-      <div className="flex justify-center">
-        <p>Log In</p>
+        <PasswordInput
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full"
+        />
+
+        {error && (
+          <p className="text-red-600 text-sm text-center">
+            {error}
+          </p>
+        )}
       </div>
-      <form onSubmit={handleSignin}>
-        <div className="border border-black ">
-          <div className="flex justify-center mt-2">
-            <label className="mr-4 hidden" htmlFor="email">Email:</label>
-            <input
-              className="border text-center w-full py-2"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-center mt-2">
-            <PasswordInput
-              id="password"
-              label=""
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          {error && <div className="error text-red-700 font-bold">{error}</div>}
-        </div>
 
-        <button className="mt-4 mb-10" type="submit">Sign In</button>
-      </form>
-      <div className="d-flex mt-2">
-        <Link
-          className="text-green-500"
-          to="/signup">
-          Need a log in? Sign up today!
+      <button
+        type="submit"
+        className="w-full mt-6 bg-blue-600 text-black py-2 rounded hover:bg-blue-700 transition"
+      >
+        Sign In
+      </button>
+
+      <div className="mt-4 text-center text-sm">
+        <Link className="text-green-600 hover:underline" to="/signup">
+          Need an account? Sign up
         </Link>
       </div>
+    </form>
+  </div>
+);
 
-    </div>
-  );
+  
 }
 
 export default Auth;

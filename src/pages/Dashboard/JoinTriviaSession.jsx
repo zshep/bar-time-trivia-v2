@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
+import { auth } from "../../../app/server/api/firebase/firebaseConfig";
 import socket from "../../main";
 
 export default function JoinTriviaSession() {
@@ -97,14 +97,14 @@ export default function JoinTriviaSession() {
 
 
     return (
-        <div className="flex flex-col w-full mt-20">
+        <div className="flex flex-col items-center w-full mt-20">
             <h1>Join a Trivia Session!</h1>
 
             <form
                 onSubmit={(event) => handleSubmitJoinCode(event)}
                 className="mt-3">
 
-                <div className="flex flex-col w-25 justify-self-center ">
+                <div className="flex flex-col justify-items-center ">
                     <label>Enter Join Code</label>
                     <input
                         className="text-center"

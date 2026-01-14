@@ -1,5 +1,6 @@
 
 import './index.css';
+import './App.css';
 import { io } from 'socket.io-client';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -12,9 +13,11 @@ socket.on('connect', () => {
 });
 
 //debugging socketlistener
+/*
 socket.onAny((event, ...args) => {
-  //console.log("🔍 Received event:", event, args);
+  console.log("🔍 Received event:", event, args);
 });
+*/
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 <React.StrictMode>
