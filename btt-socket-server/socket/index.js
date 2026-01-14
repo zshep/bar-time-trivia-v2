@@ -292,6 +292,9 @@ export function registerSocketHandlers(io, socket) {
         //merge round scores
         upsertRoundTotals(session, roundIndex, scores || []);
 
+        const answeredMap = session.questionsAnsweredByPlayer || {};
+        const correctMap = session.questionsCorrectByPlayer || {};
+
         //prepare a compact broadcast for everyone
         const leaderboard = Object.entries(session.currentPlayerScores || {})
             .map(([playerId, rec]) => ({
@@ -299,6 +302,8 @@ export function registerSocketHandlers(io, socket) {
                 name: rec.name,
                 total: rec.total,
                 rounds: rec.byRound,
+                questionsAnswered: Number(answeredMap[playerId] || 0),
+                questionsCorrect: Number(correctMap[playerId] || 0),
             }))
             .sort((a, b) => b.total - a.total);
 
