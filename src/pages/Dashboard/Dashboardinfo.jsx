@@ -4,7 +4,7 @@ import { auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import Playericon from "../../components/dashboard/playerIcon";
 import Playerstats from "../../components/dashboard/playerstats";
-
+import HostStats from "../../components/dashboard/hoststats.jsx"
 
 
 export default function DashboardInfo() {
@@ -49,6 +49,9 @@ export default function DashboardInfo() {
 
     
                     <Playerstats userId={user?.uid} userName={username}></Playerstats>
+                </div>
+                <div>
+                    <HostStats userId={user?.uid} userName={username}></HostStats>
                 </div>
             </div>
         </div>

@@ -110,12 +110,12 @@ export default function ViewGamePage() {
                 <h1>Trivia Games</h1>
             </div>
 
-            <div>
+            <div className="flex flex-col items-center">
 
-                <div className="mt-4 mb-2 w-80 border justify-self-center border-black rounded-lg pt-1 bg-black">
+                <div className="mt-4 mb-2 mx-auto w-80 border border-black rounded-lg pt-1 bg-black">
 
                     <Link
-                        className="text-3xl text-green-500  pt-2 pr-2 pl-2"
+                        className="text-3xl text-green-500 justify-self-center  pt-2 pr-2 pl-2"
                         to="/dashboard/create-game"> Create Trivia Game
                     </Link>    
                 </div>

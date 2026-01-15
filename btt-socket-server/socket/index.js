@@ -500,13 +500,15 @@ export function registerSocketHandlers(io, socket) {
             // sumary of data to save
             const finalData = {
                 sessionCode,
+                status: "completed",
                 gameId: session.gameId ?? null,
                 gameName: session.gameName ?? null,
                 hostId: session.hostId,
                 hostName: session.hostName ?? null,
-
                 totalRounds: session.roundIds?.length ?? 0,
                 roundIds: session.roundIds ?? [],
+                playerCount: session.players?.length ?? 0,
+
 
                 //sanitized players
                 players: (session.players || []).map(p => ({
@@ -519,6 +521,7 @@ export function registerSocketHandlers(io, socket) {
                 finalizedRounds: Array.from(session.finalizedRounds || []),
 
                 gameStartedAt: session.startedAt || null,
+                gameEndedAt: Date.now(),
 
             };
             await saveGameResult(sessionCode, finalData);
