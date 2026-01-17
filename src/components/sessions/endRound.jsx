@@ -434,7 +434,7 @@ export default function EndRound() {
   const currentFRItem = pendingFR[frCursor] || null;
 
   return (
-    <div>
+    <div className="flex flex-col items-center w-full">
       <div className="flex flex-col mt-4">
         <h1>Round Results</h1>
       </div>

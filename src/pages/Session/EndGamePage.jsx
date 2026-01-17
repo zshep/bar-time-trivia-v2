@@ -112,7 +112,7 @@ export default function EndGame() {
 
 
     return (
-        <div className="justify-center">
+        <div className="flex flex-col w-full items-center">
             <div className="flex justify-center text-2xl mt-1">
                 <p>Game: {gameName}</p>
             </div>

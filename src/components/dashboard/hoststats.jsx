@@ -17,10 +17,9 @@ export default function HostStats({ userId, userName }) {
   // grab host stats
   useEffect(() => {
     if (!userId) {
-        
-        setLoading(false);
-        setPastSessions([]);
-        return;
+      setLoading(false);
+      setPastSessions([]);
+      return;
     }
     let cancelled = false;
 
@@ -34,7 +33,7 @@ export default function HostStats({ userId, userName }) {
           where("hostId", "==", userId),
           where("status", "==", "completed"),
           orderBy("gameEndedAt", "desc"),
-          limit(25)
+          limit(25),
         );
 
         const snap = await getDocs(q);
@@ -44,6 +43,7 @@ export default function HostStats({ userId, userName }) {
         if (!cancelled) setPastSessions(sessions ?? []);
       } catch (err) {
         if (!cancelled) {
+          console.error("HostStats getDocs error:", err);
           setError(err);
           setPastSessions([]);
         }
@@ -83,9 +83,22 @@ export default function HostStats({ userId, userName }) {
             <li key={s.id} className="p-2 bg-white rounded border">
               <div className="font-semibold">{s.gameName || "Session"}</div>
               <div className="text-sm text-gray-600">
-                {s.gameEndedAt?.toDate
-                  ? s.gameEndedAt.toDate().toLocaleString()
-                  : "No end time"}
+                {(() => {
+                  const v = s.gameEndedAt;
+
+                  // Firestore Timestamp
+                  if (v?.toDate) return v.toDate().toLocaleDateString();
+
+                  // millis number
+                  if (typeof v === "number")
+                    return new Date(v).toLocaleDateString();
+
+                  // ISO string (just in case)
+                  if (typeof v === "string")
+                    return new Date(v).toLocaleDateString();
+
+                  
+                })()}
               </div>
             </li>
           ))}

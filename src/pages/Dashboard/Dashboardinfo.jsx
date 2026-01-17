@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../app/server/api/firebase/firebaseConfig";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import Playericon from "../../components/dashboard/playerIcon";
@@ -14,19 +15,23 @@ export default function DashboardInfo() {
     const db = getFirestore();
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            const user = auth.currentUser;
-            setUser(user);
+        const unsub = onAuthStateChanged(auth, async (u) => {
             
-            if (user) {
+
+            console.log("HostStats userId prop:", u.uid);
+            console.log("HostStats auth uid:", auth.currentUser.uid);
+
+            if (u) {
                 try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    const userDoc = await getDoc(doc(db, "users", u.uid));
                     if (userDoc.exists()) {
                         const data = userDoc.data();
                         console.log("user data:", data);
-                        setUsername(data.username || user.displayName || "User");
+                        setUser(u);
+                        setUsername(u.displayName || data.displayName || "User");
                     } else {
                         setUsername(user.displayName || "User");
+                        console.log("user data:", userDoc);
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
@@ -35,11 +40,18 @@ export default function DashboardInfo() {
             else {
                 console.log("There is no user");
             }
-        };
 
-        fetchUserData();
+            
+        })
+        
+        
+        return () => unsub();
     }, []);
 
+
+    
+    
+  
     return (
         <div className="flex w-full justify-around mt-4" >
             <div className="flex flex-col">
