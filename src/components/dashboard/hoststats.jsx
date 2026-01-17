@@ -1,55 +1,96 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
-import { db } from "../../../app/server/api/firebase/firebaseConfig"
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "../../../app/server/api/firebase/firebaseConfig";
 
+export default function HostStats({ userId, userName }) {
+  const [pastSessions, setPastSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default function HostStats({userId, userName}) {
-    const [hostStats, setHostStats] = useState(null);
-    
+  // grab host stats
+  useEffect(() => {
+    if (!userId) {
+        
+        setLoading(false);
+        setPastSessions([]);
+        return;
+    }
+    let cancelled = false;
 
-    // grab host stats
-    useEffect(() => {
-        if(!userId) return;
+    const fetchHostData = async () => {
+      setLoading(true);
+      setError(null);
 
+      try {
         const q = query(
-            collection(db, "sessions"),
-            where("hostId", "==", userId),
-            where("status", "==", "completed"),
-            orderBy("gameEndedAt", "desc"),
-            limit(25)
+          collection(db, "sessions"),
+          where("hostId", "==", userId),
+          where("status", "==", "completed"),
+          orderBy("gameEndedAt", "desc"),
+          limit(25)
         );
 
-        const snap = getDocs(q);
-        const pastSessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const snap = await getDocs(q);
 
-        if (pastSessions.length > 0) {
-            setHostStats(pastSessions);
+        const sessions = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+        if (!cancelled) setPastSessions(sessions ?? []);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err);
+          setPastSessions([]);
         }
-        
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
 
-    }, [userId])
+    fetchHostData();
 
-    
-    
-    return(
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
-        <div className="p-4 border rounded shadow bg-gray-50">
-            <h2 className="text-xl font-bold text-center mb-4">{userName}'s Host Stats</h2>
-            <div className="mt-1">
-                {hostStats.length > 0 ? (
-                    hostStats.map((session) => (
-                        <p
-                            key={session.id}>
-                                {session}</p>
-                    ))
+  return (
+    <div className="p-4 mt-2 border rounded shadow bg-gray-50">
+      <h2 className="text-xl font-bold text-center mb-4">
+        {userName}'s Host Stats
+      </h2>
 
-                ) : (
-                    <p>No Sessions Hosted </p>
+      {loading && <p className="text-gray-500 italic">Loading...</p>}
 
-                )}
+      {!loading && error && (
+        <p className="text-red-600">
+          Error loading sessions: {error.code || error.message}
+        </p>
+      )}
 
-            </div>
+      {!loading && !error && pastSessions.length === 0 && (
+        <p className="text-gray-500 italic"> No sessions hosted yet</p>
+      )}
 
-        </div>
-    )
+      {!loading && !error && pastSessions.length > 0 && (
+        <ul className="space-y-2">
+          {pastSessions.map((s) => (
+            <li key={s.id} className="p-2 bg-white rounded border">
+              <div className="font-semibold">{s.gameName || "Session"}</div>
+              <div className="text-sm text-gray-600">
+                {s.gameEndedAt?.toDate
+                  ? s.gameEndedAt.toDate().toLocaleString()
+                  : "No end time"}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
