@@ -18,8 +18,8 @@ export default function DashboardInfo() {
         const unsub = onAuthStateChanged(auth, async (u) => {
             
 
-            console.log("HostStats userId prop:", u.uid);
-            console.log("HostStats auth uid:", auth.currentUser.uid);
+            //console.log("HostStats userId prop:", u.uid);
+            //console.log("HostStats auth uid:", auth.currentUser.uid);
 
             if (u) {
                 try {

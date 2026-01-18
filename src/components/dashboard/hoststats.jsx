@@ -8,6 +8,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
+import { toCSV } from "../../utils/csv";
 
 export default function HostStats({ userId, userName }) {
   const [pastSessions, setPastSessions] = useState([]);
@@ -58,6 +59,13 @@ export default function HostStats({ userId, userName }) {
       cancelled = true;
     };
   }, [userId]);
+
+  //debugging sessionData:
+  useEffect(() => {
+    console.log("sessionData:", pastSessions);
+  }, [pastSessions]);
+
+   
 
   return (
     <div className="p-4 mt-2 border rounded shadow max-w-md mx-auto bg-gray-50">
@@ -111,13 +119,3 @@ export default function HostStats({ userId, userName }) {
   );
 }
 
-function hostStatBlock( {gameName, time, sessionData}) {
-  return(
-    <div className="flex p-3 bg-gray-100 rounded-lg shadow-sm">
-      <span>{gameName}</span>
-      <span>{time}</span>
-      <button>Download CSV</button>
-
-    </div>
-  )
-}
