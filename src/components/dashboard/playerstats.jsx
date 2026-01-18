@@ -26,7 +26,7 @@ export default function Playerstats({ userId, userName }) {
 
     if (!stats) {
         return (
-            <div className="p-4 border rounded shadow bg-gray-50">
+            <div className="p-4 border rounded shadow bg-gray-50 w-full">
                 <h2 className="text-xl font-bold text-center mb-4">{userName}'s Stats</h2>
                 <p className="text-gray-500 italic">No stats yet — play your first game!</p>
             </div>
@@ -50,7 +50,7 @@ export default function Playerstats({ userId, userName }) {
     
 
     return (
-        <div className="p-5 border rounded-xl shadow-md bg-white max-w-md mx-auto">
+        <div className="p-4 border rounded-xl shadow-md bg-white max-w-md mx-auto">
             <h2 className="text-xl font-bold text-center mb-4">{userName}'s Stats</h2>
 
             <div className="grid grid-cols-2 gap-4">

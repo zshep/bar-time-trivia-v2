@@ -60,7 +60,7 @@ export default function HostStats({ userId, userName }) {
   }, [userId]);
 
   return (
-    <div className="p-4 mt-2 border rounded shadow bg-gray-50">
+    <div className="p-4 mt-2 border rounded shadow max-w-md mx-auto bg-gray-50">
       <h2 className="text-xl font-bold text-center mb-4">
         {userName}'s Host Stats
       </h2>
@@ -86,18 +86,21 @@ export default function HostStats({ userId, userName }) {
                 {(() => {
                   const v = s.gameEndedAt;
 
-                  // Firestore Timestamp
-                  if (v?.toDate) return v.toDate().toLocaleDateString();
+                  if (!v) return null;
 
-                  // millis number
-                  if (typeof v === "number")
-                    return new Date(v).toLocaleDateString();
+                  const d =
+                    typeof v === "number"
+                      ? new Date(v)
+                      : v.toDate
+                        ? v.toDate()
+                        : new Date(v);
 
-                  // ISO string (just in case)
-                  if (typeof v === "string")
-                    return new Date(v).toLocaleDateString();
-
-                  
+                  return d.toLocaleString(undefined, {
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  });
                 })()}
               </div>
             </li>
@@ -106,4 +109,15 @@ export default function HostStats({ userId, userName }) {
       )}
     </div>
   );
+}
+
+function hostStatBlock( {gameName, time, sessionData}) {
+  return(
+    <div className="flex p-3 bg-gray-100 rounded-lg shadow-sm">
+      <span>{gameName}</span>
+      <span>{time}</span>
+      <button>Download CSV</button>
+
+    </div>
+  )
 }
