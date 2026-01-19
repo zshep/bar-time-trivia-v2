@@ -83,7 +83,7 @@ export default function Signup() {
     };
 
     return (
-        <div className="flex flex-col justify-self-center w-80 mb-20 pb-10">
+        <div className="flex flex-col items-center w-full mb-20 pb-10">
             <div>
                 <p>Sign up today to create an account</p>
             </div>

@@ -26,9 +26,9 @@ import EndGame from '../pages/Session/EndGamePage';
 function AppRouter() {
   return (         
     <Router>
-      
+      <div className='min-h-screen flex flex-col w-full'>
       <Headbanner />
-        <div className="flex-1 flex-grow w-full justify-center p-1 ">
+        <main className="flex-1 w-full p-1 ">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
@@ -65,9 +65,10 @@ function AppRouter() {
        {/* Wildcard for unmatched routes */}
         <Route path="*" element={<NotFound />} />  
       </Routes>
-      </div>
+      </main>
      
       <Footer />
+      </div>
     </Router>
   );
 }

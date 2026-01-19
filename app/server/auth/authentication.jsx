@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from "../../../src/components/PasswordInput";
 
-function Auth() {
+function Auth({ fullScreen = false }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -29,10 +29,10 @@ function Auth() {
   };
 
 return (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+  <div className={fullScreen ? "flex items-center justify-center px-4" : "w-full flex items-center justify-center"}>
     <form
       onSubmit={handleSignin}
-      className="w-full max-w-sm bg-white border border-gray-300 rounded-lg p-6 shadow"
+      className="w-full max-w-sm bg-white border rounded-lg p-6"
     >
       <h1 className="text-2xl font-semibold text-center mb-6">
         Log In
