@@ -1,19 +1,17 @@
 //dashboard page
 import Navbar from "../../components/dashboard/navbar";
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 export default function DashboardPage() {
 
     return (
 
-        <div className="flex w-full h-full">
-            
-                <Navbar></Navbar>
-                
-                <Outlet></Outlet>
-                
-
-        </div>
+       <div className="min-h-screen w-full flex bg-gray-50">
+      <Navbar />
+      <main className="flex-1 p-4">
+        <Outlet />
+      </main>
+    </div>
 
     )
 }

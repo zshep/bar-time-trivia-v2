@@ -105,54 +105,99 @@ export default function ViewGamePage() {
 
     return (
 
-        <div className="flex flex-col w-full items-center">
-            <div className=" mt-2 mb-2 pr-4">
-                <h1>Trivia Games</h1>
-            </div>
+        <div className="w-full">
+  {/* Page container */}
+  <div className="mx-auto w-full max-w-4xl px-4 py-6">
+    {/* Header */}
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      
+        <h1 className="text-2xl font-bold text-gray-900">Trivia Games</h1>
+        
+      
 
-            <div className="flex flex-col items-center">
+      <Link
+        to="/dashboard/create-game"
+        className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+      >
+        Create Trivia Game
+      </Link>
+    </div>
 
-                <div className="mt-4 mb-2 mx-auto w-80 border border-black rounded-lg pt-1 bg-black">
+    {/* Divider */}
+    <div className="mt-6 border-t border-gray-200" />
 
-                    <Link
-                        className="text-3xl text-green-500 justify-self-center  pt-2 pr-2 pl-2"
-                        to="/dashboard/create-game"> Create Trivia Game
-                    </Link>    
-                </div>
-                <p className="text-xl  border-b-2 border-0 border-black">Games Created By { userName || "You" }</p>
-                <div className="mt-1">
-                {games.length > 0 ? (
-                        games.map((game) => (
-                            <Gamecard 
-                                key={game.id} 
-                                game = {game}
-                                confirmDelete={confirmDelete}
-                                editGame={editGame}
-                            />
-                        ))
-                    ) : (
-                        <p>No games found</p>
-                    )}
-                </div>
-            </div>
-            {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-bold">Confirm Deletion</h3>
-                        <p>Are you sure you want to delete <strong>{selectedGame?.name}</strong>? This action cannot be undone.</p>
-                        <div className="flex justify-end mt-4">
-                            <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
-                                Cancel
-                            </button>
-                            <button onClick={deleteGame} className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-700">
-                                Yes, Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
+    {/* Section title */}
+    <div className="mt-6">
+      <h2 className="text-lg font-semibold text-gray-900">
+        Games created by {userName || "you"}
+      </h2>
+      <p className="text-sm text-gray-600 mt-1">
+        Click a game card to review, edit, or delete.
+      </p>
+    </div>
+
+    {/* Games list */}
+    <div className="mt-4">
+      {games.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3">
+          {games.map((game) => (
+            <Gamecard
+              key={game.id}
+              game={game}
+              confirmDelete={confirmDelete}
+              editGame={editGame}
+            />
+          ))}
         </div>
+      ) : (
+        <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 text-center">
+          <p className="text-gray-700 font-medium">No games found</p>
+          <p className="text-sm text-gray-600 mt-1">
+            Create your first trivia game to get started.
+          </p>
+          <div className="mt-4">
+            <Link
+              to="/dashboard/create-game"
+              className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+            >
+              Create Trivia Game
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* Modal */}
+  {isModalOpen && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <h3 className="text-lg font-bold text-gray-900">Confirm deletion</h3>
+        <p className="mt-2 text-sm text-gray-700">
+          Are you sure you want to delete{" "}
+          <strong>{selectedGame?.name}</strong>? This action cannot be undone.
+        </p>
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={deleteGame}
+            className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+          >
+            Yes, delete
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
     )
 
 

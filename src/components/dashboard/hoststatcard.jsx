@@ -84,18 +84,15 @@ export default function HostStatCard({ gameName, gameEndedAt, sessionData }) {
     return (
 
 
-    <div className="flex p-3 bg-gray-100 rounded-lg shadow-sm">
-        <li className="flex align-center bg-white rounded border">
-              <div className="p-2 font-semibold">{gameName || "Session"}</div>
-              <div className="p-2 font-semibold text-gray-600">{formatTime(gameEndedAt)}
-                
-              </div>
-              <button
-                className="font-semibold"
-                onClick={downloadLeaderboardCSV}>Download CSV</button>
-            </li>
-     
-     
-    </div>
+   <li className="flex items-center justify-between p-3 bg-gray-100 rounded-lg shadow-sm">
+  <div className="font-semibold">{gameName || "Session"}</div>
+  <div className="text-md text-gray-600">{formatTime(gameEndedAt)}</div>
+  <button
+    className="text-sm font-semibold text-green-600 hover:underline"
+    onClick={downloadLeaderboardCSV}
+  >
+    Download CSV
+  </button>
+</li>
   );
 }

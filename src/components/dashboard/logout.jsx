@@ -1,25 +1,30 @@
 import { signOut } from "firebase/auth";
 import { auth } from "../../../app/server/api/firebase/firebaseConfig";
+import { LogOut as LogOutIcon } from "lucide-react";
 
-export default function Logout() {
+export default function Logout({ collapsed = false }) {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error logging out: ", error);
+    }
+  };
 
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            // Optionally, redirect the user after successful logout
-            window.location.href = "/";
-            console.log("User successfully logged out.");
-          } catch (error) {
-            console.error("Error logging out: ", error);
-          }
-    };
-
-    return(
-
-        <div className="flex align-bottom">
-            <button  onClick={handleLogout} className="btn">
-                Log Out
-            </button>
-        </div>
-    )
+  return (
+    <button
+      onClick={handleLogout}
+      className={[
+        "w-full flex items-center justify-center gap-2 rounded-md",
+        "bg-gray-900 text-white text-sm py-2",
+        "hover:bg-gray-800 transition",
+        collapsed ? "px-2" : "px-3",
+      ].join(" ")}
+    >
+      {/* icon */}
+      <LogOutIcon className="h-5 w-5" />
+      {!collapsed && <span>Log out</span>}
+    </button>
+  );
 }

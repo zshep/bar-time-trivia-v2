@@ -50,7 +50,7 @@ export default function Playerstats({ userId, userName }) {
     
 
     return (
-        <div className="p-4 border rounded-xl shadow-md bg-white max-w-md mx-auto">
+        <div className="p-4 border rounded-lg shadow-sm bg-gray-50 w-full">
             <h2 className="text-xl font-bold text-center mb-4">{userName}'s Stats</h2>
 
             <div className="grid grid-cols-2 gap-4">
