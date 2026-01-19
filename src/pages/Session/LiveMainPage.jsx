@@ -88,7 +88,7 @@ export default function LiveMainPage() {
     
 
     return (
-      <div>
+      <div className="flex flex-col items-center w-full">
         <p>Loading session...</p>
         <p>SessionCode: {sessionCode}</p>
         <p>HostId: {meta.hostId}</p>
