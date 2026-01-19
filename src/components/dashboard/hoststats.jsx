@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../app/server/api/firebase/firebaseConfig";
 import { toCSV } from "../../utils/csv";
+import HostStatCard from "./hoststatcard";
 
 export default function HostStats({ userId, userName }) {
   const [pastSessions, setPastSessions] = useState([]);
@@ -87,31 +88,13 @@ export default function HostStats({ userId, userName }) {
 
       {!loading && !error && pastSessions.length > 0 && (
         <ul className="space-y-2">
-          {pastSessions.map((s) => (
-            <li key={s.id} className="p-2 bg-white rounded border">
-              <div className="font-semibold">{s.gameName || "Session"}</div>
-              <div className="text-sm text-gray-600">
-                {(() => {
-                  const v = s.gameEndedAt;
-
-                  if (!v) return null;
-
-                  const d =
-                    typeof v === "number"
-                      ? new Date(v)
-                      : v.toDate
-                        ? v.toDate()
-                        : new Date(v);
-
-                  return d.toLocaleString(undefined, {
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  });
-                })()}
-              </div>
-            </li>
+          {pastSessions.map((session) => (
+              <HostStatCard
+                key={session.id}
+                gameName={session.gameName}
+                gameEndedAt={session.gameEndedAt}
+                sessionData={session.exportSummary}
+              />
           ))}
         </ul>
       )}

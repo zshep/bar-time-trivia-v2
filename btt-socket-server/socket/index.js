@@ -524,6 +524,43 @@ export function registerSocketHandlers(io, socket) {
                 gameEndedAt: Date.now(),
 
             };
+
+            const answeredMap = session.questionsAnsweredByPlayer || {};
+            const correctMap = session.questionsCorrectByPlayer || {};
+            const roundsPlayed = session.finalizedRounds ? session.finalizedRounds.size : 0;
+
+            const exportPlayers = [];
+
+            for (const [pid, rec] of Object.entries(session.currentPlayerScores || {})) {
+                const userMatch = session.players.find(p => p.userId === pid);
+                if (!userMatch?.userId) continue;
+
+                
+                const totalPoints = Number(rec.total) || 0;
+                const questionsAnswered = Number(answeredMap[pid] || 0);
+                const questionsCorrect = Number(correctMap[pid] || 0);
+
+                exportPlayers.push({
+                    userId: userMatch.userId,
+                    name: userMatch.name || rec.name || "",
+                    total_points: totalPoints,
+                    questions_answered: questionsAnswered,
+                    questions_correct: questionsCorrect,
+                    rounds_played: roundsPlayed,
+                });
+
+            }
+
+            finalData.exportVersion = 1;
+            finalData.exportSummary = {
+                game_name: finalData.gameName || "",
+                session_code: finalData.sessionCode,
+                host_id: finalData.hostId,
+                host_name: finalData.hostName || "",
+                game_ended_at: finalData.gameEndedAt,
+                players: exportPlayers,
+            };
+
             await saveGameResult(sessionCode, finalData);
 
             //Notify players
