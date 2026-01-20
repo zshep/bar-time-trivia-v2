@@ -6,25 +6,43 @@ export default function Gamecard({ game, confirmDelete, editGame }) {
         
     return (
 
-        <div className="flex border border-black mb-2">
-            <div className="border border-black pr-2 pl-2">
-                <p className="font-bold">Game Name </p>
-                <p className="">{game.name}</p>
-            </div>
-            <div className="border-r px-4 w-1/2">
-                <p className="font-bold">Description</p>
-                <p>{game.description}</p>
-            </div>
-            <div className="border-r px-4">
-                <p className="font-bold">Rounds</p>
-                <p>{game.numberRounds || "unknown"}</p>
-            </div>
-            
-            <div className="flex flex-col text-sm py-2 ml-1">
-                <button onClick={() => editGame(game)} className="bg-yellow-500 hover:bg-yellow-700 text-white rounded-full py-2" to="/dashboard/edit-game">Edit</button>
-                <button onClick={() => confirmDelete(game)} className="mt-2 bg-red-500 hover:bg-red-700 text-white rounded-full">Delete</button>
-            </div>
-        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+  {/* Left content */}
+  <div className="flex-1">
+    <h3 className="text-lg font-semibold text-gray-900">
+      {game.name}
+    </h3>
+
+    {game.description && (
+      <p className="mt-1 text-sm text-gray-600">
+        {game.description}
+      </p>
+    )}
+
+    <div className="mt-2 text-sm text-gray-500">
+      Rounds: <span className="font-medium text-gray-700">
+        {game.numberRounds || "Unknown"}
+      </span>
+    </div>
+  </div>
+
+  {/* Actions */}
+  <div className="flex flex-col gap-2 shrink-0">
+    <button
+      onClick={() => editGame(game)}
+      className="rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-600 transition"
+    >
+      Edit
+    </button>
+
+    <button
+      onClick={() => confirmDelete(game)}
+      className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+    >
+      Delete
+    </button>
+  </div>
+</div>
     )
 
 }

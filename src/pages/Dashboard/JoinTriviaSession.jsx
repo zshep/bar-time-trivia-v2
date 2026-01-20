@@ -97,28 +97,48 @@ export default function JoinTriviaSession() {
 
 
     return (
-        <div className="flex flex-col items-center w-full mt-20">
-            <h1>Join a Trivia Session!</h1>
+        <div className="w-full">
+  <div className="mx-auto w-full max-w-md px-4 py-6">
+    {/* Header */}
+    <div className="flex flex-col items-center text-center gap-2">
+      <h1 className="text-2xl font-bold text-gray-900">
+        Join Trivia Session
+      </h1>
+      <p className="text-sm text-gray-600">
+        Enter the join code provided by the host.
+      </p>
+    </div>
 
-            <form
-                onSubmit={(event) => handleSubmitJoinCode(event)}
-                className="mt-3">
+    {/* Card */}
+    <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <form
+        onSubmit={(event) => handleSubmitJoinCode(event)}
+        className="flex flex-col gap-4"
+      >
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Join code
+          </label>
 
-                <div className="flex flex-col justify-items-center ">
-                    <label>Enter Join Code</label>
-                    <input
-                        className="text-center"
-                        value={joinCode}
-                        type="text"
-                        autoFocus={false}
-                        placeholder="XXXXXX"
-                        onChange={(e) => setJoinCode(e.target.value)}></input>
-                </div>
-                <button
-                    className="mt-3"
-                    type="submit"
-                >Submit</button>
-            </form>
+          <input
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-gray-400"
+            value={joinCode}
+            type="text"
+            autoFocus={false}
+            placeholder="XXXXXX"
+            onChange={(e) => setJoinCode(e.target.value)}
+          />
         </div>
+
+        <button
+          className="mt-2 inline-flex w-full items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+          type="submit"
+        >
+          Join Session
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
     )
 }

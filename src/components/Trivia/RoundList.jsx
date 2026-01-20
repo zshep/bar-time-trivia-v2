@@ -1,211 +1,259 @@
 import { useState, useEffect } from "react";
 import Roundcard from "./Roundcard";
-import { deleteDoc, doc, getFirestore, collection, query, where, getDocs, addDoc, orderBy, updateDoc, increment } from "firebase/firestore";
-import {  db } from "../../../app/server/api/firebase/firebaseConfig";
+import {
+  deleteDoc,
+  doc,
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  orderBy,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
+import { db } from "../../../app/server/api/firebase/firebaseConfig";
 
+export default function RoundList({ game, rounds, setRounds }) {
+  const [roundsState, setRoundsState] = useState([]); // State for rounds data
+  const [roundCategory, setRoundCategory] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [selectedRound, setSelectedRound] = useState(null);
 
-export default function RoundList({game, rounds, setRounds}) {
-    const [roundsState, setRoundsState] = useState([]); // State for rounds data
-    const [roundCategory, setRoundCategory] = useState(null);
-    const [selectedGame, setSelectedGame ] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteOpen, setDeleteOpen] =useState(false);
-    const [selectedRound, setSelectedRound] = useState(null);
+  const gameId = game.id;
 
-    const gameId = game.id;
+  const getRoundData = async () => {
+    const roundsInfo = collection(db, "rounds");
+    const q = query(
+      roundsInfo,
+      where("gameId", "==", gameId),
+      orderBy("roundNumber", "asc"),
+    );
+    const snapshot = await getDocs(q);
 
-    const getRoundData = async () => {
-        const roundsInfo = collection(db, "rounds");
-        const q = query(roundsInfo, where("gameId", "==", gameId), orderBy("roundNumber", "asc"));
-        const snapshot = await getDocs(q);
+    const roundList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("List of Rounds", roundList);
 
-        const roundList = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-        console.log("List of Rounds", roundList);
+    setRoundsState(roundList);
+  };
 
-        setRoundsState(roundList);
+  //getRoundData();
+
+  //grabbing round data from user.
+  useEffect(() => {
+    if (gameId) {
+      getRoundData(gameId);
     }
-    
-    //getRoundData();
-   
-    //grabbing round data from user.
-    useEffect(() => {
-        
-        if (gameId){
-            getRoundData(gameId);
-        }
+  }, [gameId]);
 
-    }, [gameId]);
+  // function to grab current number of rounds for game
+  const getRoundCount = async (gameId) => {
+    //console.log("counting rounds for gameid: ", gameId);
+    const roundsInfo = collection(db, "rounds");
+    const q = query(roundsInfo, where("gameId", "==", gameId));
 
-    // function to grab current number of rounds for game
-    const getRoundCount = async (gameId) => {
-        //console.log("counting rounds for gameid: ", gameId);
-        const roundsInfo = collection(db, "rounds");
-        const q = query(roundsInfo, where("gameId", "==", gameId));
-        
-        const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q);
 
-        //converting Firestore docs to an array of game objects
-        
-        //console.log("total number of Rounds:", snapshot.size)
+    //converting Firestore docs to an array of game objects
 
-        return snapshot.size;
-    }
+    //console.log("total number of Rounds:", snapshot.size)
 
-     // open modal to add Round Category
-     const chooseCategory = () => {
-        setRoundCategory("");
-        console.log("Choose the category for the round");
-        setIsModalOpen(true);
-     }
+    return snapshot.size;
+  };
 
-    
+  // open modal to add Round Category
+  const chooseCategory = () => {
+    setRoundCategory("");
+    console.log("Choose the category for the round");
+    setIsModalOpen(true);
+  };
 
-     // Function to add a new round (example)
-    const addRound = async (gameId, category) => {
-        try {
+  // Function to add a new round (example)
+  const addRound = async (gameId, category) => {
+    try {
+      setIsModalOpen(false);
+      console.log("starting to add round");
+      //getting number of rounds for game
+      const roundCount = await getRoundCount(gameId);
 
-            setIsModalOpen(false);
-            console.log("starting to add round");
-            //getting number of rounds for game
-            const roundCount = await getRoundCount(gameId);
-            
-            const newRound = {
-                gameId: gameId,
-                roundNumber: roundCount + 1,
-                roundCategory: category,
-                numberQuestions: 0,
-                createdAt: new Date()
-            };
-            //adding doc to firestore
-            const roundRef = await addDoc(collection(db, "rounds"), newRound);
-            console.log("New round added", roundRef.id);
-
-            // updating game's count 
-            const gameRef = doc(db, "games", gameId);
-            await updateDoc(gameRef, {
-                numberRounds: increment(1),
-            });
-
-
-            // re-fetching data:
-         
-            await  getRoundData();
-           
-
-            return roundRef;
-
-        }catch (err){
-            console.log("Error adding Rounds", err)
-        }
+      const newRound = {
+        gameId: gameId,
+        roundNumber: roundCount + 1,
+        roundCategory: category,
+        numberQuestions: 0,
+        createdAt: new Date(),
       };
+      //adding doc to firestore
+      const roundRef = await addDoc(collection(db, "rounds"), newRound);
+      console.log("New round added", roundRef.id);
 
-      const confirmDeleteRound = (round) => {
-        console.log("You are going to delete this round: ", round);
-        setSelectedRound(round);
-        setDeleteOpen(true);
-      }
+      // updating game's count
+      const gameRef = doc(db, "games", gameId);
+      await updateDoc(gameRef, {
+        numberRounds: increment(1),
+      });
 
+      // re-fetching data:
 
-      //delete round
-      const deleteRound = async () => {
-        console.log("we're going to delete YOU Round!!", selectedRound.roundCategory);
-        
+      await getRoundData();
 
-        try {
-            
-            const roundRef = doc(db, "rounds", selectedRound.id);
-            await deleteDoc(roundRef);
+      return roundRef;
+    } catch (err) {
+      console.log("Error adding Rounds", err);
+    }
+  };
 
-            //optimistically removing round
-            setRoundsState(prevRound => prevRound.filter(roundsState => roundsState.id !== selectedGame));
+  const confirmDeleteRound = (round) => {
+    console.log("You are going to delete this round: ", round);
+    setSelectedRound(round);
+    setDeleteOpen(true);
+  };
 
-            console.log("Round Delete Successfully");
-            setDeleteOpen(false);
+  //delete round
+  const deleteRound = async () => {
+    console.log(
+      "we're going to delete YOU Round!!",
+      selectedRound.roundCategory,
+    );
 
-             // updating game's count 
-             const gameRef = doc(db, "games", gameId);
-             await updateDoc(gameRef, {
-                 numberRounds: increment(-1),
-             });
- 
- 
-             // re-fetching data:
-          
-             await  getRoundData();
+    try {
+      const roundRef = doc(db, "rounds", selectedRound.id);
+      await deleteDoc(roundRef);
 
+      //optimistically removing round
+      setRoundsState((prevRound) =>
+        prevRound.filter((roundsState) => roundsState.id !== selectedGame),
+      );
 
-        } catch (err) {
-            console.error("Error Deleting Round:", err);
-        }
+      console.log("Round Delete Successfully");
+      setDeleteOpen(false);
 
+      // updating game's count
+      const gameRef = doc(db, "games", gameId);
+      await updateDoc(gameRef, {
+        numberRounds: increment(-1),
+      });
 
-      }
+      // re-fetching data:
 
+      await getRoundData();
+    } catch (err) {
+      console.error("Error Deleting Round:", err);
+    }
+  };
 
+  return (
+    <div className="w-full">
+      {/* Header row */}
+      <div className="flex flex-col items-center justify-between">
+      
 
-    return (
+        <button
+          type="button"
+          onClick={() => chooseCategory()}
+          className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+        >
+          Add Round
+        </button>
+      </div>
 
-        <div>
-            <p>Rounds</p>
-            <div className="mb-1 justify-items-center">
-                {roundsState.map((round, index) => (
-                    <Roundcard 
-                        key={index} 
-                        roundData={round}
-                        confirmDeleteRound={confirmDeleteRound} />
-                ))}
+      {/* List */}
+      <div className="mt-4 space-y-3">
+        {roundsState.map((round, index) => (
+          <Roundcard
+            key={round.id || index}
+            roundData={round}
+            confirmDeleteRound={confirmDeleteRound}
+          />
+        ))}
+      </div>
+
+      {/* Add Round Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">Add round</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              Choose a category for this round.
+            </p>
+
+            <label
+              htmlFor="roundCategory"
+              className="mt-4 block text-sm font-semibold text-gray-700"
+            >
+              Round category
+            </label>
+
+            <input
+              className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+              id="roundCategory"
+              type="text"
+              value={roundCategory}
+              onChange={(e) => setRoundCategory(e.target.value)}
+              placeholder="e.g., Science, Sports, Movies"
+              autoComplete="off"
+            />
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+                type="button"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => addRound(gameId, roundCategory)}
+                className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+                type="button"
+              >
+                Add round
+              </button>
             </div>
-
-            <div className="mb-3">
-                <button type="button" onClick={() => chooseCategory()}>Add Round</button> 
-                
-            </div>
-            {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col">
-                        <h3 className="text-lg font-bold">Add Round</h3>
-                        <label htmlFor="roundCategory">What is the cateogry for the round?</label>
-                        <input
-                            className="border border-black p-2" 
-                            id="roundCategory"
-                            type="text"
-                            value={roundCategory}
-                            onChange={(e) => setRoundCategory(e.target.value)}
-                            placeholder="Category"
-                            autoComplete="off"
-                            />
-                        
-                        <div className="flex justify-end mt-4 ">
-                            <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
-                                Cancel
-                            </button>
-                            <button onClick={() =>addRound(gameId, roundCategory)} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
-                                Add Round
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {isDeleteOpen && (
-                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                 <div className="bg-white p-6 rounded-lg shadow-lg">
-                     <h3 className="text-lg font-bold">Confirm Deletion</h3>
-                     <p>Are you sure you want to delete the round <strong>{selectedRound.roundCategory}?!?!</strong>?This action will delete all attached questions and cannot be undone.</p>
-                     <div className="flex justify-end mt-4">
-                         <button onClick={() => setDeleteOpen(false)} className="mr-2 px-4 py-2 bg-gray-300 rounded-full">
-                             Cancel
-                         </button>
-                         <button onClick={deleteRound} className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-700">
-                             Yes, Delete
-                         </button>
-                     </div>
-                 </div>
-             </div>
-                
-            )}
+          </div>
         </div>
-    )
-};
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">
+              Confirm deletion
+            </h3>
+
+            <p className="mt-2 text-sm text-gray-700">
+              Delete the round <strong>{selectedRound?.roundCategory}</strong>?
+              This will delete all attached questions and cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteOpen(false)}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+                type="button"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={deleteRound}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+                type="button"
+              >
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

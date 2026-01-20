@@ -434,133 +434,171 @@ export default function EndRound() {
   const currentFRItem = pendingFR[frCursor] || null;
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="flex flex-col mt-4">
-        <h1>Round Results</h1>
-      </div>
-      <div className="flex flex-col">
-        {!isHost && !resultsReady && (
-          <div>
-            <p>Waiting for Host to Finalize Results</p>
-          </div>
-        )}
-      </div>
+    <div className="w-full">
+  <div className="mx-auto w-full max-w-4xl px-4 py-6">
+    {/* Header */}
+    <div className="flex flex-col items-center text-center gap-2">
+      <h1 className="text-2xl font-bold text-gray-900">Round Results</h1>
+    </div>
 
-      {isHost && !resultsReady && (
-        <div className="space-y-4">
-          <div>
-            <p>
-              {pendingFR.length > 0
-                ? `There are pending free response Questions`
-                : `No pending free response questions`}
-            </p>
+    {/* Player waiting */}
+    {!isHost && !resultsReady && (
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+        <p className="text-sm text-gray-700">Waiting for Host to Finalize Results</p>
+      </div>
+    )}
+
+    {/* Host finalize / review */}
+    {isHost && !resultsReady && (
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+        <p className="text-sm text-gray-700">
+          {pendingFR.length > 0
+            ? "There are pending free response questions."
+            : "No pending free response questions."}
+        </p>
+
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={pendingFR.length > 0 ? handleReviewFR : handleFinalizeResults}
+            className={[
+              "rounded-md px-4 py-2 text-sm font-semibold transition",
+              pendingFR.length > 0
+                ? "bg-gray-200 text-gray-900 hover:bg-gray-300"
+                : "bg-green-700 text-white hover:bg-green-800",
+            ].join(" ")}
+            type="button"
+          >
+            {pendingFR.length > 0 ? `Review ${pendingFR.length}` : "Finalize Results"}
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* FR review modal */}
+    {isHost && frModalOpen && currentFRItem && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+          <h3 className="text-lg font-bold text-gray-900">
+            Review Free Response ({frCursor + 1} of {pendingFR.length})
+          </h3>
+
+          <div className="mt-4 space-y-2 text-sm text-gray-800">
+            <div>
+              <span className="font-semibold text-gray-900">Player:</span>{" "}
+              {currentFRItem.pId}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-900">Correct Answer:</span>{" "}
+              {currentFRItem.correctText}
+            </div>
+            <div>
+              <span className="font-semibold text-gray-900">Player Answer:</span>{" "}
+              {currentFRItem.playerText}
+            </div>
           </div>
-          <div className="mt-4">
+
+          <div className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-end">
             <button
-              onClick={
-                pendingFR.length > 0 ? handleReviewFR : handleFinalizeResults
-              }
-              className={`mt-4 px-4 py-2 rounded ${
-                pendingFR.length > 0 ? "bg-gray-300" : "bg-green-900 text-white"
-              }`}
+              onClick={handleCorrectFr}
+              className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+              type="button"
             >
-              {pendingFR.length > 0
-                ? `Review ${pendingFR.length}`
-                : "Finalize Results"}
+              Correct
+            </button>
+
+            <button
+              onClick={handleIncorrectFr}
+              className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+              type="button"
+            >
+              Incorrect
+            </button>
+
+            <button
+              onClick={() => setFrModalOpen(false)}
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+              type="button"
+            >
+              Close
             </button>
           </div>
         </div>
-      )}
-      {isHost && frModalOpen && currentFRItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h3 className="text-lg font-bold mb-2">
-              Review Free Response ({frCursor + 1} of {pendingFR.length})
-            </h3>
-            <div className="space-y-2">
-              <div>
-                <span className="font-semibold">Player:</span>{" "}
-                {currentFRItem.pId}
-              </div>
-              <div>
-                <span className="font-semibold">Correct Answer:</span>{" "}
-                {currentFRItem.correctText}
-              </div>
-              <div>
-                <span className="font-semibold">Player Answer:</span>{" "}
-                {currentFRItem.playerText}
-              </div>
-            </div>
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={handleCorrectFr}
-                className="px-4 py-2 rounded bg-green-600 text-white"
-              >
-                Correct
-              </button>
-              <button
-                onClick={handleIncorrectFr}
-                className="px-4 py-2 rounded bg-red-500 text-white"
-              >
-                Incorrect
-              </button>
-              <button
-                onClick={() => setFrModalOpen(false)}
-                className="ml-auto px-4 py-2 rounded bg-gray-200"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {resultsReady && finalScores && (
-        <div className="mt-4 space-y-4">
-          <h2 className="text-xl font-bold">Round {roundNumber} Results</h2>
-          <div>
+      </div>
+    )}
+
+    {/* Results */}
+    {resultsReady && finalScores && (
+      <div className="mt-6 space-y-6">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900">
+            Round {roundNumber} Results
+          </h2>
+
+          <div className="mt-4 space-y-2">
             {finalScores.roundScores.map((r) => (
-              <div key={r.playerId} className="border rounded p-2">
-                {r.name || r.playerId}: +{r.roundScore}
+              <div
+                key={r.playerId}
+                className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+              >
+                <span className="font-medium text-gray-900">
+                  {r.name || r.playerId}
+                </span>
+                <span className="font-semibold text-gray-900">+{r.roundScore}</span>
               </div>
             ))}
           </div>
-          {!lastRound ? (
-            <div>
-              <h2 className="text-xl font-bold mt-6">Game Totals</h2>
+        </div>
+
+        {!lastRound ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900">Game Totals</h2>
+
+            <div className="mt-4 space-y-2">
               {finalScores.leaderboard.map((p) => (
                 <div
                   key={p.playerId}
-                  className="border rounded p-2 flex justify-between"
+                  className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                 >
-                  <span>{p.name || p.playerId}</span>
-                  <span>{p.total}</span>
+                  <span className="font-medium text-gray-900">
+                    {p.name || p.playerId}
+                  </span>
+                  <span className="font-semibold text-gray-900">{p.total}</span>
                 </div>
               ))}
             </div>
-          ) : (
-            <div> Game Results Next!! </div>
-          )}
-        </div>
-      )}
-      {resultsReady && isHost && (
-        <div className="mt-4">
-          {!lastRound ? (
-            <button
-              className="border border-green-500 rounded"
-              onClick={handleNextRound}
-            >
-              Start Next Round
-            </button>
-          ) : (
-            <button
-              className="border border-red rounded"
-              onClick={handleEndGame}
-            >
-              End Game
-            </button>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+            <p className="text-sm font-semibold text-gray-900">Game Results Next!!</p>
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* Host next action */}
+    {resultsReady && isHost && (
+      <div className="mt-6 flex justify-center">
+        {!lastRound ? (
+          <button
+            className="rounded-md bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+            onClick={handleNextRound}
+            type="button"
+          >
+            Start Next Round
+          </button>
+        ) : (
+          <button
+            className="rounded-md bg-red-600 px-5 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+            onClick={handleEndGame}
+            type="button"
+          >
+            End Game
+          </button>
+        )}
+      </div>
+    )}
+  </div>
+</div>
+
   );
 }

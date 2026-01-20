@@ -112,44 +112,66 @@ export default function EndGame() {
 
 
     return (
-        <div className="flex flex-col w-full items-center">
-            <div className="flex justify-center text-2xl mt-1">
-                <p>Game: {gameName}</p>
-            </div>
-            <div>
-                {/* Winner: {leaderboard[0]} */}
-                <h4 className="text-3xl mt-6">Winner: {finalScores.leaderboard[0].name}</h4>
-            </div>
-            <div>
-                {/* LeaderBoard: Grid */}
-                <div>
-                    <h2 className="text-xl font-bold mt-8">Game Totals</h2>
-                    {finalScores.leaderboard.map(p => (
-                        <div key={p.playerId} className="border rounded border-black p-2 flex justify-between mt-3">
-                            <span>{p.name || p.playerId}</span>
-                            <span>{p.total}</span>
-                        </div>
-                    ))}
-                </div>
+        <div className="w-full">
+  <div className="mx-auto w-full max-w-4xl px-4 py-6">
+    {/* Header */}
+    <div className="flex flex-col items-center text-center gap-2">
+      <h1 className="text-2xl font-bold text-gray-900">Game Results</h1>
+      <p className="text-sm text-gray-700">
+        <span className="font-semibold text-gray-900">Game:</span> {gameName}
+      </p>
+    </div>
 
-            </div>
-            {isHost && (
-                <div>
-                    {/* Host Button: Close Session return everyone to dashboard*/}
-                    <button onClick={handleEndSession}
-                        className="border border-black rounded-md mt-5">
-                        End Session
-                    </button>
-                </div>
-            )}
-            {isHost && (
-                <button
-                    onClick={downloadLeaderboardCSV}
-                    className="mt-4 px-4 py-2 bg-green-700 text-white rounded"
-                >
-                    DownLoad LeaderBoard CSV
-                </button>
-            )}
-        </div>
+    {/* Winner */}
+    <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        Winner
+      </p>
+      <h2 className="mt-2 text-3xl font-extrabold text-gray-900">
+        {finalScores.leaderboard[0].name}
+      </h2>
+    </div>
+
+    {/* Totals */}
+    <div className="mt-6 rounded-lg   p-6 shadow-sm">
+      <h2 className="text-xl font-bold text-gray-900">Game Totals</h2>
+
+      <div className="mt-4 space-y-2">
+        {finalScores.leaderboard.map((p) => (
+          <div
+            key={p.playerId}
+            className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+          >
+            <span className="font-medium text-gray-900">
+              {p.name || p.playerId}
+            </span>
+            <span className="font-semibold text-gray-900">{p.total}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Host actions */}
+    {isHost && (
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <button
+          onClick={handleEndSession}
+          className="rounded-md border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+          type="button"
+        >
+          End Session
+        </button>
+
+        <button
+          onClick={downloadLeaderboardCSV}
+          className="rounded-md bg-green-700 px-5 py-2 text-sm font-semibold text-white hover:bg-green-800 transition"
+          type="button"
+        >
+          Download Leaderboard CSV
+        </button>
+      </div>
+    )}
+  </div>
+</div>
     )
 }

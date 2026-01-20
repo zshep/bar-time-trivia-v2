@@ -99,36 +99,36 @@ export default function LiveMainPage() {
 
 
   return (
-    <div className="flex flex-col w-full items-center">
-      <div className="flex border border-black justify-around w-1/3">
-        <div>
-          <p>Game: {meta.gameName}</p>
-        </div>
-        <div>
-          <p>Round: {currentRoundDisplay}</p>
-        </div>
+    <div className="w-full">
+  <div className="mx-auto w-full max-w-4xl px-4 py-6">
+    {/* Meta bar */}
+    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:text-left">
+        <p className="text-md text-gray-700">
+          <span className="font-semibold text-gray-900">Game:</span>{" "}
+          {meta.gameName}
+        </p>
+        <p className="text-md text-gray-700">
+          <span className="font-semibold text-gray-900">Round:</span>{" "}
+          {currentRoundDisplay}
+        </p>
       </div>
-
-      <div className="mt-10 text-2xl">
-        <p>{session.questionText || "Loading Question..."}</p>
-      </div>
-
-
-      <div>
-
-        {isHost && (
-          <HostView {...session}  />
-        )}
-        {!isHost && (
-          <PlayerView {...session} />
-        )}
-
-
-      </div>
-
-
-
     </div>
+
+    {/* Question */}
+    <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
+      <p className="text-xl sm:text-2xl font-semibold text-gray-900">
+        {session.questionText || "Loading Question..."}
+      </p>
+    </div>
+
+    {/* View */}
+    <div className="mt-6">
+      {isHost && <HostView {...session} />}
+      {!isHost && <PlayerView {...session} />}
+    </div>
+  </div>
+</div>
 
   )
 

@@ -10,31 +10,69 @@ export default function QuestionCard ( { questionData, confirmDelete, editQuesti
 
     return(
 
-        <div className="flex border border-black mb-2">
-            <div className="border border-black p-2 ">
-                <p className="font-bold">number</p>
-                <p>{questionData.questionNumber}</p>
-            </div>
-
-            <div className="border border-black p-2 w-1/2">
-                <p className="font-bold">Question</p>
-                <p>{questionData.question}</p>
-            </div>
-
-            <div className="border border-black p-2 ">
-                <p className="font-bold">Type</p>
-                <p>{questionData.questionType}</p>
-            </div>
-
-            <div className="border border-black p-2 ">
-                <p className="font-bold">Points</p>
-                <p>{questionData.points}</p>
-            </div>
-            <div className="flex flex-col">
-                <button onClick={() => editQuestion(questionData)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold  text-sm">Edit</button>
-                <button onClick={() => confirmDelete(questionData)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 text-sm">Delete</button>
-            </div>
-            
+     <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    {/* Left: main info */}
+    <div className="flex-1">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            #
+          </p>
+          <p className="text-sm font-semibold text-gray-900">
+            {questionData.questionNumber ?? "—"}
+          </p>
         </div>
+
+        <div className="min-w-[200px] flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Question
+          </p>
+          <p className="text-sm text-gray-900">
+            {questionData.question || "No question text"}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Type
+          </p>
+          <p className="text-sm font-semibold text-gray-900">
+            {questionData.questionType || "—"}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Points
+          </p>
+          <p className="text-sm font-semibold text-gray-900">
+            {questionData.points ?? "—"}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Right: actions */}
+    <div className="flex gap-2 shrink-0">
+      <button
+        onClick={() => editQuestion(questionData)}
+        className="rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-600 transition"
+        type="button"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => confirmDelete(questionData)}
+        className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+        type="button"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
     )
 }

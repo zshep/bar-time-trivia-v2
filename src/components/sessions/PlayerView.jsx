@@ -89,49 +89,47 @@ export default function PlayerView({
 
 
   return (
-
-    <div className="flex flex-col w-full  mt-5">
-      <div className="">
-
-        <div className="flex justify-center">
-
-          {currentQuestion?.type === "multipleChoice" && (
-            <QuestionMc 
-              choices={labels} 
-              selectedIndexes={selectedIndexes} 
-              setSelectedIndexes={setSelectedIndexes} />
-          )}
-
-          {currentQuestion?.type === "freeResponse" && (
-            <QuestionFc
-              setAnswer={setPlayerFrAnswer}
-              playerAnswer={playerFrAnswer}
-            />
-       
-          )}
-
-          {currentQuestion?.type === "sort" && (
-            <QuestionSort />
-          )}
-        </div>
-        {answered && (
-          <div className="text-green-600 text-lg items-center flex justify-center"> 
-            <p>Answered</p>
-          </div>
+// PlayerView (styling only)
+<div className="w-full">
+  <div className="mx-auto w-full max-w-3xl px-4 py-6">
+    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex justify-center">
+        {currentQuestion?.type === "multipleChoice" && (
+          <QuestionMc
+            choices={labels}
+            selectedIndexes={selectedIndexes}
+            setSelectedIndexes={setSelectedIndexes}
+          />
         )}
 
-        <div className="flex justify-center mt-10 ">
+        {currentQuestion?.type === "freeResponse" && (
+          <QuestionFc setAnswer={setPlayerFrAnswer} playerAnswer={playerFrAnswer} />
+        )}
 
-          <button onClick={() => handleSubmitAnswer()} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
-            Submit Answer
-          </button>
-        </div>
-
+        {currentQuestion?.type === "sort" && <QuestionSort />}
       </div>
 
+      {answered && (
+        <div className="mt-4 flex justify-center">
+          <p className="rounded-md bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
+            Answered
+          </p>
+        </div>
+      )}
 
-
-
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={() => handleSubmitAnswer()}
+          className="rounded-md bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+          type="button"
+        >
+          Submit Answer
+        </button>
+      </div>
     </div>
+  </div>
+</div>
+
+   
   )
 }

@@ -206,71 +206,101 @@ export default function HostView({
 
 
     return (
-        <div>
+        <div className="w-full">
+  <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    {currentQuestion?.type === "multipleChoice" && (
+      <QuestionMc
+        choices={currentQuestion.choices.map((c) => c.label)}
+        correctAnswers={currentQuestion.correct}
+        isHost
+      />
+    )}
 
-            <div>
+    {currentQuestion?.type === "freeResponse" && (
+      <QuestionFc answer={currentQuestion.correctText} isHost />
+    )}
+  </div>
 
-                {currentQuestion?.type === "multipleChoice" && (
-                    <QuestionMc choices={currentQuestion.choices.map(c => c.label)} correctAnswers={currentQuestion.correct} isHost />
+  <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <h2 className="text-lg font-semibold text-gray-900 text-center">
+      Players
+    </h2>
 
-
-                )}
-                {currentQuestion?.type === "freeResponse" && (
-                    <QuestionFc answer={currentQuestion.correctText} isHost /> 
-                    
-                )}
-            </div>
-
-            <div className="mt-10">
-                <div>
-                    {players.map(p => (
-                        <div key={p.id} className="flex justify-center gap-2">
-                            <span className="font-mono">{p.name}</span>
-                            <span>{answers[p.id] ? "answered" : "waiting"}</span>
-
-                        </div>
-                    ))}
-                </div>
-                <div className="flex justify-between mt-4">
-                    {hasNextQuestion && (
-                        <button
-                        onClick={handleNextQuestion}
-                        className="m-2"
-                        > Next Question </button>) }
-                    {hasPreviousQuestion && (<button
-                        onClick={handlePreviousQuestion}
-                        className="m-2"
-                        > Previous Question</button>) }
-                    
-                    <button
-                        onClick={handleEndRound}
-                        className="m-2"
-                        >End Round</button>
-
-                </div>
-            </div>
-
-            {isEndRoundModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-bold">Confirm End Round</h3>
-                        <p>Are you sure you want to end the round </p>
-                        <div className="flex justify-between mt-4">
-                             <button onClick={endRound} className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-700">
-                                End Round
-                            </button>
-                            <button onClick={() => setIsEndRoundModalOpen(false)} className="mr-2 px-4 py-2 bg-red-300 rounded-full">
-                                Cancel
-                            </button>
-                           
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-
+    <div className="mt-4 space-y-2">
+      {players.map((p) => (
+        <div
+          key={p.id}
+          className="flex items-center justify-around rounded-md border border-gray-200 bg-gray-50 px-3 py-2"
+        >
+          <span className="font-medium text-gray-900">{p.name}</span>
+          <span className="text-sm text-gray-600">
+            {answers[p.id] ? "answered" : "waiting"}
+          </span>
         </div>
+      ))}
+    </div>
+
+    <div className="mt-6 flex flex-wrap justify-center gap-2">
+      {hasPreviousQuestion && (
+        <button
+          onClick={handlePreviousQuestion}
+          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+          type="button"
+        >
+          Previous
+        </button>
+      )}
+
+      {hasNextQuestion && (
+        <button
+          onClick={handleNextQuestion}
+          className="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
+          type="button"
+        >
+          Next
+        </button>
+      )}
+
+      <button
+        onClick={handleEndRound}
+        className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition"
+        type="button"
+      >
+        End Round
+      </button>
+    </div>
+  </div>
+
+  {isEndRoundModalOpen && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <h3 className="text-lg font-bold text-gray-900">Confirm end round</h3>
+        <p className="mt-2 text-sm text-gray-700">
+          Are you sure you want to end the round?
+        </p>
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            onClick={() => setIsEndRoundModalOpen(false)}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
+            type="button"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={endRound}
+            className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+            type="button"
+          >
+            End Round
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
 
     )
 

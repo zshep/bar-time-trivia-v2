@@ -119,46 +119,56 @@ export default function CreateTriviaSession() {
 
 
     return (
-        <div className="flex flex-col w-full mt-6">
-            <h1>Create Trivia Session!</h1>
-            <div className="self-center mt-3">
-                <div className="flex flex-col">
+       <div className="w-full">
+  <div className="mx-auto w-full max-w-md px-4 py-6">
+    {/* Header */}
+    <div className="flex flex-col items-center text-center gap-2">
+      <h1 className="text-2xl font-bold text-gray-900">
+        Create Trivia Session
+      </h1>
+      <p className="text-sm text-gray-600">
+        Choose a trivia game to start a live session.
+      </p>
+    </div>
 
-                    <label htmlFor="game">Select a Game</label>
-                    <select
-                        value={selectedGameId}
-                        name="game"
-                        className="self-center text-center"
-                        required
-                        onChange={(e) => setSelectedGameId(e.target.value)}
-                    >
-                        <option
-                            disabled value=""
-                        >-- Choose Game --</option>
-                        {
-                            games.map((game) => (
+    {/* Card */}
+    <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-col gap-4">
+        <label
+          htmlFor="game"
+          className="text-sm font-semibold text-gray-700"
+        >
+          Select a game
+        </label>
 
-                                <option
-                                    key={game.id}
-                                    value={game.id}
-                                >{game.name}
+        <select
+          value={selectedGameId}
+          name="game"
+          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+          required
+          onChange={(e) => setSelectedGameId(e.target.value)}
+        >
+          <option disabled value="">
+            -- Choose Game --
+          </option>
 
+          {games.map((game) => (
+            <option key={game.id} value={game.id}>
+              {game.name}
+            </option>
+          ))}
+        </select>
 
-                                </option>
+        <button
+          className="mt-4 inline-flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
+          onClick={handleBtnClick}
+        >
+          Create Session
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-                            ))
-                        }
-
-
-                    </select>
-
-                </div>
-                <button
-                    className="mt-3 w-24 bg-green-400 text-white"
-                    onClick={handleBtnClick}>Create Session</button>
-
-
-            </div>
-        </div>
     )
 }
