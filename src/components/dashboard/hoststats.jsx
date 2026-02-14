@@ -71,7 +71,7 @@ export default function HostStats({ userId, userName }) {
   return (
     <div className="p-4 mt-2 border rounded-lg shadow-sm bg-gray-50">
       <h2 className="text-xl font-bold text-center mb-4">
-        {userName}'s Host Stats
+        {userName}&apos;s Host Stats
       </h2>
 
       {loading && <p className="text-gray-500 italic">Loading...</p>}

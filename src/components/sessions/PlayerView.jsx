@@ -3,6 +3,7 @@ import QuestionFc from "./questionFc";
 import { useState, useEffect } from "react";
 import socket from "../../main";
 import { useNavigate } from "react-router-dom";
+import QuestionSort from "./questionsort";
 
 export default function PlayerView({
   sessionCode,

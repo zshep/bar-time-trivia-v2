@@ -5,7 +5,7 @@ export default function NotFound() {
 
         <div>
             <div>
-                <h2>Whooops! That didn't work!</h2>
+                <h2>Whooops! That didn&apos;t work!</h2>
             </div>
             <div>
                 <img

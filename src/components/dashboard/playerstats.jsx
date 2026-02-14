@@ -27,12 +27,12 @@ export default function Playerstats({ userId, userName }) {
     if (!stats) {
         return (
             <div className="p-4 border rounded shadow bg-gray-50 w-full">
-                <h2 className="text-xl font-bold text-center mb-4">{userName}'s Stats</h2>
+                <h2 className="text-xl font-bold text-center mb-4">{userName}&apos;s Stats</h2>
                 <p className="text-gray-500 italic">No stats yet — play your first game!</p>
             </div>
         );
     }
-    console.log("Player stats:", stats);
+    //console.log("Player stats:", stats);
 
 
     // ---- computed values ----
@@ -51,7 +51,7 @@ export default function Playerstats({ userId, userName }) {
 
     return (
         <div className="p-4 border rounded-lg shadow-sm bg-gray-50 w-full">
-            <h2 className="text-xl font-bold text-center mb-4">{userName}'s Stats</h2>
+            <h2 className="text-xl font-bold text-center mb-4">{userName}&apos;s Stats</h2>
 
             <div className="grid grid-cols-2 gap-4">
 
