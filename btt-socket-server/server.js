@@ -6,10 +6,14 @@ import { markDisconnected } from './socket/sessionStore.js';
 
 const app = express();
 const server = createServer(app);
+const allowedOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -49,6 +53,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3001, () => {
-  console.log('Socket.io server running on port 3001');
-});
+const PORT = process.env.PORT || 3001;
+
+server.listen(PORT, () => 
+  console.log(`Socket.io server running on port ${PORT}`));
