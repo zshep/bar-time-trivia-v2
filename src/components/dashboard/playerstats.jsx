@@ -50,8 +50,8 @@ export default function Playerstats({ userId, userName }) {
     
 
     return (
-        <div className="p-4 border rounded-lg shadow-sm bg-gray-50 w-full">
-            <h2 className="text-xl font-bold text-center mb-4">{userName}&apos;s Stats</h2>
+        <div className="p-4 border rounded-lg shadow-sm bg-gray-50 text-gray-900 w-full">
+            <h2 className="text-xl font-bold text-center mb-4 text-gray-900">{userName}&apos;s Stats</h2>
 
             <div className="grid grid-cols-2 gap-4">
 
@@ -95,9 +95,9 @@ export default function Playerstats({ userId, userName }) {
 
 function StatBlock({ label, value }) {
     return (
-        <div className="flex flex-col items-center p-3 bg-gray-100 rounded-lg shadow-sm">
+        <div className="flex flex-col items-center p-3 bg-gray-100 rounded-lg shadow-sm text-gray-900">
             <span className="text-sm text-gray-600">{label}</span>
-            <span className="text-lg font-semibold">{value}</span>
+            <span className="text-lg font-semibold text-gray-900">{value}</span>
         </div>
     );
 

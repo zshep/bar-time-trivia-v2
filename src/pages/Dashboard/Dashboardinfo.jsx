@@ -26,7 +26,7 @@ export default function DashboardInfo() {
             setUser(u);
             setUsername(u.displayName || data.displayName || "User");
           } else {
-            setUsername(user.displayName || "User");
+            setUsername(u.displayName || "User");
             console.log("user data:", userDoc);
           }
         } catch (error) {
