@@ -6,7 +6,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRouter from './components/AppRouter.jsx'; 
 
-const socket = io('http://localhost:3001'); // backend server
+const socketUrl = import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
+const socket = io(socketUrl, { transports: ["websocket"] });
+
 
 socket.on('connect', () => {
     console.log('connected to socket server:', socket.id);
