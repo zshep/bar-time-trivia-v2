@@ -7,7 +7,7 @@ import { markDisconnected } from './socket/sessionStore.js';
 const app = express();
 const server = createServer(app);
 const allowedOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-
+app.get("/", (_req, res) => res.send("ok"));
 
 const io = new Server(server, {
   cors: {
