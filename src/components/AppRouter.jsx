@@ -1,5 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from "react";
+import { socket } from "../utils/socket";
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
 import DashboardPage from '../pages/Dashboard/DashboardPage';  
@@ -24,6 +26,20 @@ import EndGame from '../pages/Session/EndGamePage';
 
 
 function AppRouter() {
+  
+  // socket connection
+  useEffect(() => {
+  const onConnect = () => console.log("connected to socket server:", socket.id);
+  socket.on("connect", onConnect);
+
+  if (!socket.connected) socket.connect();
+
+  return () => {
+    socket.off("connect", onConnect);
+    socket.disconnect();
+  };
+}, []);
+
   return (         
     <Router>
       <div className='min-h-screen flex flex-col w-full'>
