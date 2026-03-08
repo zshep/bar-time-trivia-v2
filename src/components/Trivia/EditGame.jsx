@@ -1,22 +1,16 @@
-//import game and round cards
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import RoundList from "./RoundList";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function EditGame() {
-  const [rounds, setRounds] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
-  const game = location.state?.game || {}; // grabbing passed game
+  const game = location.state?.game || null;
 
-  //console.log("Editing game:", game);
-  //console.log(game.name);
-
-  // double checking if game data is available
   useEffect(() => {
     if (!game) {
-      console.error("no game Data found, redirecting...");
-      navigate("/dashbaord"); // redirect if no game data
+      console.error("No game data found, redirecting...");
+      navigate("/dashboard");
     }
   }, [game, navigate]);
 
@@ -25,7 +19,6 @@ export default function EditGame() {
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-4xl px-4 py-6">
-        {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Edit Game</h1>
@@ -43,7 +36,6 @@ export default function EditGame() {
           </button>
         </div>
 
-        {/* Game info card */}
         <div className="mt-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -66,7 +58,6 @@ export default function EditGame() {
           </div>
         </div>
 
-        {/* Rounds */}
         <div className="mt-6">
           <h2 className="text-lg font-semibold text-gray-900">Rounds</h2>
           <p className="mt-1 text-sm text-gray-600">
@@ -74,7 +65,7 @@ export default function EditGame() {
           </p>
 
           <div className="mt-4">
-            <RoundList rounds={rounds} setRounds={setRounds} game={game} />
+            <RoundList game={game} />
           </div>
         </div>
       </div>

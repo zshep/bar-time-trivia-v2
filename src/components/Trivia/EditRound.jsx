@@ -14,13 +14,14 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { db } from "../../../app/server/api/firebase/firebaseConfig";
+import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
 export default function EditRound() {
   //grabing state variabel passed from RoundCard
   const location = useLocation();
   const round = location.state?.roundData;
-  const roundId = round.id;
+  const game = location.state?.game;
+  const roundId = round?.id;
   const navigate = useNavigate();
 
   const [questionsState, setQuestionsState] = useState([]); // list of all questions
@@ -34,15 +35,25 @@ export default function EditRound() {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState("");
 
-  console.log("Round Data: ", round);
-  //console.log("Round Id:", roundId);
+  //missing round/game data guard
+  useEffect(() => {
+    if (!round || !game) {
+      console.error("Missing round or game data.");
+      navigate("/dashboard/viewgamePage");
+      return;
+    }
+
+    getQuestionData();
+  }, [roundId, game, navigate]);
 
   //grab question data from firestore
   const getQuestionData = async () => {
+    const user = auth.currentUser;
     const questionInfo = collection(db, "questions");
     const q = query(
       questionInfo,
       where("roundId", "==", roundId),
+      where("user_id", "==", user.uid),
       orderBy("questionNumber", "asc"),
     );
     const snapshot = await getDocs(q);
@@ -134,7 +145,7 @@ export default function EditRound() {
       <div className="mx-auto w-full max-w-4xl px-4 py-6">
         {/* Header */}
         <div className="flex flex-col gap-4  sm:justify-between ">
-          <div className="flex flex-col justify-self-center"> 
+          <div className="flex flex-col justify-self-center">
             <h1 className="text-2xl font-bold text-gray-900">
               Round: {round?.roundCategory || "Untitled"}
             </h1>
@@ -147,7 +158,7 @@ export default function EditRound() {
               className="inline-flex w-fit items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition"
               onClick={() =>
                 navigate("/dashboard/edit-game", {
-                  state: { gameId: round?.gameId, game: round?.game },
+                  state: { game },
                 })
               }
               type="button"

@@ -3,7 +3,6 @@ import Roundcard from "./Roundcard";
 import {
   deleteDoc,
   doc,
-  getFirestore,
   collection,
   query,
   where,
@@ -13,168 +12,180 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { db } from "../../../app/server/api/firebase/firebaseConfig";
+import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 
-export default function RoundList({ game, rounds, setRounds }) {
-  const [roundsState, setRoundsState] = useState([]); // State for rounds data
-  const [roundCategory, setRoundCategory] = useState(null);
-  const [selectedGame, setSelectedGame] = useState(null);
+export default function RoundList({ game }) {
+  const [roundsState, setRoundsState] = useState([]);
+  const [roundCategory, setRoundCategory] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [selectedRound, setSelectedRound] = useState(null);
 
-  const gameId = game.id;
+  const gameId = game?.id;
 
   const getRoundData = async () => {
-    const roundsInfo = collection(db, "rounds");
-    const q = query(
-      roundsInfo,
-      where("gameId", "==", gameId),
-      orderBy("roundNumber", "asc"),
-    );
-    const snapshot = await getDocs(q);
+    if (!gameId) return;
 
-    const roundList = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    console.log("List of Rounds", roundList);
+    try {
+      const user = auth.currentUser;
 
-    setRoundsState(roundList);
+      if (!user) {
+        console.error("No authenticated user found.");
+        return;
+      }
+
+      const roundsInfo = collection(db, "rounds");
+      const q = query(
+        roundsInfo,
+        where("gameId", "==", gameId),
+        where("user_id", "==", user.uid),
+        orderBy("roundNumber", "asc"),
+      );
+
+      const snapshot = await getDocs(q);
+
+      const roundList = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+
+      console.log("List of Rounds", roundList);
+      setRoundsState(roundList);
+    } catch (err) {
+      console.error("Error getting rounds:", err);
+    }
   };
 
-  //getRoundData();
-
-  //grabbing round data from user.
   useEffect(() => {
     if (gameId) {
-      getRoundData(gameId);
+      getRoundData();
     }
   }, [gameId]);
 
-  // function to grab current number of rounds for game
   const getRoundCount = async (gameId) => {
-    //console.log("counting rounds for gameid: ", gameId);
-    const roundsInfo = collection(db, "rounds");
-    const q = query(roundsInfo, where("gameId", "==", gameId));
-
-    const snapshot = await getDocs(q);
-
-    //converting Firestore docs to an array of game objects
-
-    //console.log("total number of Rounds:", snapshot.size)
-
-    return snapshot.size;
+    try {
+      const user = auth.currentUser;
+      const roundsInfo = collection(db, "rounds");
+      const q = query(
+        roundsInfo,
+        where("gameId", "==", gameId),
+        where("user_id", "==", user.uid),
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.size;
+    } catch (err) {
+      console.error("Error getting round count:", err);
+      return 0;
+    }
   };
 
-  // open modal to add Round Category
   const chooseCategory = () => {
     setRoundCategory("");
-    console.log("Choose the category for the round");
     setIsModalOpen(true);
   };
 
-  // Function to add a new round (example)
   const addRound = async (gameId, category) => {
     try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.error("No authenticated user found.");
+        return;
+      }
+
+      const trimmedCategory = category.trim();
+
+      if (!trimmedCategory) {
+        console.error("Round category is required.");
+        return;
+      }
+
       setIsModalOpen(false);
       console.log("starting to add round");
-      //getting number of rounds for game
+
       const roundCount = await getRoundCount(gameId);
 
       const newRound = {
         gameId: gameId,
+        user_id: user.uid,
         roundNumber: roundCount + 1,
-        roundCategory: category,
+        roundCategory: trimmedCategory,
         numberQuestions: 0,
         createdAt: new Date(),
       };
-      //adding doc to firestore
+
       const roundRef = await addDoc(collection(db, "rounds"), newRound);
       console.log("New round added", roundRef.id);
 
-      // updating game's count
       const gameRef = doc(db, "games", gameId);
       await updateDoc(gameRef, {
         numberRounds: increment(1),
       });
 
-      // re-fetching data:
-
       await getRoundData();
 
       return roundRef;
     } catch (err) {
-      console.log("Error adding Rounds", err);
+      console.log("Error adding rounds", err);
     }
   };
 
   const confirmDeleteRound = (round) => {
-    console.log("You are going to delete this round: ", round);
+    console.log("You are going to delete this round:", round);
     setSelectedRound(round);
     setDeleteOpen(true);
   };
 
-  //delete round
   const deleteRound = async () => {
-    console.log(
-      "we're going to delete YOU Round!!",
-      selectedRound.roundCategory,
-    );
+    if (!selectedRound) return;
+
+    console.log("Deleting round:", selectedRound.roundCategory);
 
     try {
       const roundRef = doc(db, "rounds", selectedRound.id);
       await deleteDoc(roundRef);
 
-      //optimistically removing round
-      setRoundsState((prevRound) =>
-        prevRound.filter((roundsState) => roundsState.id !== selectedGame),
+      setRoundsState((prevRounds) =>
+        prevRounds.filter((round) => round.id !== selectedRound.id),
       );
 
-      console.log("Round Delete Successfully");
+      console.log("Round deleted successfully");
       setDeleteOpen(false);
 
-      // updating game's count
       const gameRef = doc(db, "games", gameId);
       await updateDoc(gameRef, {
         numberRounds: increment(-1),
       });
 
-      // re-fetching data:
-
       await getRoundData();
     } catch (err) {
-      console.error("Error Deleting Round:", err);
+      console.error("Error deleting round:", err);
     }
   };
 
   return (
     <div className="w-full">
-      {/* Header row */}
       <div className="flex flex-col items-center justify-between">
-      
-
         <button
           type="button"
-          onClick={() => chooseCategory()}
+          onClick={chooseCategory}
           className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition"
         >
           Add Round
         </button>
       </div>
 
-      {/* List */}
       <div className="mt-4 space-y-3">
         {roundsState.map((round, index) => (
           <Roundcard
             key={round.id || index}
             roundData={round}
+            game={game}
             confirmDeleteRound={confirmDeleteRound}
           />
         ))}
       </div>
 
-      {/* Add Round Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
@@ -221,7 +232,6 @@ export default function RoundList({ game, rounds, setRounds }) {
         </div>
       )}
 
-      {/* Delete Modal */}
       {isDeleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
