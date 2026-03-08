@@ -1,8 +1,23 @@
-# React + Vite
+# Bar Time Trivia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+## Local Development Setup
+1. Install pnpm
+corepack enable
+corepack prepare pnpm@latest --activate
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+2. Install dependencies
+pnpm install
+
+3. Create server environment file
+btt-socket-server/.env
+
+CLIENT_ORIGINS=http://localhost:5173
+PORT=3001
+FIREBASE_SERVICE_ACCOUNT_PATH=./serviceAccountKey.json
+
+4. Place Firebase Admin key at
+btt-socket-server/serviceAccountKey.json
+
+5. Start development
+pnpm run dev
