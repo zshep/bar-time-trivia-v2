@@ -1,6 +1,6 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import socket from "../../main";
+import socket from "../../utils/socket";
 
 export default function EndRound() {
   const navigate = useNavigate();

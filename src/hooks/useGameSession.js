@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import socket from "../main";
+import socket from "../utils/socket";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../app/server/api/firebase/firebaseConfig";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";

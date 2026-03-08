@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../app/server/api/firebase/firebaseConfig";
-import socket from "../../main";
+import socket from "../../utils/socket";
 
 export default function JoinTriviaSession() {
 

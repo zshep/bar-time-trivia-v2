@@ -1,17 +1,22 @@
-import admin from 'firebase-admin';
-
+import "dotenv/config";
+import admin from "firebase-admin";
+import fs from "fs";
 
 function initFirebaseAdmin() {
   if (admin.apps.length) return admin;
 
-  const json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (!json) {
+  let serviceAccount;
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_PATH) {
+    const json = fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf8");
+    serviceAccount = JSON.parse(json);
+  } else {
     throw new Error(
-      "Missing FIREBASE_SERVICE_ACCOUNT_JSON env var (Firebase Admin credentials)."
+      "Missing Firebase Admin credentials. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH."
     );
   }
-
-  const serviceAccount = JSON.parse(json);
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

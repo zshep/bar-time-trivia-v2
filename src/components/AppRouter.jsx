@@ -1,7 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from "react";
-import { socket } from "../utils/socket";
+import  socket from "../utils/socket";
 import Home from '../pages/Home'; 
 import Signup from '../pages/signup';  
 import DashboardPage from '../pages/Dashboard/DashboardPage';  

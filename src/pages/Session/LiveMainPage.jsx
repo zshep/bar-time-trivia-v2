@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import {useLocation, useParams } from "react-router-dom";
-import socket from "../../main";
-import { safeEmit } from "../../utils/safeEmit";
+import { useLocation}  from "react-router-dom";
+import socket from "../../utils/socket";
 import { useReconnect } from "../../hooks/useReconnect";
-import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
-import { orderBy, getDocs, collection, query, where } from "firebase/firestore";
 import { useGameSession } from "../../hooks/useGameSession";
 import PlayerView from "../../components/sessions/PlayerView";
 import HostView from "../../components/sessions/HostView";

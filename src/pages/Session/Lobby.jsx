@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import socket from "../../main";
+import socket from "../../utils/socket";
 import { db, auth } from "../../../app/server/api/firebase/firebaseConfig";
 import {
   getDoc,

@@ -1,4 +1,4 @@
-import socket from "../main";
+import socket from "./socket";
 
 export function safeEmit(event, payload) {
     if (!payload?.sessionCode) {

@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+.env
+.env.local
+btt-socket-server/.env
+btt-socket-server/serviceAccountKey.json
+
 # Editor directories and files
 serviceAccountKey.json
 .vscode/*

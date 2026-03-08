@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import socket from "../../main";
+import socket from "../../utils/socket";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toCSV } from "../../utils/csv";
 

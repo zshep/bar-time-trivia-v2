@@ -2,7 +2,7 @@ import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
-import socket from "../../main";
+import socket from "../../utils/socket";
 
 
 

@@ -1,6 +1,6 @@
 import { auth, db } from "../../../app/server/api/firebase/firebaseConfig"
 import { useEffect, useState } from "react";
-import socket from "../../main";
+import socket from "../../utils/socket";
 import { deleteDoc, doc, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 

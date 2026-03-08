@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import socket from "../main";
+import socket from "../utils/socket";
 
 
 export function useReconnect() {
