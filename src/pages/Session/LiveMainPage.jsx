@@ -53,7 +53,7 @@ export default function LiveMainPage() {
   
 
 
-  console.log("session:", session);
+  //console.log("session:", session);
   //console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
   //reconnect hook
   useReconnect();
@@ -81,7 +81,7 @@ export default function LiveMainPage() {
   // protecting with conditional rendering
   if (!sessionCode || !meta.hostId || session.loading) {
 
-    console.log(`gameId: ${meta.gameId} sessionCode: ${sessionCode} hostId: ${meta.hostId} session.loading: ${session.loading}`)
+    //console.log(`gameId: ${meta.gameId} sessionCode: ${sessionCode} hostId: ${meta.hostId} session.loading: ${session.loading}`)
     
 
     return (
