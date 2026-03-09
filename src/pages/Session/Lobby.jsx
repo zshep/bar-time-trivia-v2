@@ -62,10 +62,12 @@ export default function Lobby() {
 
     const fetchRounds = async () => {
       try {
+        const user = auth.currentUser;
         const col = collection(db, "rounds");
         const q = query(
           col,
           where("gameId", "==", gameId),
+          where("user_id", "==", user.uid),
           orderBy("roundNumber", "asc"),
         );
         const snap = await getDocs(q);
