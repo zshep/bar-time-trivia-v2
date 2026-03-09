@@ -94,7 +94,7 @@ export default function EditRound() {
     };
 
     navigate("/dashboard/questionpage", {
-      state: { questionData },
+      state: { questionData, game },
     });
   };
 

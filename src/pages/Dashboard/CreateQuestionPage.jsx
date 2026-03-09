@@ -17,6 +17,7 @@ export default function CreateQuestionPage() {
   const navigate = useNavigate();
 
   const questionData = location.state?.questionData;
+  const game = location.state?.game;
 
   const roundId = questionData?.roundData?.id;
   const questionType = questionData?.questionType;
@@ -91,7 +92,7 @@ export default function CreateQuestionPage() {
       });
 
       navigate("/dashboard/edit-round", {
-        state: { roundData: questionData.roundData },
+        state: { roundData: questionData.roundData, game },
       });
     } catch (err) {
       console.log("Error adding question", err);
