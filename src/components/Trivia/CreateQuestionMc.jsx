@@ -2,8 +2,8 @@ import { useEffect, useState } from "react"
 
 export default function CreateQuestionMc({ answers, setAnswers, choices, setChoices }) {
 
-    console.log(answers);
-    console.log(choices);
+    //console.log(answers);
+    //console.log(choices);
 
     //updates array in parent's whenever user types
     const handleChoiceChange = (index, newValue) => {
@@ -32,7 +32,7 @@ export default function CreateQuestionMc({ answers, setAnswers, choices, setChoi
     <div className="mb-4">
       <p className="text-lg font-semibold text-gray-900">Answer Choices</p>
       <p className="mt-1 text-sm text-gray-600">
-        The game will randomize answer choices. Check all correct answers.
+        Check all correct answers.
       </p>
     </div>
 

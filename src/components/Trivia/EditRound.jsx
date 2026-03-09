@@ -19,8 +19,8 @@ import { auth, db } from "../../../app/server/api/firebase/firebaseConfig";
 export default function EditRound() {
   //grabing state variabel passed from RoundCard
   const location = useLocation();
-  const round = location.state?.roundData;
-  const game = location.state?.game;
+  const round = location.state?.roundData || null;
+  const game = location.state?.game || null;
   const roundId = round?.id;
   const navigate = useNavigate();
 
@@ -104,6 +104,7 @@ export default function EditRound() {
       state: {
         questionData,
         roundData: round,
+        game,
       },
     });
   };

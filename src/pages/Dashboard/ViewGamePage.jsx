@@ -27,7 +27,7 @@ export default function ViewGamePage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        console.log("User Authenticated: ", user);
+        //console.log("User Authenticated: ", user);
 
         setUserId(user.uid);
         setUsername(user.displayName);
@@ -47,7 +47,7 @@ export default function ViewGamePage() {
 
           // adding game info to games variabel
           setGames(gameList);
-          console.log("games: ", gameList);
+          //console.log("games: ", gameList);
         } catch (err) {
           console.log("Error with grabbing games", err);
         }
