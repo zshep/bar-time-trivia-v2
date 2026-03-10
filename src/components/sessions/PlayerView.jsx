@@ -86,6 +86,7 @@ export default function PlayerView({
   useEffect(() => {
     setAnswered(false);
     setPlayerFrAnswer("");
+    setSelectedIndexes([]);
   }, [currentQuestion]);
 
 
