@@ -66,6 +66,7 @@ export default function LiveMainPage() {
     }
     else {
       console.log("You have a session");
+      console.log("Question Type:", session.questionType );
     }
   }, [session])
 

@@ -190,6 +190,8 @@ export function registerSocketHandlers(io, socket) {
         if (!session) return;
         if (session.hostSocketId !== socket.id) return;
 
+        console.log("QuestionObject:", question);
+
         const newQuestion = {
             gameName: question.gameName,
             id: question.id,
@@ -197,7 +199,8 @@ export function registerSocketHandlers(io, socket) {
             text: question.text,
             number: question.number,
             roundId: question.roundId,
-            roundNumber: question.roundNumber
+            roundNumber: question.roundNumber,
+            choices: question.choices || null
         }
 
         //setting current question
