@@ -163,7 +163,7 @@ export function useGameSession({
   useEffect(() => {
     if (!currentQuestion || !userId || userId !== hostId) return;
 
-    console.log("Host emitting question to players...", currentQuestion);
+    //console.log("Host emitting question to players...", currentQuestion);
     socket.emit("send-question", {
       sessionCode,
       question: { ...currentQuestion, roundNumber: currentRoundNumber },

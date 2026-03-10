@@ -190,10 +190,20 @@ export function registerSocketHandlers(io, socket) {
         if (!session) return;
         if (session.hostSocketId !== socket.id) return;
 
+        const newQuestion = {
+            gameName: question.gameName,
+            id: question.id,
+            type: question.type,
+            text: question.text,
+            number: question.number,
+            roundId: question.roundId,
+            roundNumber: question.roundNumber
+        }
+
         //setting current question
         //console.log("server storing question", question);
         setCurrentQuestion(sessionCode, question);
-        io.to(sessionCode).emit('new-question', question);
+        io.to(sessionCode).emit('new-question', newQuestion);
     });
 
     // reconnecting player
