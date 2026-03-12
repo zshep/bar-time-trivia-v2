@@ -1,14 +1,303 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      // Allow authenticated users to read/write their own document
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    // -----------------
+    // helpers
+    // -----------------
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Allow authenticated users to query the `users` collection
-    match /users/{userId=**} {
-      allow read: if request.auth != null;
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUsername(username) {
+      return username is string
+        && username.size() >= 3
+        && username.size() <= 20
+        && username.matches('^[a-zA-Z0-9_]+$');
+    }
+
+    function isValidUserCreateData() {
+      return request.resource.data.keys().hasOnly([
+        "username",
+        "usernameLower",
+        "email",
+        "gamesCreated",
+        "sessionsPlayed",
+        "stats"
+      ])
+      && isValidUsername(request.resource.data.username)
+      && request.resource.data.usernameLower is string
+      && request.resource.data.usernameLower == request.resource.data.username.lower()
+      && request.resource.data.usernameLower.matches('^[a-z0-9_]{3,20}$')
+      && request.resource.data.email is string
+      && request.resource.data.email == request.auth.token.email
+      && request.resource.data.gamesCreated is int
+      && request.resource.data.gamesCreated == 0
+      && request.resource.data.sessionsPlayed is int
+      && request.resource.data.sessionsPlayed == 0
+      && request.resource.data.stats is map;
+    }
+
+    function isValidUserUpdateData() {
+      return request.resource.data.keys().hasOnly([
+        "username",
+        "usernameLower",
+        "email",
+        "gamesCreated",
+        "sessionsPlayed",
+        "stats"
+      ])
+      && isValidUsername(request.resource.data.username)
+      && request.resource.data.usernameLower is string
+      && request.resource.data.usernameLower == resource.data.usernameLower
+      && request.resource.data.email is string
+      && request.resource.data.email == resource.data.email
+      && request.resource.data.gamesCreated is int
+      && request.resource.data.gamesCreated >= resource.data.gamesCreated
+      && request.resource.data.sessionsPlayed is int
+      && request.resource.data.sessionsPlayed >= resource.data.sessionsPlayed
+      && request.resource.data.stats is map;
+    }
+
+    // -----------------
+    // users
+    // -----------------
+    match /users/{userId} {
+      allow create: if isOwner(userId) && isValidUserCreateData();
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && isValidUserUpdateData();
+      allow delete: if isOwner(userId);
+    }
+
+    // -----------------
+    // usernames
+    // -----------------
+    match /usernames/{username} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(["uid"])
+        && request.resource.data.uid == request.auth.uid
+        && username.matches('^[a-z0-9_]{3,20}$')
+        && !exists(/databases/$(database)/documents/usernames/$(username));
+
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // -----------------
+    // games
+    // owner-only
+    // -----------------
+    match /games/{gameId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          "createdAt",
+          "description",
+          "name",
+          "numberRounds",
+          "user_id"
+        ])
+        && request.resource.data.user_id == request.auth.uid
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.description is string
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.numberRounds is int
+        && request.resource.data.numberRounds >= 0
+        && request.resource.data.numberRounds <= 20;
+
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          "createdAt",
+          "description",
+          "name",
+          "numberRounds",
+          "user_id"
+        ])
+        && request.resource.data.user_id == resource.data.user_id
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.description is string
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.numberRounds is int
+        && request.resource.data.numberRounds >= 1
+        && request.resource.data.numberRounds <= 20;
+
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // -----------------
+    // rounds
+    // creator-owned for now
+    // -----------------
+    match /rounds/{roundId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          "createdAt",
+          "gameId",
+          "numberQuestions",
+          "roundCategory",
+          "roundNumber",
+          "user_id"
+        ])
+        && request.resource.data.user_id == request.auth.uid
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.gameId is string
+        && request.resource.data.numberQuestions is int
+        && request.resource.data.numberQuestions >= 0
+        && request.resource.data.numberQuestions <= 100
+        && request.resource.data.roundCategory is string
+        && request.resource.data.roundCategory.size() > 0
+        && request.resource.data.roundNumber is int
+        && request.resource.data.roundNumber >= 1
+        && request.resource.data.roundNumber <= 20;
+
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          "createdAt",
+          "gameId",
+          "numberQuestions",
+          "roundCategory",
+          "roundNumber",
+          "user_id"
+        ])
+        && request.resource.data.user_id == resource.data.user_id
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.gameId == resource.data.gameId
+        && request.resource.data.numberQuestions is int
+        && request.resource.data.numberQuestions >= 0
+        && request.resource.data.numberQuestions <= 100
+        && request.resource.data.roundCategory is string
+        && request.resource.data.roundCategory.size() > 0
+        && request.resource.data.roundNumber is int
+        && request.resource.data.roundNumber >= 1
+        && request.resource.data.roundNumber <= 20;
+
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+    // -----------------
+    // questions
+    // creator-owned for now
+    // -----------------
+    match /questions/{questionId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          "answer",
+          "points",
+          "question",
+          "questionNumber",
+          "questionType",
+          "roundId",
+          "user_id"
+        ])
+        && request.resource.data.user_id == request.auth.uid
+        && (
+          (request.resource.data.questionType == "freeResponse"
+            && request.resource.data.answer is string
+            && request.resource.data.answer.size() > 0)
+          ||
+          (request.resource.data.questionType == "multipleChoice"
+            && request.resource.data.answer is map)
+          ||
+          (request.resource.data.questionType == "sort"
+            && request.resource.data.answer is map)
+        )
+        && request.resource.data.points is int
+        && request.resource.data.points >= 0
+        && request.resource.data.points <= 100
+        && request.resource.data.question is string
+        && request.resource.data.question.size() > 0
+        && request.resource.data.questionNumber is int
+        && request.resource.data.questionNumber >= 0
+        && request.resource.data.questionNumber <= 100
+        && request.resource.data.questionType is string
+        && request.resource.data.roundId is string;
+
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          "answer",
+          "points",
+          "question",
+          "questionNumber",
+          "questionType",
+          "roundId",
+          "user_id"
+        ])
+        && request.resource.data.user_id == resource.data.user_id
+        && request.resource.data.roundId == resource.data.roundId
+        && (
+          (request.resource.data.questionType == "freeResponse"
+            && request.resource.data.answer is string
+            && request.resource.data.answer.size() > 0)
+          ||
+          (request.resource.data.questionType == "multipleChoice"
+            && request.resource.data.answer is map)
+          ||
+          (request.resource.data.questionType == "sort"
+            && request.resource.data.answer is map)
+        )
+        && request.resource.data.points is int
+        && request.resource.data.points >= 0
+        && request.resource.data.points <= 100
+        && request.resource.data.question is string
+        && request.resource.data.question.size() > 0
+        && request.resource.data.questionNumber is int
+        && request.resource.data.questionNumber >= 0
+        && request.resource.data.questionNumber <= 100
+        && request.resource.data.questionType is string;
+
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // -----------------
+    // sessions
+    // host-only
+    // supports current mixed hostId / host_id schema
+    // -----------------
+    match /sessions/{sessionId} {
+      allow read: if signedIn()
+        && (
+          (resource.data.hostId is string && resource.data.hostId == request.auth.uid) ||
+          (resource.data.host_id is string && resource.data.host_id == request.auth.uid)
+        );
+
+      allow create: if signedIn()
+        && (
+          (request.resource.data.hostId is string && request.resource.data.hostId == request.auth.uid) ||
+          (request.resource.data.host_id is string && request.resource.data.host_id == request.auth.uid)
+        );
+
+      allow update: if signedIn()
+        && (
+          (resource.data.hostId is string && resource.data.hostId == request.auth.uid) ||
+          (resource.data.host_id is string && resource.data.host_id == request.auth.uid)
+        )
+        && (
+          !("hostId" in request.resource.data) || request.resource.data.hostId == resource.data.hostId
+        )
+        && (
+          !("host_id" in request.resource.data) || request.resource.data.host_id == resource.data.host_id
+        );
+
+      allow delete: if signedIn()
+        && (
+          (resource.data.hostId is string && resource.data.hostId == request.auth.uid) ||
+          (resource.data.host_id is string && resource.data.host_id == request.auth.uid)
+        );
     }
   }
 }
