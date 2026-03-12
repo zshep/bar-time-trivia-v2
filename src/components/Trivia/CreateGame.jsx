@@ -57,18 +57,24 @@ export default function CreateGame({ onGameDataChange}) {
     <div className="justify-items-center">
       <h1>Create a Trivia Game</h1>
       <p>You have created {gameCount} games.</p>
-      <div className="flex flex-col w-1/2 justify-items-center">
+      <div className="flex flex-col w-full justify-items-center">
         <label htmlFor="gameName">Trivia Game Name</label>
         <input 
           id="gameName" 
           type="text" 
           value={gameName} 
           onChange={(e) => setGameName(e.target.value)} required
-          autoComplete="off" 
+          autoComplete="off"
+          className="border border-black w-1/2 self-center" 
           />
 
         <label htmlFor="gameDescription">Description</label>
-        <textarea id="gameDescription" value={description} onChange={(e) => setDescription(e.target.value)} required />
+        <textarea 
+          id="gameDescription" 
+          value={description} 
+          onChange={(e) => setDescription(e.target.value)} 
+          required
+          className="border border-black w-1/2 self-center" />
       </div>
 
       

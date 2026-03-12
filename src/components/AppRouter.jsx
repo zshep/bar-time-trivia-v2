@@ -44,7 +44,7 @@ function AppRouter() {
     <Router>
       <div className='min-h-screen flex flex-col w-full'>
       <Headbanner />
-        <main className="flex-1 w-full p-1 ">
+        <main className="flex-1 w-full">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />

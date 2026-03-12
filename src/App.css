@@ -1,17 +1,9 @@
 #root {
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  padding: 0rem;
-  text-align: center;
-  margin: 0px;
-  padding: 0rem;
-  align-items: center;
-  font-family: "Atma", system-ui;
-  height: 100%;
   min-height: 100vh;
-  max-height: 200vh;
-  
+  margin: 0;
+  font-family: "Atma", system-ui;
+  text-align: center;
 }
 
 .logo {

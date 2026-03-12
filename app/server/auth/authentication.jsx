@@ -64,7 +64,7 @@ return (
 
       <button
         type="submit"
-        className="w-full mt-6 bg-gray-800 text-black py-2 rounded hover:bg-gray-700 transition"
+        className="w-1/2 mt-6 bg-gray-800 text-black py-2 rounded hover:bg-gray-700 transition border border-black"
       >
         Sign In
       </button>
