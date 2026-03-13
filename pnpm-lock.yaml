@@ -9,8 +9,11 @@ importers:
   .:
     dependencies:
       '@firebasegen/default-connector':
-        specifier: file:dataconnect-generated\js\default-connector
+        specifier: file:dataconnect-generated/js/default-connector
         version: file:dataconnect-generated/js/default-connector(firebase@11.0.2)
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -57,9 +60,6 @@ importers:
       concurrently:
         specifier: ^9.1.2
         version: 9.1.2
-      dotenv:
-        specifier: ^17.3.1
-        version: 17.3.1
       eslint:
         specifier: ^9.14.0
         version: 9.14.0(jiti@1.21.6)

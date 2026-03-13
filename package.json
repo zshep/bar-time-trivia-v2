@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "dotenv": "^17.3.1",
-    "@firebasegen/default-connector": "file:dataconnect-generated\\js\\default-connector",
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "express": "^4.21.2",
     "firebase": "^11.0.2",
     "firebase-admin": "^13.2.0",
