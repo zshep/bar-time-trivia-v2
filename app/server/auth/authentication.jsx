@@ -61,6 +61,11 @@ return (
           </p>
         )}
       </div>
+      <div>
+        <p>for Demo:</p>
+        <p>email: demo@bttdemo.com</p>
+        <p>password: demo123</p>
+      </div>
 
       <button
         type="submit"

@@ -16,13 +16,13 @@ export default function PasswordInput({
     return (
         <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
+        
       </label>
       <div className="relative">
         <input
           id={id}
           type={showPassword ? "text" : "password"}
-          className="border px-3 py-2 w-full rounded text-center pr-10"
+          className="border px-3 py-2 w-full rounded text-left pr-10"
           value={value}
           onChange={onChange}
           placeholder={placeholder}
