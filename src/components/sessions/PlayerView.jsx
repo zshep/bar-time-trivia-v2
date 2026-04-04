@@ -1,9 +1,9 @@
 import QuestionMc from "./questionMc";
 import QuestionFc from "./questionFc";
-import { useState, useEffect } from "react";
-import socket from "../../utils/socket";
-import { useNavigate } from "react-router-dom";
 import QuestionSort from "./questionsort";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import socket from "../../utils/socket";
 
 export default function PlayerView({
   sessionCode,

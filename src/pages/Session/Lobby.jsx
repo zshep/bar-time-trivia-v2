@@ -201,7 +201,7 @@ export default function Lobby() {
     };
   }, [joinCode]);
 
-  // ----- Host check -----
+  // ----- User/Host check -----
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUserId(user.uid || "");
