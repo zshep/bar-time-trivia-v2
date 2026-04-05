@@ -22,7 +22,7 @@ import Lobby from '../pages/Session/Lobby';
 import LiveMainPage from '../pages/Session/LiveMainPage';
 import EndRound from './sessions/endRound';
 import EndGame from '../pages/Session/EndGamePage';
-
+import Spectator from '../pages/Spectator';
 
 
 function AppRouter() {
@@ -48,6 +48,7 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/watch" element={<Spectator />} />
 
         {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardPage />} > 

@@ -5,6 +5,8 @@ import { useReconnect } from "../../hooks/useReconnect";
 import { useGameSession } from "../../hooks/useGameSession";
 import PlayerView from "../../components/sessions/PlayerView";
 import HostView from "../../components/sessions/HostView";
+import SpecatorView from "../../components/sessions/SpectatorView";
+
 
 export default function LiveMainPage() {
 
@@ -74,7 +76,7 @@ export default function LiveMainPage() {
   const isHost = session.userId === session.hostId;
   console.log("isHost??", isHost);
 
-  // determining who is the presenter
+  // determining who is the presenter TODO: FIX TO FIND unanimous players
   const isPresenter = Boolean(
     new URLSearchParams(window.location.search).get("presenter")
   );
@@ -124,6 +126,7 @@ export default function LiveMainPage() {
     <div className="mt-6">
       {isHost && <HostView {...session} />}
       {!isHost && <PlayerView {...session} />}
+      
     </div>
   </div>
 </div>
