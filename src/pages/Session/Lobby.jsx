@@ -157,6 +157,7 @@ export default function Lobby() {
       //deteremining if host or player
       const user = auth.currentUser;
       const isHostUser = user?.uid === hostId;
+      const spectator = user?.uid === "watcher1";
 
       if (gameStarted && !isHostUser) {
         console.log(
