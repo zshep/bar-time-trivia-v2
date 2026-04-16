@@ -8,6 +8,7 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameName,
     gameId,
     players: [],
+    watchers: [],
     currentRound: null, //round number
     currentRoundId: null,
     currentRoundName: null,

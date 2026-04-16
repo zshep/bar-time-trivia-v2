@@ -3,15 +3,16 @@ import QuestionMc from "./questionMc";
 import QuestionSort from "./questionsort";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import socket from "../../utils/socket"
+import socket from "../../utils/socket";
 
 
 export default function SpecatorView ({
     sessionCode,
-    curentQuestion,
+    currentQuestion,
     questionType
 }) {
 
+  const labels = (currentQuestion?.choices || []).map(c => c.label);
   const currentQuestionId = currentQuestion?.id || "no-ID";
   const navigate = useNavigate();
 
@@ -41,13 +42,12 @@ export default function SpecatorView ({
                 {currentQuestion?.type === "multipleChoice" && (
                   <QuestionMc
                     choices={labels}
-                    selectedIndexes={selectedIndexes}
-                    setSelectedIndexes={setSelectedIndexes}
+                   
                   />
                 )}
         
                 {currentQuestion?.type === "freeResponse" && (
-                  <QuestionFc setAnswer={setPlayerFrAnswer} playerAnswer={playerFrAnswer} />
+                  <QuestionFc />
                 )}
         
                 {currentQuestion?.type === "sort" && <QuestionSort />}
