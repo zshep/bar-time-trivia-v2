@@ -63,13 +63,11 @@ export default function Spectator() {
   const handleSubmitJoinCode = (event) => {
     event.preventDefault();
     console.log("submiting Join Code: ", joinCode);
-    console.log("player: ", userName);
 
     //emiting to socket
     socket.emit("request-session-info", { sessionCode: joinCode });
-    socket.emit("join-session", {
+    socket.emit("join-session-spectator", {
       sessionCode: joinCode,
-      playerName: userName,
       userId,
     });
   };

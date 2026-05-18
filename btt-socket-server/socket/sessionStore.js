@@ -8,7 +8,7 @@ export function createSession(sessionCode, hostId, hostName, gameName, gameId, h
     gameName,
     gameId,
     players: [],
-    watchers: [],
+    spectators: [],
     currentRound: null, //round number
     currentRoundId: null,
     currentRoundName: null,
@@ -41,6 +41,13 @@ export function addPlayerToSession(sessionCode, player) {
 
   session.players.push(player);
 
+}
+
+export function addSpectatorToSession(sessionCode, user) {
+  const session = sessions.get(sessionCode);
+  if (!session) return;
+
+  session.spectators.push(user);
 }
 
 export function findSessionBySocketId(socketId) {

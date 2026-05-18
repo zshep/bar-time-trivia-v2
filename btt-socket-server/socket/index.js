@@ -6,6 +6,7 @@ import {
   startGame,
   nextQuestion,
   addOrAttachPlayer,
+  addSpectatorToSession,
   setHostSocket,
   setCurrentQuestion,
   getCurrentQuestionIndex,
@@ -47,62 +48,64 @@ export function registerSocketHandlers(io, socket) {
       return;
     }
 
-    //grabbing spectators
-    if (userId == "watcher1") {
-      console.log("This is a spectator");
+    const player = addOrAttachPlayer(sessionCode, {
+      socketId: socket.id,
+      userId,
+      name: playerName,
+    });
 
-      socket.join(sessionCode);
-      console.log(
-        `Spectator with userId: ${userId} joined session ${sessionCode}`,
-      );
-
-      io.to(sessionCode).emit("joined-successfully", {
-        sessionCode,
-        gameName: session.gameName,
-        hostId: session.hostId,
-        hostName: session.hostName,
-      });
+    if (!player) {
+      socket.emit("join-error", { message: "Could not add player" });
       return;
-
-      //adding in players who are not spectators
-    } else {
-      const player = addOrAttachPlayer(sessionCode, {
-        socketId: socket.id,
-        userId,
-        name: playerName,
-      });
-
-      if (!player) {
-        socket.emit("join-error", { message: "Could not add player" });
-        return;
-      }
-
-      socket.join(sessionCode);
-      console.log(
-        `${playerName} with userId: ${userId} joined session ${sessionCode}`,
-      );
-
-      //sync for late joiner
-      if (session.currentQuestion) {
-        socket.emit("new-question", session.currentQuestion);
-      }
-
-      const safePlayers = session.players.map((p) => ({
-        id: p.id,
-        userId: p.userId,
-        name: p.name,
-        connected: p.connected,
-      }));
-
-      io.to(sessionCode).emit("player-list-update", { players: safePlayers });
-      io.to(sessionCode).emit("joined-successfully", {
-        sessionCode,
-        gameName: session.gameName,
-        hostId: session.hostId,
-        hostName: session.hostName,
-        players: safePlayers,
-      });
     }
+
+    socket.join(sessionCode);
+    console.log(
+      `${playerName} with userId: ${userId} joined session ${sessionCode}`,
+    );
+
+    //sync for late joiner
+    if (session.currentQuestion) {
+      socket.emit("new-question", session.currentQuestion);
+    }
+
+    const safePlayers = session.players.map((p) => ({
+      id: p.id,
+      userId: p.userId,
+      name: p.name,
+      connected: p.connected,
+    }));
+
+    io.to(sessionCode).emit("player-list-update", { players: safePlayers });
+    io.to(sessionCode).emit("joined-successfully", {
+      sessionCode,
+      gameName: session.gameName,
+      hostId: session.hostId,
+      hostName: session.hostName,
+      players: safePlayers,
+    });
+  });
+
+  //Spectator joins a session
+  socket.on("join-session-spectator", ({ sessionCode, userId }) => {
+    const session = getSession(sessionCode);
+    if (!session) return;
+
+    console.log("This is a spectator", userId);
+
+    const spectator = addSpectatorToSession(sessionCode)
+
+    socket.join(sessionCode);
+    console.log(
+      `Spectator with userId: ${userId} joined session ${sessionCode}`,
+    );
+
+    io.to(sessionCode).emit("joined-successfully", {
+      sessionCode,
+      gameName: session.gameName,
+      hostId: session.hostId,
+      hostName: session.hostName,
+    });
   });
 
   socket.on("request-player-list", ({ sessionCode }) => {
