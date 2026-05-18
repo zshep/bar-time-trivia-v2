@@ -43,11 +43,43 @@ export function addPlayerToSession(sessionCode, player) {
 
 }
 
+// simple add spectator to session
 export function addSpectatorToSession(sessionCode, user) {
   const session = sessions.get(sessionCode);
-  if (!session) return;
+  if (!session) return null;
 
   session.spectators.push(user);
+}
+
+// more robus adding/ reattaching spectator
+export function addOrAttachSpectator(sessionCode, {socketId, userId}) {
+  const session = sessions.get(sessionCode);
+  if (!session) return null;
+
+  let spectator = userId
+    ? session.spectators.find( s => s.userId === userId)
+    : session.spectators.find(s => s.id === socketId)
+
+    // first time conneciton
+  if (!spectator) {
+    const spectatorKey = userId || socketId
+
+    spectator = {
+      id: socketId,
+      spectatorKey,
+      userId,
+      connected: true
+    };
+
+    session.spectators.push(spectator)
+  } else {
+    //reconnect
+
+    //reset timer?
+    spectator.id = socketId
+    spectator.connected = true
+
+  }
 }
 
 export function findSessionBySocketId(socketId) {
@@ -70,6 +102,7 @@ export function findSessionByUserId(userId) {
   }
   return null;
 }
+
 
 //handle reconnect of dropped player
 export function addOrAttachPlayer(sessionCode, { socketId, userId, name }) {
@@ -101,7 +134,6 @@ export function addOrAttachPlayer(sessionCode, { socketId, userId, name }) {
       };
     
       session.players.push(player);
-
   }
 
   if (!player.playerKey) {
@@ -109,6 +141,8 @@ export function addOrAttachPlayer(sessionCode, { socketId, userId, name }) {
   }
   return player;
 }
+
+
 
 // removing player
 export function removePlayerFromSession(sessionCode, socketId) {

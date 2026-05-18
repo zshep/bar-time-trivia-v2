@@ -12,6 +12,7 @@ import {
   getCurrentQuestionIndex,
   setRoundData,
   nextRound,
+  addOrAttachSpectator,
 } from "./sessionStore.js";
 import { saveGameResult } from "../firestore/saveGameResult.js";
 import { adminDb } from "./firebaseAdmin.js";
@@ -93,7 +94,15 @@ export function registerSocketHandlers(io, socket) {
 
     console.log("This is a spectator", userId);
 
-    const spectator = addSpectatorToSession(sessionCode)
+    const spectator = addOrAttachSpectator(sessionCode, {
+      socketId: socket.id, 
+      userId
+    })
+
+    if (!spectator) {
+      socket.emit("join-error", { message: "Could not add spectator" });
+      return;
+    }
 
     socket.join(sessionCode);
     console.log(
