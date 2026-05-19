@@ -56,11 +56,14 @@ export function addOrAttachSpectator(sessionCode, {socketId, userId}) {
   const session = sessions.get(sessionCode);
   if (!session) return null;
 
+  
+
   let spectator = userId
     ? session.spectators.find( s => s.userId === userId)
     : session.spectators.find(s => s.id === socketId)
 
     // first time conneciton
+    
   if (!spectator) {
     const spectatorKey = userId || socketId
 
@@ -80,18 +83,25 @@ export function addOrAttachSpectator(sessionCode, {socketId, userId}) {
     spectator.connected = true
 
   }
+  console.log("adding a new spectator", spectator)
+
+  return spectator
 }
 
 export function findSessionBySocketId(socketId) {
   for (const [sessionCode, session] of sessions.entries()) {
+    const spectator = session.spectators.find(s => s.id === socketId)
     const player = session.players.find(p => p.id === socketId);
     if (player) {
       return { sessionCode, session, player };
     }
+    if (spectator) {
+      return { sessionCode, session, spectator };
+    }
     if (session.hostSocketId === socketId) return { sessionCode, session, player: null, isHost: true }
   }
 
-  console.log("session and or player not found");
+  console.log("session, spectator or player not found");
   return null; //not found
 }
 

@@ -32,6 +32,7 @@ export default function Spectator() {
       localStorage.setItem("sessionCode", sessionCode);
       if (userId) localStorage.setItem("userId", userId);
       localStorage.setItem("isHost", "false");
+      localStorage.setItem("isSpectator", "true");
 
       navigate(`/session/lobby/${sessionCode}`, {
         state: {

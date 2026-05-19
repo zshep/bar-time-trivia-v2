@@ -314,6 +314,32 @@ export function registerSocketHandlers(io, socket) {
     io.to(sessionCode).emit("host-status", { connected: true });
   });
 
+  //reconnect specator
+  socket.on("reconnect-spectator", ({ sessionCode, userId}) => {
+    const session = getSession(sessionCode);
+    if (!session) {
+      socket.emit("reconnect-failed", { reason: "Cannot find Session" });
+      return;
+    }
+
+    const spectator = addOrAttachSpectator(sessionCode, {
+      socketId: socket.id,
+      userId,
+    });
+
+    if (!spectator) {
+      socket.emit("reconnect-failed", { reason: "spectator-not-found" });
+      return;
+    }
+
+    socket.join(sessionCode);
+
+    if (session.currentQuestion)
+      socket.emit("new-question", session.currentQuestion);
+    
+
+  })
+
   //finalizing results from host
   socket.on("results-finalized", ({ finalRoundData }) => {
     const { sessionCode } = finalRoundData || {};

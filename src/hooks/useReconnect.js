@@ -1,28 +1,31 @@
 import { useEffect } from "react";
 import socket from "../utils/socket";
 
-
 export function useReconnect() {
-    useEffect(() => {
-        const sessionCode = localStorage.getItem("sessionCode");
-        const userId = localStorage.getItem("userId");
-        const isHost = localStorage.getItem("isHost") === "true";
+  useEffect(() => {
+    const sessionCode = localStorage.getItem("sessionCode");
+    const userId = localStorage.getItem("userId");
+    const isHost = localStorage.getItem("isHost") === "true";
+    const isSpectator = localStorage.getItem("isSpectator");
 
-        
-        if (!sessionCode || !userId) return;
-        
-        //only try once per page load
-        if (window.__BTT_HAS_RECONNECTED) return;
-        window.__BTT_HAS_RECONNECTED = true;
+    if (!sessionCode || !userId) return;
 
-        console.log(`Attempting to reconnect for session ${sessionCode} for userId ${userId} and isHost is ${isHost}`);
+    //only try once per page load
+    if (window.__BTT_HAS_RECONNECTED) return;
+    window.__BTT_HAS_RECONNECTED = true;
 
-        if (isHost) {
-            socket.emit("reconnect-host", { sessionCode, userId });
-        } else {
-            console.log("the player is attempting to reconnect");
-            socket.emit("reconnect-player", { sessionCode, userId });
-        }
-    
-    },[])
+    console.log(
+      `Attempting to reconnect for session ${sessionCode} for userId ${userId} and isHost is ${isHost}`,
+    );
+
+    if (isHost) {
+      socket.emit("reconnect-host", { sessionCode, userId });
+    } else if (isSpectator) {
+      console.log("spectator attempting to recnnect");
+      socket.emit("reconnect-specator", { sessionCode, userId });
+    } else {
+      console.log("the player is attempting to reconnect");
+      socket.emit("reconnect-player", { sessionCode, userId });
+    }
+  }, []);
 }
