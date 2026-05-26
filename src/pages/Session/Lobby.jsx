@@ -30,7 +30,7 @@ export default function Lobby() {
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountDown] = useState(3);
   const [userId, setUserId] = useState("");
-
+  const [isSpectator, setIsSpectator] = useState(state.isSpectator ?? false);
   // ----- Ref to prevent session spam -----
   const sessionInfoRequestedRef = useRef(false);
   useReconnect();
@@ -117,7 +117,7 @@ export default function Lobby() {
         if (gameName && gameId && joinCode && hostId) {
           console.log("Navigating to live session.");
           navigate(`/session/live/${joinCode}`, {
-            state: { gameName, gameId, sessionCode: joinCode, hostId },
+            state: { gameName, gameId, sessionCode: joinCode, hostId, isSpectator },
           });
         } else {
           console.warn("Missing session data at end of countdown.");
@@ -159,7 +159,7 @@ export default function Lobby() {
       const isHostUser = user?.uid === hostId;
       const spectator = user?.uid === "watcher1";
 
-      if (gameStarted && !isHostUser) {
+      if (gameStarted && !isHostUser && !isSpectator) {
         console.log(
           "Game has already started and I'm a player — navigating now.",
         );
@@ -172,6 +172,17 @@ export default function Lobby() {
           },
         });
         console.log("player navigating to live game");
+      } else if (gameStarted && isSpectator) {
+        console.log("game has started and I'm a spectator");
+        navigate(`/session/live/${joinCode}`, {
+          state: {
+            gameName,
+            gameId,
+            sessionCode: joinCode,
+            hostId,
+            isSpectator
+          }
+        })
       }
     };
 
@@ -231,6 +242,7 @@ export default function Lobby() {
     localStorage.setItem("sessionCode", joinCode);
     localStorage.setItem("userId", userId);
     localStorage.setItem("isHost", isHost);
+    localStorage.setItem("isSpectator", isSpectator);
   }, [joinCode, userId, isHost]);
 
   return (

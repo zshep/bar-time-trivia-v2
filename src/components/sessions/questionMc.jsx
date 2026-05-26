@@ -2,7 +2,8 @@ export default function QuestionMc({
     choices=[], 
     selectedIndexes = [], 
     setSelectedIndexes, 
-    isHost = false, 
+    isHost = false,
+    isSpectator = false, 
     correctAnswers = [] 
 }) {
 
@@ -22,7 +23,7 @@ export default function QuestionMc({
   <div className="mx-auto w-full max-w-2xl">
     <div className="text-center">
       <p className="text-lg font-semibold text-gray-900">Answer Choices</p>
-      {!isHost && (
+      {!isHost && !isSpectator && (
         <p className="mt-1 text-sm text-gray-600">
           Select all answers that are correct.
         </p>
@@ -39,7 +40,7 @@ export default function QuestionMc({
             {choice || "—"}
           </p>
 
-          {!isHost && (
+          {!isHost && !isSpectator && (
             <input
               className="h-5 w-5 accent-gray-900"
               type="checkbox"

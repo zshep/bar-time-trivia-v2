@@ -5,18 +5,21 @@ export default function QuestionFc({
   setAnswer,
   playerAnswer,
   isHost = false,
+  isSpectator = false,
 }) {
   const [answered, setAnswered] = useState(false);
 
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-md">
-        {isHost ? (
+        {isHost && (
           <p className="text-sm text-gray-700">
             <span className="font-semibold text-gray-900">Correct answer:</span>{" "}
             {answer}
           </p>
-        ) : (
+        )} 
+        {!isHost && !isSpectator && (
+          
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
             name="FrQuestion"
@@ -27,6 +30,7 @@ export default function QuestionFc({
             autoComplete="off"
           />
         )}
+        
       </div>
     </div>
   );

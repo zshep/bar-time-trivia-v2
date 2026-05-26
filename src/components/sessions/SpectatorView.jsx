@@ -42,12 +42,12 @@ export default function SpecatorView ({
                 {currentQuestion?.type === "multipleChoice" && (
                   <QuestionMc
                     choices={labels}
-                   
+                    isSpectator = {true}
                   />
                 )}
         
                 {currentQuestion?.type === "freeResponse" && (
-                  <QuestionFc />
+                  <QuestionFc isSpectator = {true} />
                 )}
         
                 {currentQuestion?.type === "sort" && <QuestionSort />}

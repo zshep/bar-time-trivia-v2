@@ -9,6 +9,7 @@ export default function Spectator() {
   const [gameName, setGameName] = useState("Unknown Game");
   const [hostId, setHostId] = useState("uknown host");
   const [hostName, setHostName] = useState("Unknown");
+  const [isSpectator, setIsSpectator] = useState(true);
   const navigate = useNavigate();
 
   // handling socket calls for entering Join Code
@@ -40,6 +41,7 @@ export default function Spectator() {
           gameName,
           hostId,
           hostName: hostName,
+          isSpectator,
         },
       });
     };

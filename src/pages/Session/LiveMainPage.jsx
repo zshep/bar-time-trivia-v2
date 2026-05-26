@@ -12,7 +12,8 @@ export default function LiveMainPage() {
 
   const { state } = useLocation();
   const sessionCode = state?.sessionCode;
-  
+  const isSpectator = state?.isSpectator || false;
+
   //grabing game info if there
   const [meta, setMeta] = useState({
     gameName: state?.gameName,
@@ -57,6 +58,7 @@ export default function LiveMainPage() {
 
   //console.log("session:", session);
   //console.log(`gameId: ${gameId} sessionCode: ${sessionCode} hostId: ${hostId}`)
+  
   //reconnect hook
   useReconnect();
 
@@ -75,6 +77,7 @@ export default function LiveMainPage() {
   //finding host
   const isHost = session.userId === session.hostId;
   console.log("isHost??", isHost);
+  console.log("isSpectator??", isSpectator);
 
   // determining who is the presenter TODO: FIX TO FIND unanimous players
   const isPresenter = Boolean(
@@ -125,7 +128,8 @@ export default function LiveMainPage() {
     {/* View */}
     <div className="mt-6">
       {isHost && <HostView {...session} />}
-      {!isHost && <PlayerView {...session} />}
+      {!isHost && !isSpectator && <PlayerView {...session} />}
+      {!isHost && isSpectator && <SpecatorView {...session} />}
       
     </div>
   </div>
