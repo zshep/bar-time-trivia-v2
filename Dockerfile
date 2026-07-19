@@ -24,6 +24,9 @@ RUN --mount=type=cache,target=/root/.npm \
 # Create a stage for installing production dependecies.
 FROM base as deps
 
+# Copy local file dependencies FIRST (before pnpm install)
+COPY dataconnect-generated ./dataconnect-generated
+
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.local/share/pnpm/store to speed up subsequent builds.
 # Leverage bind mounts to package.json and pnpm-lock.yaml to avoid having to copy them
@@ -36,6 +39,9 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 ################################################################################
 # Create a stage for building the application.
 FROM deps as build
+
+# Copy local file dependencies
+COPY dataconnect-generated ./dataconnect-generated
 
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
@@ -54,7 +60,6 @@ RUN pnpm run build
 # where the necessary files are copied from the build stage.
 FROM base as final
 
-# Use production node environment by default.
 ENV NODE_ENV production
 
 # Run the application as a non-root user.
@@ -63,14 +68,23 @@ USER node
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
 
+# Copy Firebase credentials
+COPY btt-socket-server/serviceAccountKey.json .
+
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/. ./.
 
+# Fix ownership of copied files (must be before USER node, so add as root)
+USER root
+RUN chown -R node:node /usr/src/app
+USER node
 
 # Expose the port that the application listens on.
 EXPOSE 3001
 
 # Run the application.
 CMD pnpm run dev
+
+
