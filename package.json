@@ -1,7 +1,7 @@
 {
   "name": "bar-time-trivia-v2",
   "engines" : {
-    "node": ">-22.23.4 <25.0.0"
+    "node": ">22.23.4 <25.0.0"
   },
   "private": true,
   "version": "0.0.0",
